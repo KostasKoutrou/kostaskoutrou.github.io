@@ -1,5 +1,7 @@
-Here you can say lots of fun things about your site.
+Welcome to my blog!
 
-Maybe say a some things about yourself.
+Here you will find posts about cybersecurity, including Microsoft Security, Open Source Security etc.
 
-Or maybe what you plan to blog about.
+This is a new project, so updates will be pushed frequently.
+
+Please, enjoy!
