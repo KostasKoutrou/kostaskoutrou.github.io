@@ -47,8 +47,8 @@ CFA is a measure that mostly protects against attacks related to ransomware.
 
 Device Control enables controls related to usage and installation of peripheral (USB/Bluetooth) or other devices with endpoints. Common scenarios include:
 - Control access to USB devices
--   Configure device installation restrictions
--   Control access to removable media
+  - Configure device installation restrictions
+  - Control access to removable media
 - BitLocker control: Block usage of removable media if BitLocker is disabled
 - Control access to printers
 - Bluetooth services control: Allowing advertising, discovery, preparing prompting
