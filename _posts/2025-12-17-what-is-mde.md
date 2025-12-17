@@ -80,3 +80,21 @@ Exploit Protection provides the following protection measures:
 1. Validate stack integrity (StackPivot)
 1. Hardware-enforced stack protection
 
+#### .5 Web and Network Protection
+
+##### .5.1 Web Protection
+
+Web Protection in MDE includes the following capabilities:
+1. Custom Indicators: When defined in MDE portal, with the Web Protection feature enabled, the endpoints are blocked when accessing the Blocked Indicators (URLs/IPs).
+2. Web Threat Protection: It stops access to phishing, malicious, untrusted, or low-reputation sites.
+3. Web Content Filtering (WCF): This provides the ability to block access of websites based on categories (e.g., gambling, torrenting, cloud storage, etc.).
+
+##### .5.2 Network Protection
+
+Network Protection:
+1. Protects devices by preventing connections to malicious or suspicious sites.
+2. Expands MS Defender SmartScreen to block all outbound HTTP(S) traffic to poor-reputation destinations.
+3. Extends Web Protection, which works only on Microsoft Edge browser, to the OS level.
+4. Is a core component to Web Content Filtering.
+5. Provides visibility and blocking of IoCs when used with EDR. Indicators defined in MDE portal are blocked only if Network Protection is enabled.
+
