@@ -54,3 +54,29 @@ Device Control enables controls related to usage and installation of peripheral 
 - Bluetooth services control: Allowing advertising, discovery, preparing prompting
 
 #### .4 Exploit Protection
+
+Exploit Protection helps protect against malware that uses exploits to infect devices and spread. It consist of many mitigations that can be applied to either the whole OS or individual apps. It protects by default some behaviors which are correlated to exploits, like an app accessing parts of memory which it should be able to. The protection measures vary from simple which can be enabled OS-wide and in audit mode to test, all the way to complex protection which protect only per-application and cannot be turned on audit mode but only be turned on immediately.
+Exploit Protection provides the following protection measures:
+1. Control flow guard (CFG)
+1. Data Execution Prevention (DEP)
+1. Force randomization for images (Mandatory ASLR)
+1. Randomize memory allocations (Bottom-Up ASLR)
+1. Validate exception chains (SEHOP)
+1. Validate heap integrity
+1. Arbitrary code guard (ACG)
+1. Block low integrity images
+1. Block remote images
+1. Block untrusted fonts
+1. Code integrity guard
+1. Disable extension points
+1. Disable Win32k system calls
+1. Don't allow child processes
+1. Export address filtering (EAF)
+1. Import address filtering (IAF)
+1. Simulate execution (SimExec)
+1. Validate API invocation (CallerCheck)
+1. Validate handle usage
+1. Validate image dependency integrity
+1. Validate stack integrity (StackPivot)
+1. Hardware-enforced stack protection
+
