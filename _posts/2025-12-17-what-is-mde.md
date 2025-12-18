@@ -98,3 +98,18 @@ Network Protection:
 4. Is a core component to Web Content Filtering.
 5. Provides visibility and blocking of IoCs when used with EDR. Indicators defined in MDE portal are blocked only if Network Protection is enabled.
 
+### Next-Generation Protection
+
+Under Next-Gen Protection is where most of the more "advanced" protection mechanisms reside to block emerging threats.
+
+#### .1 Microsoft Defender Antivirus (MDAV)
+
+Here is where the famous MDAV lives. With it, process creation events and file download events from the internet are monitored. It not only uses its signature-based engine, but also predictive technologies such as machine learning and cloud-delivered protection to find attacks. If working offline, the latest dynamic intelligence from the Intelligence Security Graph is provision regularyl throughout the day.
+
+#### .2 Cloud Portection and MDAV
+
+To identify new threats dynamically, Next-Gen Protection technologies work with
+1. AI systems which are using machine learning models
+2. Large sets of interconnected data in the Microsoft Intelligent Security Graph.
+
+MDAV works with Microsoft Cloud services, also known as Microsoft Advanced Protection Service (MAPS). 
