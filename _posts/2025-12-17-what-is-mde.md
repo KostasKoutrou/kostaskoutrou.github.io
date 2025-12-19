@@ -112,4 +112,32 @@ To identify new threats dynamically, Next-Gen Protection technologies work with
 1. AI systems which are using machine learning models
 2. Large sets of interconnected data in the Microsoft Intelligent Security Graph.
 
-MDAV works with Microsoft Cloud services, also known as Microsoft Advanced Protection Service (MAPS). 
+MDAV works with Microsoft Cloud services, also known as Microsoft Advanced Protection Service (MAPS). With these, next-gen technologies provide quick identification of new threats. This is done by MDAV uploading samples of metadata or the samples themselves to allow Cloud protection to identify of the samples are malicious.
+
+#### .3 Tamper Protection
+
+When Tamper Protection is enabled on a machine, the following MDAV setting cannot be changed by anyone, not even by applying a new GPO or a setting in Intune:
+
+- Virus and threat protection remains enabled.
+- Real-time protection remains turned on.
+- Behavior monitoring remains turned on.
+- Antivirus protection, including IOfficeAntivirus (IOAV) remains enabled.
+- Cloud protection remains enabled.
+- Security intelligence updates occur.
+- Automatic actions are taken on detected threats.
+- Notifications are visible in the Windows Security app on Windows devices.
+- Archived files are scanned.
+- Exclusions can't be modified or added
+
+#### .4 Block at first sight (BAFS)
+
+BAFS is a simple feature in MDE. When enabled, if a file or executable is never seen before by MDE and it is identified as suspicious, the opening action or the execution of it is blocked until a verdict is received from the cloud-delivered protection.
+
+#### .5 Anti-Malware Scan Interface (AMSI) integration with MDAV
+
+AMSI provides the capability to inspect PowerShell and other scripts, even if there is obfuscation applied on them. MDE utilizes AMSI to protect against fileless malware, dynamic script-based attacks, and other threats of this nature.
+
+#### .6 Other MDAV Components and Technologies
+
+<img width="975" height="401" alt="image" src="https://github.com/user-attachments/assets/05ee9ded-66da-4284-b3e6-07a945c83178" />
+
