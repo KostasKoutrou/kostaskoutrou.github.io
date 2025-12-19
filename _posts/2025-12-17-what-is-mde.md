@@ -137,7 +137,24 @@ BAFS is a simple feature in MDE. When enabled, if a file or executable is never 
 
 AMSI provides the capability to inspect PowerShell and other scripts, even if there is obfuscation applied on them. MDE utilizes AMSI to protect against fileless malware, dynamic script-based attacks, and other threats of this nature.
 
-#### .6 Other MDAV Components and Technologies
+#### .6 MDAV Components and Technologies
+
+MDAV utilizes multiples engines to be able to detect and prevent a wide range of threats and attacker techniques. The following diagram shows the different engines used:
 
 <img width="975" height="401" alt="image" src="https://github.com/user-attachments/assets/05ee9ded-66da-4284-b3e6-07a945c83178" />
+
+As shown above, there is a balance between engines running locally on the client which provide real time protection, and engines being provided via cloud-delivered protection which handle the heavy load when needed. With this graph the necessity of the cloud-delivered protection is also highlighted, as a machine gets a plethora of additional capabilities when it is enabled.
+
+In the following table, the engines are described briefly:
+
+|On the Client|In the Cloud|
+|-|-|
+|ML engine: Lightweight ML engine. It has specialized models for specific file types commonly abused, like PE files, PowerShell, macros, JS, PDF, etc.|Metadata-based ML engine: Specialized ML models analyze a featurized description of suspicious files sent by the client. Stacked ensemble classifiers combine results to make a verdict. You can read more on how it works here: https://www.microsoft.com/security/blog/2019/07/25/new-machine-learning-model-sifts-through-the-good-to-unearth-the-bad-in-evasive-malware/|
+|Behavior monitoring engine: Monitors for potential attacks post-execution. It observes process behaviors, including behavior sequence at runtime, to identify and block activities based on predetermined rules.|Behavior-based ML engine: Suspicious behavior sequences are used to trigger to analyze the process tree behavior using ML models. Monitored attack techniques span the attack chain, like exploits, elevation, persistence, lateral movement, and exfiltration.|
+|Memory scanning engine: Scans memory space used by a running process to expose malicious behavior that could be hiding with code obfuscation.|AMSI-paired ML engine: Client-side and cloud-side pairs analyze scripts behavior pre and post execution to detect threats like fileless and in-memory attacks.|
+|AMSI integration engine: Enables detection of files and in-memory attacks, defeating code obfuscation. This blocks malicious behavior of scripts client-side.|File classification ML engine: Multi-class, deep neural network classifiers examine full file contents. Suspicious files are held from running and submitted to the cloud protection service for classification.|
+|Heuristics engine: Rules identify file characteristics that have similarities with known malicious characteristics to catch new threats or modifications of known ones.|Detonation-based ML engine: Suspicious files are detonated in a sandbox. Deep learning classifiers analyze the observed behavior to block attacks.|
+|Emulation engine: Dynamically unpacks malware and examine how they would behave at runtime. Checks both during runtime and the memory content after, finding malware packers and polymorphic malware.|Reputation ML engine: Reputation sources and models from all Microsoft are queried to block threats linked to malicious/suspicious URLs, domains, emails, and files. Sources include SmartScreen, MDO, and others through the Microsoft Intelligent Security Graph.|
+|Network engine: Network activity is inspected.|Smart rules engine: Smart rules identify threats based on researcher expertise and collective knowledge of threats.|
+|CommandLine Scanning engine: Scans command lines of all processes before they execute.|CommandLine ML engine: ML models scan suspicious command lines in the cloud.|
 
