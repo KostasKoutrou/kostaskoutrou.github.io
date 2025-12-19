@@ -28,7 +28,7 @@ ASR is the first line of defense in the world of MDE. ASR, as its name suggests,
 ASR Rules is one of the protection measures included under ASR. These protect against common malware behaviors and risk application actions. The ASR Rules can be separeted in a few different categories based on what protection they provide, and they are the following:
 
 |Polymorphic threats|Lateral movement & credential theft|Productivity apps rules|Email rules|Script rules|Misc rules|
-|-|-|-|-|-|-|
+|:-:|:-:|:-:|:-:|:-:|:-:|
 |Block executable files from running unless they meet a prevalence (1,000 machines), age, or trusted list criteria|Block process creations originating from PSExec and WMI commands|Block Office apps from creating executable content|Block executable content from email client and webmail|Block execution of potentially obfuscated scripts|Block abuse of exploited vulnerable signed drivers|
 |Block untrusted and unsigned processes that run from USB|Block credential stealing from the Windows local security authority subsystem (lsass.exe)|Block Office apps from creating child processes|Block only Office communication applications from creating child processes|Block JS/VBS from launching downloaded executable content|Block webshell creation for servers|
 |Use advanced protection against ransomware|Block persistence through WMI event subscription|Block Office apps from injecting code into other processes|Block Office communication apps from creating child processes| | |
@@ -148,7 +148,7 @@ As shown above, there is a balance between engines running locally on the client
 In the following table, the engines are described briefly:
 
 |On the Client|In the Cloud|
-|-|-|
+|:-:|:-:|
 |**ML engine**: Lightweight ML engine. It has specialized models for specific file types commonly abused, like PE files, PowerShell, macros, JS, PDF, etc.|**Metadata-based ML engine**: Specialized ML models analyze a featurized description of suspicious files sent by the client. Stacked ensemble classifiers combine results to make a verdict. You can read more on how it works here: https://www.microsoft.com/security/blog/2019/07/25/new-machine-learning-model-sifts-through-the-good-to-unearth-the-bad-in-evasive-malware/|
 |**Behavior monitoring engine**: Monitors for potential attacks post-execution. It observes process behaviors, including behavior sequence at runtime, to identify and block activities based on predetermined rules.|**Behavior-based ML engine**: Suspicious behavior sequences are used to trigger to analyze the process tree behavior using ML models. Monitored attack techniques span the attack chain, like exploits, elevation, persistence, lateral movement, and exfiltration.|
 |**Memory scanning engine**: Scans memory space used by a running process to expose malicious behavior that could be hiding with code obfuscation.|**AMSI-paired ML engine**: Client-side and cloud-side pairs analyze scripts behavior pre and post execution to detect threats like fileless and in-memory attacks.|
