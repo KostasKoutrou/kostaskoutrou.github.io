@@ -215,22 +215,5 @@ MDAV could be operating in different modes, depending on whether there is anothe
  2. Files are _not_ scanned and actions are _not_ taken.
  3. It is recommended to have MDAV in Passive Mode for additional alerting, and if the main AV gets removed for any reason (licensing, uninstall, etc.), then MDAV will switch to Active Mode automatically, to keep protecting the machine.
 
-The following table lists the features that are available depending on the MDAV mode.
-
-|Protection|Active mode|Passive mode|Disabled or uninstalled|
-|-|-|-|-|
-|Real-time protection|Yes|Endpoint DLP has limited functionalities|No|
-|Cloud-delivered protection|Yes|No|No|
-|Network protection|Yes|No|No|
-|Attack surface reduction rules|Yes|No|No|
-|File scanning and detection information|Yes|Yes|No|
-| | |By default, scan schedule is not followed, with some exceptions.| |
-|Threat remediation|Yes|Only alerts. EDR in block mode does block threats.|No|
-|Security intelligence updates|Yes|Yes|No|
-| | |Windows Update settings only. Defender-specific update schedulers are not following.| |
-|Data Loss Prevention|Yes|Yes|No|
-|Controlled folder access|Yes|No|No|
-|Web content filtering|Yes|Only on Edge|No|
-|Device control|Yes|Yes|No|
-|PUA protection|Yes|No|No|
+#### .10 Behavioral blocking and containment
 
