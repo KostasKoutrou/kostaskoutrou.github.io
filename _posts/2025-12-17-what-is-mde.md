@@ -12,6 +12,7 @@
 ## Capabilities, visualized
 
 
+---
 
 ## MDE Threat Protection Stack
 
