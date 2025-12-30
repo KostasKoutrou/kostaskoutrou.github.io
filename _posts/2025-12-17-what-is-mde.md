@@ -1,6 +1,6 @@
 # What is Microsoft Defender for Endpoint, for the Endpoint
 
-Introduction
+## Introduction
 
 ---
 
@@ -9,24 +9,19 @@ Introduction
 * TOC
 {:toc}
 
-## Graph of all measures
+## Capabilities, visualized
+
+
 
 ## MDE Threat Protection Stack
 
 The MDE Threat Protection Stack is essentially all the components that contibute to protecting the endpoints.
 
-### Core Defender Vulnerability Management
-
-With Core Defender Vulnerability Management, the purpose is to identify vulnerabilities and misconfigurations in the endpoints of the tenant. With this information, the following components are enhanced:
-- Endpoint Detection and Response (EDR) insights are provided by correlating with endpoint vulnerabilities.
-- Device vulnerability context is added during investigations.
-- A remediation process is facilitated via Intune or Configuration Manager.
-
-### Attack Surface Reduction (ASR)
+### 1 Attack Surface Reduction (ASR)
 
 ASR is the first line of defense in the world of MDE. ASR, as its name suggests, applies a series of security configurations and protections which aim at minimizing the potential entry points for attackers. This is done by blocking different series of actions which are known to be frequently used by attacks, but rarely used for legitimate purposes.
 
-#### .1 Attack Surface Reduction Rules
+#### 1.1 Attack Surface Reduction Rules
 
 ASR Rules is one of the protection measures included under ASR. These protect against common malware behaviors and risk application actions. The ASR Rules can be separeted in a few different categories based on what protection they provide, and they are the following:
 
@@ -38,7 +33,7 @@ ASR Rules is one of the protection measures included under ASR. These protect ag
 |Block use of copied of impersonated system tools| Block rebooting machine in Safe Mode|Block Adobe Reader from creating child processes| | | |
 |||Block Win32 API calls from office macros||||
 
-#### .2 Controlled Folder Access (CFA)
+#### 1.2 Controlled Folder Access (CFA)
 
 CFA is a measure that mostly protects against attacks related to ransomware.
 1. With CFA essentially you define a set of directories (folders) and a set of applications. Only that set of apps is allowed to process in any way the set of directories.
@@ -46,7 +41,7 @@ CFA is a measure that mostly protects against attacks related to ransomware.
 3. Apps are added to the list automatically when they are highly prevalent in the organization and haven't displayed any behavior deemed malicious.
 4. In the default folder list, the folders Documents, Pictures, Videos, Videos, Music, and Favorites are included.
 
-#### .3 Device Control
+#### 1.3 Device Control
 
 Device Control enables controls related to usage and installation of peripheral (USB/Bluetooth) or other devices with endpoints. Common scenarios include:
 - Control access to USB devices
@@ -56,7 +51,7 @@ Device Control enables controls related to usage and installation of peripheral 
 - Control access to printers
 - Bluetooth services control: Allowing advertising, discovery, preparing prompting
 
-#### .4 Exploit Protection
+#### 1.4 Exploit Protection
 
 Exploit Protection helps protect against malware that uses exploits to infect devices and spread. It consist of many mitigations that can be applied to either the whole OS or individual apps. It protects by default some behaviors which are correlated to exploits, like an app accessing parts of memory which it should be able to. The protection measures vary from simple which can be enabled OS-wide and in audit mode to test, all the way to complex protection which protect only per-application and cannot be turned on audit mode but only be turned on immediately.
 Exploit Protection provides the following protection measures:
@@ -83,16 +78,16 @@ Exploit Protection provides the following protection measures:
 1. Validate stack integrity (StackPivot)
 1. Hardware-enforced stack protection
 
-#### .5 Web and Network Protection
+#### 1.5 Web and Network Protection
 
-##### .5.1 Web Protection
+##### 1.5.1 Web Protection
 
 Web Protection in MDE includes the following capabilities:
 1. Custom Indicators: When defined in MDE portal, with the Web Protection feature enabled, the endpoints are blocked when accessing the Blocked Indicators (URLs/IPs).
 2. Web Threat Protection: It stops access to phishing, malicious, untrusted, or low-reputation sites.
 3. Web Content Filtering (WCF): This provides the ability to block access of websites based on categories (e.g., gambling, torrenting, cloud storage, etc.).
 
-##### .5.2 Network Protection
+##### 1.5.2 Network Protection
 
 Network Protection:
 1. Protects devices by preventing connections to malicious or suspicious sites.
@@ -101,15 +96,15 @@ Network Protection:
 4. Is a core component to Web Content Filtering.
 5. Provides visibility and blocking of IoCs when used with EDR. Indicators defined in MDE portal are blocked only if Network Protection is enabled.
 
-### Next-Generation Protection
+### 2 Next-Generation Protection
 
 Under Next-Gen Protection is where most of the more "advanced" protection mechanisms reside to block emerging threats.
 
-#### .1 Microsoft Defender Antivirus (MDAV)
+#### 2.1 Microsoft Defender Antivirus (MDAV)
 
 Here is where the famous MDAV lives. With it, process creation events and file download events from the internet are monitored. It not only uses its signature-based engine, but also predictive technologies such as machine learning and cloud-delivered protection to find attacks. If working offline, the latest dynamic intelligence from the Intelligence Security Graph is provision regularyl throughout the day.
 
-#### .2 Cloud Portection and MDAV
+#### 2.2 Cloud Portection and MDAV
 
 To identify new threats dynamically, Next-Gen Protection technologies work with
 1. AI systems which are using machine learning models
@@ -117,7 +112,7 @@ To identify new threats dynamically, Next-Gen Protection technologies work with
 
 MDAV works with Microsoft Cloud services, also known as Microsoft Advanced Protection Service (MAPS). With these, next-gen technologies provide quick identification of new threats. This is done by MDAV uploading samples of metadata or the samples themselves to allow Cloud protection to identify of the samples are malicious.
 
-#### .3 Tamper Protection
+#### 2.3 Tamper Protection
 
 When Tamper Protection is enabled on a machine, the following MDAV setting cannot be changed by anyone, not even by applying a new GPO or a setting in Intune:
 
@@ -132,15 +127,15 @@ When Tamper Protection is enabled on a machine, the following MDAV setting canno
 - Archived files are scanned.
 - Exclusions can't be modified or added
 
-#### .4 Block at first sight (BAFS)
+#### 2.4 Block at first sight (BAFS)
 
 BAFS is a simple feature in MDE. When enabled, if a file or executable is never seen before by MDE and it is identified as suspicious, the opening action or the execution of it is blocked until a verdict is received from the cloud-delivered protection.
 
-#### .5 Anti-Malware Scan Interface (AMSI) integration with MDAV
+#### 2.5 Anti-Malware Scan Interface (AMSI) integration with MDAV
 
 AMSI provides the capability to inspect PowerShell and other scripts, even if there is obfuscation applied on them. MDE utilizes AMSI to protect against fileless malware, dynamic script-based attacks, and other threats of this nature.
 
-#### .6 MDAV Components and Technologies
+#### 2.6 MDAV Components and Technologies
 
 MDAV utilizes multiples engines to be able to detect and prevent a wide range of threats and attacker techniques. The following diagram shows the different engines used:
 
@@ -163,7 +158,7 @@ In the following table, the engines are described briefly:
 |**Network engine**: Network activity is inspected.|**Smart rules engine**: Smart rules identify threats based on researcher expertise and collective knowledge of threats.|
 |**CommandLine Scanning engine**: Scans command lines of all processes before they execute.|**CommandLine ML engine**: ML models scan suspicious command lines in the cloud.|
 
-#### .7 Potentially Unwanted Apps (PUA)
+#### 2.7 Potentially Unwanted Apps (PUA)
 
 PUA is a category of software that can:
 
@@ -185,7 +180,7 @@ PUA can:
 
 Both MDAV and SmartScreen provide PUA protection.
 
-#### .8 Scheduled Scans
+#### 2.8 Scheduled Scans
 
 There are three types of scans in MDAV:
 
@@ -195,7 +190,7 @@ There are three types of scans in MDAV:
 
 In most cases, the recommended approach is to execute only one Full Scan per endpoint, and then only run Quick Scans, because them together with Real-Time Protection being enabled covers all files in an endpoint.
 
-#### .9 MDAV Modes
+#### 2.9 MDAV Modes
 
 MDAV could be operating in different modes, depending on whether there is another AV solution installed on the endpoint, or based on the policies and security settings applied on the endpoint:
 
@@ -218,7 +213,7 @@ MDAV could be operating in different modes, depending on whether there is anothe
  2. Files are _not_ scanned and actions are _not_ taken.
  3. It is recommended to have MDAV in Passive Mode for additional alerting, and if the main AV gets removed for any reason (licensing, uninstall, etc.), then MDAV will switch to Active Mode automatically, to keep protecting the machine.
 
-#### .10 Behavioral blocking and containment
+#### 2.10 Behavioral blocking and containment
 
 This is a feature based on AI/ML to target fileless malware, polymorphic threats, and human-operated attacks. It detects attacks based on their behaviors and process trees. This feature utilizes the following:
 
@@ -232,7 +227,7 @@ Components of Behavioral blocking and containment:
 - Client behavioral blocking: As suspicious behaviors are detected on devices by MDAV, artifacts such as files or apps are blocked, checked, and remediated automatically. When suspicious behaviors are detected, MDAV sends them and their process tress to the cloud protection service to determine their maliciousness. If detected, it is blocked on the device.
 - Feedback-loop blocking, AKA Rapid Protection: With it, when a suspicious behavior or file is detection, information about it is sent to multiple classifiers. The rapid protection loop engine inspects and correlated the info with other signals to identify if to block the file. This results in blocking malware on a device, other devices in the org, and devices in other orgs. So there is this community approach where you will get threat intel from other orgs based on detections.
 
-#### .11 UEFI scanning in MDE
+#### 2.11 UEFI scanning in MDE
 
 MDE now has a UEFI scanner. This helps in attempts of attackers compromosing the boot flow to achieve low-level malware behavior that is hard to detect.
 
