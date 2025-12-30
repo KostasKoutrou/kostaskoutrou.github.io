@@ -1,4 +1,4 @@
-# What is Microsoft Defender for Endpoint
+# What is Microsoft Defender for Endpoint, for the Endpoint
 
 Introduction
 
