@@ -162,9 +162,75 @@ In the following table, the engines are described briefly:
 
 #### .7 Potentially Unwanted Apps (PUA)
 
-PUA is a category of software that can
+PUA is a category of software that can:
 
 - Cause the machine to run slowly
 - Display unexpected apps
 - Install other software that might be unwanted
+
+PUA could be:
+
+- Advertising software
+- Bundled software that offers to install additional software not related to the original one, and could be not signed by the same entity as the original one
+- Software that evades detection
+
+PUA can:
+
+- Increase the risk of the endpoints being infected with actual malware
+- Make malware harder to identify
+- Cost time and effort to clean up
+
+Both MDAV and SmartScreen provide PUA protection.
+
+#### .8 Scheduled Scans
+
+There are three types of scans in MDAV:
+
+- Quick Scan: Scan the locations with high probability of having malware registered to start with the system, including registry keys and known Windows startup folders.
+- Full Scan: Start with a Quick Scan, and then scan all mounted fixed disks and removable and network drives. A Full Scan could take a few hours or days to complete.
+- Custom Scan: Scan what is provided in input.
+
+In most cases, the recommended approach is to execute only one Full Scan per endpoint, and then only run Quick Scans, because them together with Real-Time Protection being enabled covers all files in an endpoint.
+
+#### .9 MDAV Modes
+
+MDAV could be operating in different modes, depending on whether there is another AV solution installed on the endpoint, or based on the policies and security settings applied on the endpoint:
+
+- Active Mode:
+ 1. MDAV is the main AV solution on the machine.
+ 2. Files are scanned, and actions are taken, i.e., threats are actively remediated.
+- Passive Mode:
+ 1. MDAV is _not_ the main AV solution on the machine.
+ 2. While files are still scanned, actions are not taken, i.e., threats are not remediated.
+ 3. Updates should still be applied, as they improve alerting and performance(!).
+- Endpoint Detection and Response (EDR) in Block Mode:
+ 1. This is an enhancement to Passive Mode, where actions are taken in malicious artifacts detected by EDR capabilites. Actions are taken on post-breach, behavioral EDR detections, which were not detected by the installed AV solution.
+ 2. Several features are still not available (Active Mode is required):
+  - Real-Time Protection
+  - Network Protection
+  - ASR
+  - Indicators
+- Disabled or Uninstalled:
+ 1. MDAV is _not_ the main AV solution on the machine.
+ 2. Files are _not_ scanned and actions are _not_ taken.
+ 3. It is recommended to have MDAV in Passive Mode for additional alerting, and if the main AV gets removed for any reason (licensing, uninstall, etc.), then MDAV will switch to Active Mode automatically, to keep protecting the machine.
+
+The following table lists the features that are available depending on the MDAV mode.
+
+|Protection|Active mode|Passive mode|Disabled or uninstalled|
+|-|-|-|-|
+|Real-time protection|Yes|Endpoint DLP has limited functionalities|No|
+|Cloud-delivered protection|Yes|No|No|
+|Network protection|Yes|No|No|
+|Attack surface reduction rules|Yes|No|No|
+|File scanning and detection information|Yes|Yes|No|
+| | |By default, scan schedule is not followed, with some exceptions.| |
+|Threat remediation|Yes|Only alerts. EDR in block mode does block threats.|No|
+|Security intelligence updates|Yes|Yes|No|
+| | |Windows Update settings only. Defender-specific update schedulers are not following.| |
+|Data Loss Prevention|Yes|Yes|No|
+|Controlled folder access|Yes|No|No|
+|Web content filtering|Yes|Only on Edge|No|
+|Device control|Yes|Yes|No|
+|PUA protection|Yes|No|No|
 
