@@ -6,6 +6,9 @@ Introduction
 
 ## Contents
 
+* TOC
+{:toc}
+
 ## Graph of all measures
 
 ## MDE Threat Protection Stack
@@ -217,3 +220,26 @@ MDAV could be operating in different modes, depending on whether there is anothe
 
 #### .10 Behavioral blocking and containment
 
+This is a feature based on AI/ML to target fileless malware, polymorphic threats, and human-operated attacks. It detects attacks based on their behaviors and process trees. This feature utilizes the following:
+
+- Next-Gen Protection detects threats by analyzing behaviors.
+- EDR received signals across your network, devices, and kernel behavior, creating alerts and incidents.
+- MDE has visibility in email, data, apps, network, endpoint, and kernel behavior signals received through EDR. MDE correlates these signals, and raises alerts and incidents.
+
+Components of Behavioral blocking and containment:
+
+- ASR Rules prevent predefines common attack behaviors.
+- Client behavioral blocking: As suspicious behaviors are detected on devices by MDAV, artifacts such as files or apps are blocked, checked, and remediated automatically. When suspicious behaviors are detected, MDAV sends them and their process tress to the cloud protection service to determine their maliciousness. If detected, it is blocked on the device.
+- Feedback-loop blocking, AKA Rapid Protection: With it, when a suspicious behavior or file is detection, information about it is sent to multiple classifiers. The rapid protection loop engine inspects and correlated the info with other signals to identify if to block the file. This results in blocking malware on a device, other devices in the org, and devices in other orgs. So there is this community approach where you will get threat intel from other orgs based on detections.
+
+#### .11 UEFI scanning in MDE
+
+MDE now has a UEFI scanner. This helps in attempts of attackers compromosing the boot flow to achieve low-level malware behavior that is hard to detect.
+
+Windows Defender System Guard combats this with hardware-based security features including hypervisor-level attestation and Secure Launch (aka Dynamic Root of Trust (DRTM)).
+
+With the new UEFI scanner, firmware scanning becomes broadly available. It is built-in with MDAV. It gives MDE the ability to scan inside the firmware file system and perform security assessments. It performs dynamic analysis on the firmware it gets from the hardware flash storage. By obtaining the firmware, the scanner is able to parse the firmware, enabling MDE to inspect firmware content at runtime.
+
+#### .12 Early Launch Antimalware (ELAM) and MDAV
+
+ELAM combats early boot threats (e.g., rootkits, or malicious drivers that can hide from detection) by using a driver named Wdboot.sys that starts before other boot-start drivers. ELAM enabled the evaluation of other drivers, and helps the Windows kernel decide whether those drivers should be initialized.
