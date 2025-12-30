@@ -141,8 +141,10 @@ AMSI provides the capability to inspect PowerShell and other scripts, even if th
 
 MDAV utilizes multiples engines to be able to detect and prevent a wide range of threats and attacker techniques. The following diagram shows the different engines used:
 
+<img alt="image" src="https://github.com/user-attachments/assets/05ee9ded-66da-4284-b3e6-07a945c83178" />
+<!--
 <img width="975" height="401" alt="image" src="https://github.com/user-attachments/assets/05ee9ded-66da-4284-b3e6-07a945c83178" />
-
+-->
 As shown above, there is a balance between engines running locally on the client which provide real time protection, and engines being provided via cloud-delivered protection which handle the heavy load when needed. With this graph the necessity of the cloud-delivered protection is also highlighted, as a machine gets a plethora of additional capabilities when it is enabled.
 
 In the following table, the engines are described briefly:
