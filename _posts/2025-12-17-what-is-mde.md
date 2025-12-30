@@ -160,3 +160,11 @@ In the following table, the engines are described briefly:
 |**Network engine**: Network activity is inspected.|**Smart rules engine**: Smart rules identify threats based on researcher expertise and collective knowledge of threats.|
 |**CommandLine Scanning engine**: Scans command lines of all processes before they execute.|**CommandLine ML engine**: ML models scan suspicious command lines in the cloud.|
 
+#### .7 Potentially Unwanted Apps (PUA)
+
+PUA is a category of software that can
+
+- Cause the machine to run slowly
+- Display unexpected apps
+- Install other software that might be unwanted
+
