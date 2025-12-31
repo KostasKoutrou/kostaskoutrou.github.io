@@ -97,7 +97,7 @@ Web Protection in MDE includes the following capabilities:
 
 ##### 1.5.2 Network Protection
 
-Network Protection:
+Network Protection in MDE:
 1. Protects devices by **preventing connections** to malicious or suspicious sites.
 2. **Expands MS Defender SmartScreen** to block all outbound HTTP(S) traffic to poor-reputation destinations.
 3. **Extends Web Protection**, which works only on Microsoft Edge browser, to the OS level.
