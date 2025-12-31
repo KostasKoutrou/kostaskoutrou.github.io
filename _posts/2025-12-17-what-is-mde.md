@@ -8,7 +8,7 @@ In this series about MDE, I will try to gather and simplify all the concepts nee
 
 Many of us have heard "is it Defender?" when a machine is performing poorly. This series is an attempt to have an assistive tool in answering quickly and effectively.
 
-In this Blog post, I will be focusing on what the capabilities of MDE are, when it is running on an endpoint. The capabilities are explained on a high level, without going into many details, just to get an understanding of what each capability does. In the next blogs, I will go into more details of each capability, and what to look for when troubleshooting them.
+In this Blog post, the focus is on what the capabilities of MDE are, when it is running on an endpoint. The capabilities are explained on a high level, without going into many details, just to get an understanding of what each capability does. In the next posts, more details of each capability will be provided, and what to look for when troubleshooting them.
 
 ---
 
@@ -17,14 +17,15 @@ In this Blog post, I will be focusing on what the capabilities of MDE are, when 
 * TOC
 {:toc}
 
-## Capabilities, visualized
-
-
 ---
 
 ## MDE Threat Protection Stack
 
-The MDE Threat Protection Stack is essentially all the components that contibute to protecting the endpoints.
+The MDE Threat Protection Stack is essentially all the components/capabilities that contibute to protecting the endpoints.
+
+### Capabilities, visualized
+
+
 
 ### 1 Attack Surface Reduction (ASR)
 
