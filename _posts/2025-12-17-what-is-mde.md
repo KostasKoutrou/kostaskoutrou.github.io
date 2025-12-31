@@ -10,6 +10,8 @@ Many of us have heard "is it Defender?" when a machine is performing poorly. Thi
 
 In this Blog post, the focus is on what the capabilities of MDE are, when it is running on an endpoint. The capabilities are explained on a high level, without going into many details, just to get an understanding of what each capability does. In the next posts, more details of each capability will be provided, and what to look for when troubleshooting them.
 
+All the information is based on official documentation of Microsoft, which you can find [here](https://learn.microsoft.com/en-us/defender-endpoint/microsoft-defender-endpoint)
+
 ---
 
 ## Contents
