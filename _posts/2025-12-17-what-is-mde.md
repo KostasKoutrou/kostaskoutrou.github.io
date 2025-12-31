@@ -23,13 +23,7 @@ So let's get started.
 
 ---
 
-## MDE Threat Protection Stack
-
-The MDE Threat Protection Stack is essentially all the components/capabilities that contibute to protecting the endpoints.
-
-### Capabilities, visualized
-
-
+## MDE Components and Capabilities
 
 ### 1 Attack Surface Reduction (ASR)
 
