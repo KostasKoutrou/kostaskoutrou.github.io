@@ -188,7 +188,33 @@ In the following table, the engines are described briefly:
 
 Both MDAV and SmartScreen provide PUA protection.
 
-#### 2.8 Scheduled Scans
+#### 2.8 Behavioral blocking and containment
+
+This is a feature based on AI/ML to target fileless malware, polymorphic threats, and human-operated attacks. It detects attacks based on their behaviors and process trees. This feature utilizes the following:
+
+- **Next-Gen Protection** detects threats by analyzing **behaviors**.
+- **EDR** received **signals** across your network, devices, and kernel behavior, creating alerts and incidents.
+- **MDE** has **visibility** in email, data, apps, network, endpoint, and kernel behavior **signals** received through EDR. **MDE correlates these signals**, and raises alerts and incidents.
+
+**Components of Behavioral blocking and containment:**
+
+- **ASR Rules** prevent predefines **common attack behaviors**.
+- **Client behavioral blocking**: As suspicious behaviors are detected on devices by MDAV, artifacts such as files or apps are blocked, checked, and remediated automatically. When suspicious behaviors are detected, MDAV sends them and their process tress to the cloud protection service to determine their maliciousness. If detected, it is blocked on the device.
+- **Feedback-loop blocking**, AKA Rapid Protection: With it, when a suspicious behavior or file is detection, information about it is sent to multiple classifiers. The rapid protection loop engine inspects and correlated the info with other signals to identify if to block the file. This results in blocking malware on a device, other devices in the org, and devices in other orgs. So there is this community approach where you will get threat intel from other orgs based on detections.
+
+#### 2.9 UEFI scanning in MDE
+
+MDE now has a UEFI scanner. This helps in attempts of attackers compromosing the boot flow to achieve low-level malware behavior that is hard to detect.
+
+Windows Defender System Guard combats this with hardware-based security features including hypervisor-level attestation and Secure Launch (aka Dynamic Root of Trust (DRTM)).
+
+**With the new UEFI scanner, firmware scanning becomes broadly available**. It is built-in with MDAV. It gives MDE the ability to scan inside the firmware file system and perform security assessments. It performs dynamic analysis on the firmware it gets from the hardware flash storage. By obtaining the firmware, the scanner is able to parse the firmware, enabling MDE to inspect firmware content at runtime.
+
+#### 2.10 Early Launch Antimalware (ELAM) and MDAV
+
+**ELAM combats early boot threats** (e.g., rootkits, or malicious drivers that can hide from detection) by using a **driver named Wdboot.sys that starts before other boot-start drivers**. ELAM enables the evaluation of other drivers, and helps the Windows kernel decide whether those drivers should be initialized.
+
+### 3 Scheduled Scans
 
 There are three types of scans in MDAV:
 
@@ -198,7 +224,7 @@ There are three types of scans in MDAV:
 
 In most cases, the recommended approach is to execute only one Full Scan per endpoint, and then only run Quick Scans, because them together with Real-Time Protection being enabled covers all files in an endpoint.
 
-#### 2.9 MDAV Modes
+### 4 MDAV Modes
 
 MDAV could be operating in different modes, depending on whether there is another AV solution installed on the endpoint, or based on the policies and security settings applied on the endpoint:
 
@@ -220,32 +246,6 @@ MDAV could be operating in different modes, depending on whether there is anothe
  1. MDAV is **_not_** the main AV solution on the machine.
  2. Files are **_not_** scanned and actions are **_not_** taken.
  3. It is recommended to have MDAV in Passive Mode for additional alerting, and if the main AV gets removed for any reason (licensing, uninstall, etc.), then MDAV will switch to Active Mode automatically, to keep protecting the machine.
-
-#### 2.10 Behavioral blocking and containment
-
-This is a feature based on AI/ML to target fileless malware, polymorphic threats, and human-operated attacks. It detects attacks based on their behaviors and process trees. This feature utilizes the following:
-
-- **Next-Gen Protection** detects threats by analyzing **behaviors**.
-- **EDR** received **signals** across your network, devices, and kernel behavior, creating alerts and incidents.
-- **MDE** has **visibility** in email, data, apps, network, endpoint, and kernel behavior **signals** received through EDR. **MDE correlates these signals**, and raises alerts and incidents.
-
-**Components of Behavioral blocking and containment:**
-
-- **ASR Rules** prevent predefines **common attack behaviors**.
-- **Client behavioral blocking**: As suspicious behaviors are detected on devices by MDAV, artifacts such as files or apps are blocked, checked, and remediated automatically. When suspicious behaviors are detected, MDAV sends them and their process tress to the cloud protection service to determine their maliciousness. If detected, it is blocked on the device.
-- **Feedback-loop blocking**, AKA Rapid Protection: With it, when a suspicious behavior or file is detection, information about it is sent to multiple classifiers. The rapid protection loop engine inspects and correlated the info with other signals to identify if to block the file. This results in blocking malware on a device, other devices in the org, and devices in other orgs. So there is this community approach where you will get threat intel from other orgs based on detections.
-
-#### 2.11 UEFI scanning in MDE
-
-MDE now has a UEFI scanner. This helps in attempts of attackers compromosing the boot flow to achieve low-level malware behavior that is hard to detect.
-
-Windows Defender System Guard combats this with hardware-based security features including hypervisor-level attestation and Secure Launch (aka Dynamic Root of Trust (DRTM)).
-
-**With the new UEFI scanner, firmware scanning becomes broadly available**. It is built-in with MDAV. It gives MDE the ability to scan inside the firmware file system and perform security assessments. It performs dynamic analysis on the firmware it gets from the hardware flash storage. By obtaining the firmware, the scanner is able to parse the firmware, enabling MDE to inspect firmware content at runtime.
-
-#### 2.12 Early Launch Antimalware (ELAM) and MDAV
-
-**ELAM combats early boot threats** (e.g., rootkits, or malicious drivers that can hide from detection) by using a **driver named Wdboot.sys that starts before other boot-start drivers**. ELAM enables the evaluation of other drivers, and helps the Windows kernel decide whether those drivers should be initialized.
 
 ## Conclusion
 
