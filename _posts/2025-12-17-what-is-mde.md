@@ -248,3 +248,9 @@ With the new UEFI scanner, firmware scanning becomes broadly available. It is bu
 #### 2.12 Early Launch Antimalware (ELAM) and MDAV
 
 ELAM combats early boot threats (e.g., rootkits, or malicious drivers that can hide from detection) by using a driver named Wdboot.sys that starts before other boot-start drivers. ELAM enabled the evaluation of other drivers, and helps the Windows kernel decide whether those drivers should be initialized.
+
+## Conclusion
+
+This post got longer that I hoped for, even after cutting quite a bit of details. Hopefully it will help have more spherical knowledge around MDE when it is running on an endpoint.
+
+I hope to see you back in the next posts.
