@@ -2,6 +2,14 @@
 
 ## Introduction
 
+What is MDE, for the Endpoint? I always wondered what is going on on the device after MDE is installed on it and it gets onboarded to MDE. There are so many capabilities that MDE and Defender Antivirus (MDAV) provides, that it is difficult to know what is going on when something is blocked or the performance of the machine is degraded when running a specific process.
+
+In this series about MDE, I will try to gather and simplify all the concepts needed when running MDE on an endpoint. The purpose of the series is to be able to have a better understanding of what exactly is being run on a machine onboarded to MDE, what is being checked/scanned and how, and how to approach a troubleshooting session effectively in case that it is needed.
+
+Many of us have heard "is it Defender?" when a machine is performing poorly. Hopefully this series will be an assistive tool in answering quickly and effectively.
+
+In this Blog post, I will be focusing on what the capabilities of MDE are, when it is running on an endpoint. The capabilities are explained on a high level, without going into many details, just to get an understanding of what each capability does. In the next blogs, I will go into more details of each capability, and what to look for when troubleshooting them.
+
 ---
 
 ## Contents
