@@ -63,7 +63,7 @@ Device Control enables controls related to usage and installation of peripheral 
 
 #### 1.4 Exploit Protection
 
-Exploit Protection helps protect against malware that uses exploits to infect devices and spread. It consist of many mitigations that can be applied to either the whole OS or individual apps. It protects by default some behaviors which are correlated to exploits, like an app accessing parts of memory which it should be able to. The protection measures vary from simple which can be enabled OS-wide and in audit mode to test, all the way to complex protection which protect only per-application and cannot be turned on audit mode but only be turned on immediately.
+Exploit Protection helps protect against malware that uses exploits to infect devices and spread. It consists of many mitigations that can be applied to either the whole OS or individual apps. It protects by default some behaviors which are correlated to exploits, like an app accessing parts of memory which it should be able to. The protection measures vary from simple which can be enabled OS-wide and in audit mode to test, all the way to complex protection which protect only per-application and cannot be turned on audit mode but only be turned on immediately.
 Exploit Protection provides the following protection measures:
 1. Control flow guard (CFG)
 1. Data Execution Prevention (DEP)
