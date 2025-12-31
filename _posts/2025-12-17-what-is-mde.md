@@ -27,11 +27,11 @@ So let's get started.
 
 ### 1 Attack Surface Reduction (ASR)
 
-ASR is the first line of defense in the world of MDE. ASR, as its name suggests, applies a series of security configurations and protections which aim at minimizing the potential entry points for attackers. This is done by blocking different series of actions which are known to be frequently used by attacks, but rarely used for legitimate purposes.
+ASR is the **first line** of defense in the world of MDE. ASR, as its name suggests, applies a series of security configurations and protections which aim at **minimizing the potential entry points for attackers**. This is done by blocking different series of actions which are known to be frequently used by attacks, but rarely used for legitimate purposes.
 
 #### 1.1 Attack Surface Reduction Rules
 
-ASR Rules is one of the protection measures included under ASR. These protect against common malware behaviors and risk application actions. The ASR Rules can be separeted in a few different categories based on what protection they provide, and they are the following:
+ASR Rules is one of the protection measures included under ASR. These **protect against common malware behaviors and risky application actions**. The ASR Rules can be separeted in a few different categories based on what protection they provide, and they are the following:
 
 |Polymorphic threats|Lateral movement & credential theft|Productivity apps rules|Email rules|Script rules|Misc rules|
 |:-:|:-:|:-:|:-:|:-:|:-:|
