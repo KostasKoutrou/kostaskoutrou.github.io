@@ -6,7 +6,7 @@ What is MDE, for the Endpoint? I always wondered what is going on on the device 
 
 In this series about MDE, I will try to gather and simplify all the concepts needed when running MDE on an endpoint. The purpose of the series is to be able to have a better understanding of what exactly is being run on a machine onboarded to MDE, what is being checked/scanned and how, and how to approach a troubleshooting session effectively in case that it is needed.
 
-Many of us have heard "is it Defender?" when a machine is performing poorly. Hopefully this series will be an assistive tool in answering quickly and effectively.
+Many of us have heard "is it Defender?" when a machine is performing poorly. This series is an attempt to have an assistive tool in answering quickly and effectively.
 
 In this Blog post, I will be focusing on what the capabilities of MDE are, when it is running on an endpoint. The capabilities are explained on a high level, without going into many details, just to get an understanding of what each capability does. In the next blogs, I will go into more details of each capability, and what to look for when troubleshooting them.
 
