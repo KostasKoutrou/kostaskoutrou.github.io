@@ -245,11 +245,11 @@ MDE now has a UEFI scanner. This helps in attempts of attackers compromosing the
 
 Windows Defender System Guard combats this with hardware-based security features including hypervisor-level attestation and Secure Launch (aka Dynamic Root of Trust (DRTM)).
 
-With the new UEFI scanner, firmware scanning becomes broadly available. It is built-in with MDAV. It gives MDE the ability to scan inside the firmware file system and perform security assessments. It performs dynamic analysis on the firmware it gets from the hardware flash storage. By obtaining the firmware, the scanner is able to parse the firmware, enabling MDE to inspect firmware content at runtime.
+**With the new UEFI scanner, firmware scanning becomes broadly available**. It is built-in with MDAV. It gives MDE the ability to scan inside the firmware file system and perform security assessments. It performs dynamic analysis on the firmware it gets from the hardware flash storage. By obtaining the firmware, the scanner is able to parse the firmware, enabling MDE to inspect firmware content at runtime.
 
 #### 2.12 Early Launch Antimalware (ELAM) and MDAV
 
-ELAM combats early boot threats (e.g., rootkits, or malicious drivers that can hide from detection) by using a driver named Wdboot.sys that starts before other boot-start drivers. ELAM enabled the evaluation of other drivers, and helps the Windows kernel decide whether those drivers should be initialized.
+**ELAM combats early boot threats** (e.g., rootkits, or malicious drivers that can hide from detection) by using a **driver named Wdboot.sys that starts before other boot-start drivers**. ELAM enables the evaluation of other drivers, and helps the Windows kernel decide whether those drivers should be initialized.
 
 ## Conclusion
 
