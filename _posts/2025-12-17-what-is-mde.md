@@ -63,28 +63,28 @@ Device Control enables **controls related to usage and installation of periphera
 
 Exploit Protection helps **protect against malware that uses exploits** to infect devices and spread. It consists of many **mitigations that can be applied to either the whole OS or individual apps**. It protects by default some behaviors which are correlated to exploits, like an app accessing parts of memory which it should not be able to. The protection measures vary from simple which can be enabled OS-wide and in audit mode to test, all the way to complex protection which protect only per-application and cannot be turned on audit mode but only be turned on immediately.
 Exploit Protection provides the following protection measures:
-1. Control flow guard (CFG)
-1. Data Execution Prevention (DEP)
-1. Force randomization for images (Mandatory ASLR)
-1. Randomize memory allocations (Bottom-Up ASLR)
-1. Validate exception chains (SEHOP)
-1. Validate heap integrity
-1. Arbitrary code guard (ACG)
-1. Block low integrity images
-1. Block remote images
-1. Block untrusted fonts
-1. Code integrity guard
-1. Disable extension points
-1. Disable Win32k system calls
-1. Don't allow child processes
-1. Export address filtering (EAF)
-1. Import address filtering (IAF)
-1. Simulate execution (SimExec)
-1. Validate API invocation (CallerCheck)
-1. Validate handle usage
-1. Validate image dependency integrity
-1. Validate stack integrity (StackPivot)
-1. Hardware-enforced stack protection
+1. **Control flow guard (CFG)**: Mitigates the risk of attackers using memory corruption vulnerabilities by protecting indirect function calls.
+1. **Data Execution Prevention (DEP)**: Prevents memory that wasn’t explicitly allocated as executable from being executed.
+1. **Force randomization for images (Mandatory ASLR)**: With Address Space Layout Randomization (ASLR), every time a program runs, Windows loads its code and libraries at a random memory address, to block attackers predicting where these are located.
+1. **Randomize memory allocations (Bottom-Up ASLR)**: This mitigation requires Mandatory ASLR. This adds entropy to relocations, so their location is randomized. 
+1. **Validate exception chains (SEHOP)**: Mitigation against the Structured Exception Handler (SEH) overwrite exploitation technique.
+1. **Validate heap integrity**: This increases the protection level of heap mitigations in Windows, by causing the app to terminate if a heap corruption is detected.
+1. **Arbitrary code guard (ACG)**: Protect an application from executing dynamically generated code. It prevents memory from being marked as executable.
+1. **Block low integrity images**: Prevents the app from loading files that are untrusted, because they’ve been downloaded from the internet from a sandboxed browser.
+1. **Block remote images**: Prevents the application from loading files that are hosted on a remote device, such as UNC share, which could be a device controlled by the attacker.
+1. **Block untrusted fonts**: Mitigates the risk of a flow in font parsing leading to the attacker being able to run code on the device.
+1. **Code integrity guard**: Ensure that all binaries loaded into a process are digitally signed by Microsoft. With the use of WHQL (Windows Hardware Quality Labs) signatures, drivers developed by third parties can be signed to also become trusted.
+1. **Disable extension points**: Windows lets programs hook into or extend other programs in a few ways, for example, by loading DLLs automatically or watching certain system events. These are called extension points. This function disables various extension points for an app, which might be used to establish persistence or elevate privileges of malicious content, thus only loading the program’s own code.
+1. **Disable Win32k system calls**: Win32k.sys is a Windows kernel module that connects apps to the display and input system. Because it is running in kernel mode, and apps can indirectly call its functions, sandboxes/low-privilege apps could exploit it to escape the sandbox and gain admin-level privileges. So, disabling Win32k system calls for an app means that this app doesn’t need to draw windows or interact with the display, so there is no need to communicate with the Windows GUI system at all.
+1. **Don't allow child processes**: Prevents an app from creating child processes/applications.
+1. **Export address filtering (EAF)**: Mitigates the risk of malicious code looking at the export address table of all loaded modules to find modules that contain useful APIs for their attack.
+1. **Import address filtering (IAF)**: This mitigation protects against modifying the import address table (IAT), potentially redirecting to arbitrary code.
+1. **Simulate execution (SimExec)**: Only for 32-bit apps. It helps validate that calls to sensitive APIs return to legitimate caller functions.
+1. **Validate API invocation (CallerCheck)**: It is a mitigation for return-oriented programming (ROP) techniques that validates that sensitive APIs were called from a valid caller.
+1. **Validate handle usage**: A handle is a reference to a protected object. It is a mitigation that helps protect against an attacker using an existing handle to access a protected object.
+1. **Validate image dependency integrity**: Helps protect against attacks that attempt to substitute code for DLLs that are statically linked by Windows binaries.
+1. **Validate stack integrity (StackPivot)**: Helps protect against the Stack Pivot attack, a ROP attack where an attacker creates a fake stack in heap memory, and then tricks the application into returning into the fake stack that controls the flow of execution.
+1. **Hardware-enforced stack protection**: This protects against ROP based attacks. Attackers modify the return address stored on the stack, which tells the CPU where to go back to after finishing a function.
 
 #### 1.5 Web and Network Protection
 
