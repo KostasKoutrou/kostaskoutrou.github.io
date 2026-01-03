@@ -55,13 +55,13 @@ Ignore DeviceEvents with ActionType `ExploitGuardNetworkProtectionAudited` and `
 ```kql
 ```
 
-|DeviceEvents ActionType|Description|
-|-|-|
-|ExploitGuardAcgAudited or ExploitGuardAcgEnforced|Arbitrary code guard (ACG) **detected** or **blocked** an attempt to modify code page permissions or create unsigned code pages.|
-|ExploitGuardChildProcessAudited or ExploitGuardChildProcessBlocked|Exploit protection **detected** or **blocked** the creation of a child process|
-|ExploitGuardEafViolationAudited or ExploitGuardEafViolationBlocked|Export address filtering (EAF) blocked possible exploitation activity.|
-|ExploitGuardIafViolationAudited or ExploitGuardIafViolationBlocked|Import address filtering (IAF) **detected** or **blocked** possible exploitation activity.|
-|ExploitGuardLowIntegrityImageAudited or ExploitGuardLowIntegrityImageBlocked|Exploit protection **detected** or **blocked** the launch of a process from a low-integrity file.|
+|DeviceEvents ActionType|Description|Exploit Protection Measure|
+|-|-|-|
+|ExploitGuardAcgAudited or ExploitGuardAcgEnforced|Arbitrary code guard (ACG) **detected** or **blocked** an attempt to modify code page permissions or create unsigned code pages.|Arbitrary code guard (ACG)|
+|ExploitGuardChildProcessAudited or ExploitGuardChildProcessBlocked|Exploit protection **detected** or **blocked** the creation of a child process|Don’t allow child processes|
+|ExploitGuardEafViolationAudited or ExploitGuardEafViolationBlocked|Export address filtering (EAF) blocked possible exploitation activity.|Export address filtering (EAF)|
+|ExploitGuardIafViolationAudited or ExploitGuardIafViolationBlocked|Import address filtering (IAF) **detected** or **blocked** possible exploitation activity.|Import address filtering (IAF)|
+|ExploitGuardLowIntegrityImageAudited or ExploitGuardLowIntegrityImageBlocked|Exploit protection **detected** or **blocked** the launch of a process from a low-integrity file.|Block low integrity images|
 |ExploitGuardNonMicrosoftSignedAudited or ExploitGuardNonMicrosoftSignedBlocked|Exploit protection **detected** or **blocked** the launch of a process from an image file that is not signed by Microsoft.|
 |ExploitGuardRopExploitAudited or ExploitGuardRopExploitBlocked|Exploit protection blocked possible return-object programming (ROP) exploitation.|
 |ExploitGuardSharedBinaryAudited or ExploitGuardSharedBinaryBlocked|Exploit protection detected or blocked the launch of a process from a file in a remote shared file.|
