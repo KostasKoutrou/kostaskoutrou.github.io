@@ -39,7 +39,7 @@ In the following table the ASR Rules action types are listed and the ASR rule th
 |AsrPersistenceThroughWmiAudited<br>AsrPersistenceThroughWmiBlocked<br>AsrPersistenceThroughWmiWarnBypassed|Block persistence through WMI event subscription|
 |AsrPsexecWmiChildProcessAudited<br>AsrPsexecWmiChildProcessBlocked<br>AsrPsexecWmiChildProcessWarnBypassed|Block Process Creations originating from PSExec & WMI commands|
 |AsrRandomwareAudited<br>AsrRandomwareBlocked<br>AsrRandomwareWarnBypassed|Use advanced protection against ransomware|
-|AsrSafeModeRebootAudited<br>AsrSafeModeReboot<br>AsrSafeModeRebootWarnBypassed|Block rebooting machine in Safe Mode|
+|AsrSafeModeRebootAudited<br>AsrSafeModeRebootBlocked<br>AsrSafeModeRebootWarnBypassed|Block rebooting machine in Safe Mode|
 |AsrScriptExecutableDownloadAudited<br>AsrScriptExecutableDownloadBlocked<br>AsrScriptExecutableDownloadWarnBypassed|Block JavaScript or VBScript from launching downloaded executable content|
 |AsrUntrustedExecutableAudited<br>AsrUntrustedExecutableBlocked<br>AsrUntrustedExecutableWarnBypassed|Block executable files from running unless they meet a prevalence, age, or trusted list criteria|
 |AsrUntrustedUsbProcessAudited<br>AsrUntrustedUsbProcessBlocked<br>AsrUntrustedUsbProcessWarnBypassed|Block untrusted and unsigned processes that run from USB|
