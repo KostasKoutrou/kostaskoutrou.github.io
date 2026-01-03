@@ -25,6 +25,7 @@ So, searching for CFA DeviceEvents can be done with the following KQL query:
 
 ```kql
 DeviceEvents
+//If you want only blocks, remove the 'ControlledFolderAccessViolationAudited'.
 | where ActionType in ('ControlledFolderAccessViolationAudited','ControlledFolderAccessViolationBlocked')
 ```
 
@@ -32,7 +33,7 @@ DeviceEvents
 
 Device Control has six Action Types reported in DeviceEvents:
 
-|Action Type|Description|
+|DeviceEvents ActionType|Description|
 |-|-|
 |BluetoothPolicyTriggered|A Bluetooth service llowed or blocked by a device control policy.|
 |PnPDeviceAllowed|Device control allowed a trusted plug and play (PnP) device. Note that this is the default event when Device Control is enabled but no block policies are configured (ADD MORE INFO HERE)|
@@ -46,3 +47,35 @@ DeviceEvents
 | where ActionType in ("BluetoothPolicyTriggered","PnPDeviceBlocked",
 "PrintJobBlocked","RemovableStorageFileEvent","RemovableStoragePolicyTriggered") //You may want to search for "PnPDeviceAllowed", too, after configuring Device Control policies, to make sure that the desired activities are allowed. But for checking for Device Control Blocks, it is not needed.
 ```
+
+### Exploit Protection
+
+Ignore DeviceEvents with ActionType `ExploitGuardNetworkProtectionAudited` and `ExploitGuardNetowkrProtectionBlocked` when checking for Exploit Protection, as these Action Types correspond to detection done by Network Protection, which is a different ASR, and will be described in the next section.
+
+```kql
+```
+
+|DeviceEvents ActionType|Description|
+|-|-|
+|ExploitGuardAcgAudited or ExploitGuardAcgEnforced|Arbitrary code guard (ACG) **detected** or **blocked** an attempt to modify code page permissions or create unsigned code pages.|
+|ExploitGuardChildProcessEnforced or ExploitGuardChildProcessBlocked|Exploit protection **detected** or **blocked** the creation of a child process|
+|ExploitGuardEafViolationAudited or ExploitGuardEafViolationBlocked|Export address filtering (EAF) blocked possible exploitation activity.|
+|ExploitGuardIafViolationAudited or ExploitGuardIafViolationBlocked|Import address filtering (IAF) **detected** or **blocked** possible exploitation activity.|
+|ExploitGuardLowIntegrityImageAudited or ExploitGuardLowIntegrityImageBlocked|Exploit protection **detected** or **blocked** the launch of a process from a low-integrity file.|
+|ExploitGuardNonMicrosoftSignedAudited or ExploitGuardNonMicrosoftSignedBlocked|Exploit protection **detected** or **blocked** the launch of a process from an image file that is not signed by Microsoft.|
+|ExploitGuardRopExploitAudited or ExploitGuardRopExploitBlocked|Exploit protection blocked possible return-object programming (ROP) exploitation.|
+|ExploitGuardSharedBinaryAudited or ExploitGuardSharedBinaryBlocked|Exploit protection detected or blocked the launch of a process from a file in a remote shared file.|
+|ExploitGuardWin32SystemCallAudited or ExploitGuardWin32SystemCallBlocked|Exploit protection **detected** or **blocked** a call to the Windows system AIP|
+|||
+|||
+|||
+|||
+|||
+|||
+|||
+|||
+|||
+|||
+|||
+|||
+|||
