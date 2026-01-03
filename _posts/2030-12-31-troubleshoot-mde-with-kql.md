@@ -18,9 +18,9 @@ The ASR Rules ActionTypes come in tuples:
 
 |ActionType|Description|
 |-|-|
-|Asr<RuleName>Audited|ASR Rule of <RuleName> was triggered but did not block.|
-|Asr<RuleName>Blocked|ASR Rule of <RuleName> was triggered and blocked.|
-|Asr<RuleName>WarnBypassed|ASR Rule of <RuleName> was triggered in Warn mode, and the user excluded themselves from it.|
+|Asr\<RuleName\>Audited|ASR Rule of <RuleName> was triggered but did not block.|
+|Asr\<RuleName\>Blocked|ASR Rule of <RuleName> was triggered and blocked.|
+|Asr\<RuleName\>WarnBypassed|ASR Rule of <RuleName> was triggered in Warn mode, and the user excluded themselves from it.|
 
 In the following table the ASR Rules action types are listed and the ASR rule that they correspond to.
 
