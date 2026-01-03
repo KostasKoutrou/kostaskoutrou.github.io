@@ -10,6 +10,8 @@ You can always refer to the DeviceEvents Schema reference directly from the Adva
 
 If you want to get a tl;dr KQL query from this blog post, check the last section.
 
+All the information is based on official documentation of Microsoft, which you can find [here](https://learn.microsoft.com/en-us/defender-endpoint/).
+
 ### DeviceEvents table
 
 The detections by MDE are reported under the DeviceEvents table in Advanced Hunting.
@@ -69,7 +71,7 @@ DeviceEvents
 
 When looking for CFA detections, keep the following in mind:
 
-CFA has only two Action Types reported in DeviceEvents:
+CFA has only 2 `ActionType` possible values reported in `DeviceEvents`:
 
 - ControlledFolderAccessViolationAudited
 - ControlledFolderAccessViolationBlocked
@@ -86,22 +88,27 @@ DeviceEvents
 
 When looking for Device Control detections, keep the following in mind:
 
-Device Control has six `ActionType`s reported in `DeviceEvents`:
+Device Control has 6 `ActionType` possible values reported in `DeviceEvents`:
 
 |DeviceEvents ActionType|Description|
 |-|-|
 |BluetoothPolicyTriggered|A Bluetooth service llowed or blocked by a device control policy.|
-|PnPDeviceAllowed|Device control allowed a trusted plug and play (PnP) device. Note that this is the default event when Device Control is enabled but no block policies are configured (ADD MORE INFO HERE)|
+|PnpDeviceConnected|(ADD INFO HERE)|
+|PnPDeviceAllowed|Device control allowed a trusted plug and play (PnP) device. Note that when a device installation restrictions are configured and a device is installed, an event with `ActionType` of `PnPDeviceAllowed` is created.|
 |PnPDeviceBlocked|Device control blocked an untrusted plug and play (PnP) device.|
 |PrintJobBlocked|Device control prevented an untrusted printer from printing.|
 |RemovableStorageFileEvent|Removable storage file activity matched a device control removable storage access control policy.|
 |RemovableStoragePolicyTriggered|Device control detected an attempted read/write/execute event from a removable storage device.|
+
+The KQL query to search for Device Control detections is the following:
 
 ```kql
 DeviceEvents
 | where ActionType in ("BluetoothPolicyTriggered","PnPDeviceBlocked",
 "PrintJobBlocked","RemovableStorageFileEvent","RemovableStoragePolicyTriggered") //You may want to search for "PnPDeviceAllowed", too, after configuring Device Control policies, to make sure that the desired activities are allowed. But for checking for Device Control Blocks, it is not needed.
 ```
+
+Keep in mind that even after excluding the `PnPDeviceAllowed` `ActionType`, the other possible `ActionType` values still contain activities which may indicating not blocking, but allowing.
 
 ### Exploit Protection
 
