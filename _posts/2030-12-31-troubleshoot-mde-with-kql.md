@@ -55,10 +55,14 @@ Ignore DeviceEvents with ActionType `ExploitGuardNetworkProtectionAudited` and `
 ```kql
 ```
 
+Microsoft's [documentation](https://learn.microsoft.com/en-us/defender-endpoint/exploit-protection#exploit-protection-and-advanced-hunting) does not include all the Exploit protection DeviceEvents ActionTypes, it only includes the ones actually starting with the substring `ExploitGuard`. The actual complete list is found in the following table.
+
 |DeviceEvents ActionType|Description|Exploit Protection Measure|
 |-|-|-|
-|ExploitGuardAcgAudited or ExploitGuardAcgEnforced|Arbitrary code guard (ACG) **detected** or **blocked** an attempt to modify code page permissions or create unsigned code pages.|Arbitrary code guard (ACG)|
-|ExploitGuardChildProcessAudited or ExploitGuardChildProcessBlocked|Exploit protection **detected** or **blocked** the creation of a child process|Don’t allow child processes|
+|ExploitGuardAcgAudited
+ExploitGuardAcgEnforced|Arbitrary code guard (ACG) **detected** or **blocked** an attempt to modify code page permissions or create unsigned code pages.|Arbitrary code guard (ACG)|
+|ExploitGuardChildProcessAudited
+ExploitGuardChildProcessBlocked|Exploit protection **detected** or **blocked** the creation of a child process|Don’t allow child processes|
 |ExploitGuardEafViolationAudited or ExploitGuardEafViolationBlocked|Export address filtering (EAF) blocked possible exploitation activity.|Export address filtering (EAF)|
 |ExploitGuardIafViolationAudited or ExploitGuardIafViolationBlocked|Import address filtering (IAF) **detected** or **blocked** possible exploitation activity.|Import address filtering (IAF)|
 |ExploitGuardLowIntegrityImageAudited or ExploitGuardLowIntegrityImageBlocked|Exploit protection **detected** or **blocked** the launch of a process from a low-integrity file.|Block low integrity images|
