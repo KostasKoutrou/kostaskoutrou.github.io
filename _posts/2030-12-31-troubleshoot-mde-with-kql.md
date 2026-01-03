@@ -55,6 +55,8 @@ Ignore DeviceEvents with ActionType `ExploitGuardNetworkProtectionAudited` and `
 ```kql
 ```
 
+Note that some Exploit Protection measures do not create events, because they do not detect. For example, with Mandatory ASLR and Bottom-up ASLR, a program's code and libraries and loaded at a random memory address instead of a predictable one. This measure does not detect anything to create an event for.
+
 Microsoft's [documentation](https://learn.microsoft.com/en-us/defender-endpoint/exploit-protection#exploit-protection-and-advanced-hunting) does not include all the Exploit protection DeviceEvents ActionTypes, it only includes the ones actually starting with the substring `ExploitGuard`. The actual complete list is found in the following table.
 
 |DeviceEvents ActionType|Description|Exploit Protection Measure|
@@ -68,16 +70,16 @@ Microsoft's [documentation](https://learn.microsoft.com/en-us/defender-endpoint/
 |ExploitGuardRopExploitAudited<br>ExploitGuardRopExploitBlocked|Exploit protection blocked possible return-object programming (ROP) exploitation.|Simulate execution (SimExec)<br>Validate API invocation (CallerCheck)<br>Validate stack integrity (StackPivot)|
 |ExploitGuardSharedBinaryAudited<br>ExploitGuardSharedBinaryBlocked|Exploit protection detected or blocked the launch of a process from a file in a remote shared file.|Block remote images|
 |ExploitGuardWin32SystemCallAudited<br>ExploitGuardWin32SystemCallBlocked|Exploit protection **detected** or **blocked** a call to the Windows system AIP|Disable Win32k system calls|
-|||
-|||
-|||
-|||
-|||
-|||
-|||
-|||
-|||
-|||
-|||
-|||
-|||
+|ControlFlowGuardViolation|Control Flow Guard terminated an application after detecting an invalid function call|Control flow guard (CFG)|
+
+Unfortunately, it seems that for the following Exploit Protection measures, there are no Device Events created. If you know more details, please let me know:
+
+- Data Execution Prevention (DEP)
+- Validate exception chains (SEHOP)
+- Validate heap integrity
+- Block untrusted fonts
+- Disable extension points
+- Validate handle usage
+- Validate image dependency integrity
+- Hardware-enforced stack protection
+
