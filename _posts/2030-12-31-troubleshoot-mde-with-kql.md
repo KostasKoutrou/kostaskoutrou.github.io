@@ -2,6 +2,7 @@
 
 ## Introduction
 
+Describe that we are looking at DeviceEvents table in advanced hunting, and filtering for different ActionType.
 
 You can always refer to the DeviceEvents Schema reference directly from the Advanced Hunting page in Defender:
 
@@ -11,6 +12,38 @@ You can always refer to the DeviceEvents Schema reference directly from the Adva
 ### Attack Surface Reduction Rules Detections
 
 Each ASR Rule has its own GUID. This will need to be used when configuring, e.g., a GPO to enable ASR rules in Audit or Block mode for machines. The ASR Rule to GUID matrix can be found in Microsoft's [Attack surface reduction rules reference](https://learn.microsoft.com/en-us/defender-endpoint/attack-surface-reduction-rules-reference#asr-rule-to-guid-matrix)
+
+The ASR Rules ActionTypes come in tuples:
+
+|ActionType|Description|
+|-|-|
+|Asr<RuleName>Audited|ASR Rule of <RuleName> was triggered but did not block.|
+|Asr<RuleName>Blocked|ASR Rule of <RuleName> was triggered and blocked.|
+|Asr<RuleName>Bypassed|ASR Rule of <RuleName> was triggered in Warn mode, and the user excluded themselves from it.|
+
+In the following table the ASR Rules action types are listed and the ASR rule that they correspond to.
+
+|ActionType|ASR Rule|
+|-|-|
+|AsrAbusedSystemToolAudited<br>AsrAbusedSystemToolBlocked<br>AsrAbusedSystemToolBypassed|Block use of a copied or impersonated system tools|
+|AsrAdobeReaderChiledProcess<br>AsrAdobeReaderChiledProcess<br>AsrAdobeReaderChiledProcess|Block Adobe Reader from creating child processes|
+|AsrExecutableEmailContent<br>AsrExecutableEmailContent<br>AsrExecutableEmailContent|Block Launching of executable content from email attachment|
+|AsrExecutableOfficeContent<br>AsrExecutableOfficeContent<br>AsrExecutableOfficeContent|Block Office applications from creating executable content|
+|AsrLsassCredentialTheft<br>AsrLsassCredentialTheft<br>AsrLsassCredentialTheft|Block credential stealing from the Windows local security authority subsystem (lsass.exe)|
+|AsrObfuscatedScript<br>AsrObfuscatedScript<br>AsrObfuscatedScript|Block execution of potentially obfuscated scripts|
+|AsrOfficeChildProcess<br>AsrOfficeChildProcess<br>AsrOfficeChildProcess|Block all Office applications from creating child processes|
+||Block Office communication application from creating child processes|
+||Block Win32 API calls from Office macro|
+||Block Office applications from injecting code into other processes|
+||Block persistence through WMI event subscription|
+||Block Process Creations originating from PSExec & WMI commands|
+||Use advanced protection against ransomware|
+||Block rebooting machine in Safe Mode|
+||Block JavaScript or VBScript from launching downloaded executable content|
+||Block executable files from running unless they meet a prevalence, age, or trusted list criteria|
+||Block untrusted and unsigned processes that run from USB|
+||Block abuse of in-the-wild exploited vulnerable signed drivers|
+||Block Webshell creation for Servers|
 
 The following KQL query parses the AdditionalFields column in order to extract the ASR Rule GUID.
 
