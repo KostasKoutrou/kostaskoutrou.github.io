@@ -81,7 +81,7 @@ Exploit Protection provides the following protection measures:
 1. **Import address filtering (IAF)**: This mitigation protects against modifying the import address table (IAT), potentially redirecting to arbitrary code.
 1. **Simulate execution (SimExec)**: Only for 32-bit apps. It helps validate that calls to sensitive APIs return to legitimate caller functions.
 1. **Validate API invocation (CallerCheck)**: It is a mitigation for return-oriented programming (ROP) techniques that validates that sensitive APIs were called from a valid caller.
-1. **Validate handle usage**: A handle is a reference to a protected object. It is a mitigation that helps protect against an attacker using an existing handle to access a protected object.
+1. **Validate handle usage**: A handle is a reference to a protected object. This measure is a mitigation that helps protect against an attacker using an existing handle to access a protected object.
 1. **Validate image dependency integrity**: Helps protect against attacks that attempt to substitute code for DLLs that are statically linked by Windows binaries.
 1. **Validate stack integrity (StackPivot)**: Helps protect against the Stack Pivot attack, a ROP attack where an attacker creates a fake stack in heap memory, and then tricks the application into returning into the fake stack that controls the flow of execution.
 1. **Hardware-enforced stack protection**: This protects against ROP based attacks. Attackers modify the return address stored on the stack, which tells the CPU where to go back to after finishing a function.
