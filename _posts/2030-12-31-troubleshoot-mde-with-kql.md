@@ -10,11 +10,20 @@ You can always refer to the DeviceEvents Schema reference directly from the Adva
 
 If you want to get a tl;dr KQL query from this blog post, check the last section.
 
+### DeviceEvents table
+
+The detections by MDE are reported under the DeviceEvents table in Advanced Hunting.
+
+Two important columns of the DeviceEvents table are the following:
+
+- ActionType: The `ActionType` column shows what action triggered the `DeviceEvents` event. When it comes to MDE, the `ActionType` column shows which MDE detection tirggered the event.
+- AdditionalFields: The `AdditionalFields` column contains, as its name suggests, additional information regarding the event which does not fit any of the other columns. When it comes to MDE detections, the `AdditionalFields` column contains necessary information about the detection, such as whether something was blocked or audited, or what policy triggered the event. It is in JSON format, and, depending on what is being searched for, the `AdditionalFields` JSON data will need to be parsed in order to retrieve the correct information. In the queries below, there are some examples to get a better idea of how to parse the column.
+
 ### Attack Surface Reduction Rules Detections
 
-Each ASR Rule has its own GUID. This will need to be used when configuring, e.g., a GPO to enable ASR rules in Audit or Block mode for machines. The ASR Rule to GUID matrix can be found in Microsoft's [Attack surface reduction rules reference](https://learn.microsoft.com/en-us/defender-endpoint/attack-surface-reduction-rules-reference#asr-rule-to-guid-matrix)
+When looking for ASR Rules detections, keep the following in mind:
 
-The ASR Rules ActionTypes come in tuples:
+For each ASR Rule detection, there can be one of three ActionTypes in the DeviceEvents table, depending on the enabled state of the ASR Rule for the machine:
 
 |ActionType|Description|
 |-|-|
@@ -46,22 +55,26 @@ In the following table the ASR Rules action types are listed and the ASR rule th
 |AsrVulnerableSignedDriverAudited<br>AsrVulnerableSignedDriverBlocked<br>AsrVulnerableSignedDriverWarnBypassed|Block abuse of in-the-wild exploited vulnerable signed drivers|
 |AsrWebShellOnServerAudited<br>AsrWebShellOnServerBlocked<br>AsrWebShellWarnBypassed (does not have the "OnServer" substring like the other 2)|Block Webshell creation for Servers|
 
-The following KQL query parses the AdditionalFields column in order to extract the ASR Rule GUID.
+Each ASR Rule has its own GUID. GUIDs are needed when configuring, e.g., a GPO to enable ASR rules in Audit or Block mode for machines. The ASR Rule to GUID matrix can be found in Microsoft's [Attack surface reduction rules reference](https://learn.microsoft.com/en-us/defender-endpoint/attack-surface-reduction-rules-reference#asr-rule-to-guid-matrix)
+
+The KQL query to search for ASR Rule detections is the following:
 
 ```kql
 DeviceEvents
 | where ActionType startswith 'Asr'
-| extend RuleId=extractjson("$Ruleid", AdditionalFields, typeof(string))
+| extend RuleId=extractjson("$Ruleid", AdditionalFields, typeof(string)) //Parse the AdditionalFields column in order to extract the ASR Rule GUID.
 ```
 
 ### Controlled Folder Access Detections
+
+When looking for CFA detections, keep the following in mind:
 
 CFA has only two Action Types reported in DeviceEvents:
 
 - ControlledFolderAccessViolationAudited
 - ControlledFolderAccessViolationBlocked
 
-So, searching for CFA DeviceEvents can be done with the following KQL query:
+The KQL query to search for CFA detections is the following:
 
 ```kql
 DeviceEvents
@@ -71,7 +84,9 @@ DeviceEvents
 
 ### Device Control
 
-Device Control has six Action Types reported in DeviceEvents:
+When looking for Device Control detections, keep the following in mind:
+
+Device Control has six `ActionType`s reported in `DeviceEvents`:
 
 |DeviceEvents ActionType|Description|
 |-|-|
