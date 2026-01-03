@@ -2,6 +2,12 @@
 
 ## Introduction
 
+
+You can always refer to the DeviceEvents Schema reference directly from the Advanced Hunting page in Defender:
+
+<img alt="image" src="https://github.com/user-attachments/assets/d43c04c7-c212-49b4-8e5e-767a6b20decd" />
+
+
 ### Attack Surface Reduction Rules Detections
 
 Each ASR Rule has its own GUID. This will need to be used when configuring, e.g., a GPO to enable ASR rules in Audit or Block mode for machines. The ASR Rule to GUID matrix can be found in Microsoft's [Attack surface reduction rules reference](https://learn.microsoft.com/en-us/defender-endpoint/attack-surface-reduction-rules-reference#asr-rule-to-guid-matrix)
@@ -57,7 +63,7 @@ Ignore DeviceEvents with ActionType `ExploitGuardNetworkProtectionAudited` and `
 
 Note that some Exploit Protection measures do not create events, because they do not detect. For example, with Mandatory ASLR and Bottom-up ASLR, a program's code and libraries and loaded at a random memory address instead of a predictable one. This measure does not detect anything to create an event for.
 
-Microsoft's [documentation](https://learn.microsoft.com/en-us/defender-endpoint/exploit-protection#exploit-protection-and-advanced-hunting) does not include all the Exploit protection DeviceEvents ActionTypes, it only includes the ones actually starting with the substring `ExploitGuard`. The actual complete list is found in the following table.
+Microsoft's [documentation](https://learn.microsoft.com/en-us/defender-endpoint/exploit-protection#exploit-protection-and-advanced-hunting) does not include the Control Flow Guard (CFG) DeviceEvents ActionTypes, it only includes the Exploit Protection measures ActionTypes actually starting with the substring `ExploitGuard`. The actual complete list is found in the following table.
 
 |DeviceEvents ActionType|Description|Exploit Protection Measure|
 |-|-|-|
