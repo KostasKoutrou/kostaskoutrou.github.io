@@ -58,7 +58,7 @@ Ignore DeviceEvents with ActionType `ExploitGuardNetworkProtectionAudited` and `
 |DeviceEvents ActionType|Description|
 |-|-|
 |ExploitGuardAcgAudited or ExploitGuardAcgEnforced|Arbitrary code guard (ACG) **detected** or **blocked** an attempt to modify code page permissions or create unsigned code pages.|
-|ExploitGuardChildProcessEnforced or ExploitGuardChildProcessBlocked|Exploit protection **detected** or **blocked** the creation of a child process|
+|ExploitGuardChildProcessAudited or ExploitGuardChildProcessBlocked|Exploit protection **detected** or **blocked** the creation of a child process|
 |ExploitGuardEafViolationAudited or ExploitGuardEafViolationBlocked|Export address filtering (EAF) blocked possible exploitation activity.|
 |ExploitGuardIafViolationAudited or ExploitGuardIafViolationBlocked|Import address filtering (IAF) **detected** or **blocked** possible exploitation activity.|
 |ExploitGuardLowIntegrityImageAudited or ExploitGuardLowIntegrityImageBlocked|Exploit protection **detected** or **blocked** the launch of a process from a low-integrity file.|
