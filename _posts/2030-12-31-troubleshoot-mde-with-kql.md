@@ -2,11 +2,7 @@
 
 ## Introduction
 
-Describe that we are looking at DeviceEvents table in advanced hunting, and filtering for different ActionType.
 
-You can always refer to the DeviceEvents Schema reference directly from the Advanced Hunting page in Defender:
-
-<img alt="image" src="https://github.com/user-attachments/assets/d43c04c7-c212-49b4-8e5e-767a6b20decd" />
 
 If you want to get a tl;dr KQL query from this blog post, check the last section.
 
@@ -21,11 +17,15 @@ Two important columns of the DeviceEvents table are the following:
 - ActionType: The `ActionType` column shows what action triggered the `DeviceEvents` event. When it comes to MDE, the `ActionType` column shows which MDE detection tirggered the event.
 - AdditionalFields: The `AdditionalFields` column contains, as its name suggests, additional information regarding the event which does not fit any of the other columns. When it comes to MDE detections, the `AdditionalFields` column contains necessary information about the detection, such as whether something was blocked or audited, or what policy triggered the event. It is in JSON format, and, depending on what is being searched for, the `AdditionalFields` JSON data will need to be parsed in order to retrieve the correct information. In the queries below, there are some examples to get a better idea of how to parse the column.
 
+You can always refer to the Device``Events Schema reference directly from the Advanced Hunting page in Defender to review the different available values:
+
+<img alt="image" src="https://github.com/user-attachments/assets/d43c04c7-c212-49b4-8e5e-767a6b20decd" />
+
 ### Attack Surface Reduction Rules Detections
 
 When looking for ASR Rules detections, keep the following in mind:
 
-For each ASR Rule detection, there can be one of three ActionTypes in the DeviceEvents table, depending on the enabled state of the ASR Rule for the machine:
+For each ASR Rule detection, there can be one of three possible `ActionType` values in the `DeviceEvents` table, depending on the enabled state of the ASR Rule for the machine:
 
 |ActionType|Description|
 |-|-|
@@ -88,12 +88,12 @@ DeviceEvents
 
 When looking for Device Control detections, keep the following in mind:
 
-Device Control has 6 `ActionType` possible values reported in `DeviceEvents`:
+Device Control has 7 `ActionType` possible values reported in `DeviceEvents`:
 
 |DeviceEvents ActionType|Description|
 |-|-|
 |BluetoothPolicyTriggered|A Bluetooth service llowed or blocked by a device control policy.|
-|PnpDeviceConnected|(ADD INFO HERE)|
+|PnpDeviceConnected|This event appears when a PnP device is connected on an onboarded device, regardless of whether Device Control is enabled or not.|
 |PnPDeviceAllowed|Device control allowed a trusted plug and play (PnP) device. Note that when a device installation restrictions are configured and a device is installed, an event with `ActionType` of `PnPDeviceAllowed` is created.|
 |PnPDeviceBlocked|Device control blocked an untrusted plug and play (PnP) device.|
 |PrintJobBlocked|Device control prevented an untrusted printer from printing.|
@@ -105,23 +105,43 @@ The KQL query to search for Device Control detections is the following:
 ```kql
 DeviceEvents
 | where ActionType in ("BluetoothPolicyTriggered","PnPDeviceBlocked",
-"PrintJobBlocked","RemovableStorageFileEvent","RemovableStoragePolicyTriggered") //You may want to search for "PnPDeviceAllowed", too, after configuring Device Control policies, to make sure that the desired activities are allowed. But for checking for Device Control Blocks, it is not needed.
+"PrintJobBlocked","RemovableStorageFileEvent","RemovableStoragePolicyTriggered") //You may want to search for "PnPDeviceAllowed" and "PnPDeviceConnected", too, after configuring Device Control policies, to make sure that the desired activities are allowed and to investigate further activities. But for checking for Device Control Blocks, it is not needed.
 ```
 
 Keep in mind that even after excluding the `PnPDeviceAllowed` `ActionType`, the other possible `ActionType` values still contain activities which may indicating not blocking, but allowing.
 
-### Exploit Protection
-
-Ignore DeviceEvents with ActionType `ExploitGuardNetworkProtectionAudited` and `ExploitGuardNetowkrProtectionBlocked` when checking for Exploit Protection, as these Action Types correspond to detection done by Network Protection, which is a different ASR, and will be described in the next section.
+For example, take a look at the following KQL query:
 
 ```kql
 DeviceEvents
-| where ActionType startswith ("ExploitGuard
+| where ActionType == "RemovableStoragePolicyTriggered"
+| extend parsed=parse_json(AdditionalFields)
+| extend MediaClass = tostring(parsed.ClassName)
+| extend MediaDeviceId = tostring(parsed.DeviceId)
+| extend MediaDescription = tostring(parsed.DeviceDescription)
+| extend SerialNumberId = tostring(parsed.SerialNumber)
+| extend RemovableStoragePolicy = tostring(parsed.RemovableStoragePolicy)
+| extend RemovableStorageAccess = tostring(parsed.RemovableStorageAccess)
+| extend RemovableStoragePolicyVerdict = tostring(parsed.RemovableStoragePolicyVerdict)
+| extend PID = tostring(parsed.ProductId)
+| extend VID = tostring(parsed.VendorId)
+| extend VID_PID = strcat(VID,"_",PID)
+| extend InstancePathId = tostring(parsed.DeviceInstanceId)
+| project Timestamp, RemovableStoragePolicy, RemovableStorageAccess,RemovableStoragePolicyVerdict, SerialNumberId,VID, PID, VID_PID, InstancePathId
+| order by Timestamp desc
 ```
 
-Note that some Exploit Protection measures do not create events, because they do not detect. For example, with Mandatory ASLR and Bottom-up ASLR, a program's code and libraries and loaded at a random memory address instead of a predictable one. This measure does not detect anything to create an event for.
+The `ActionType` `RemovableStoragePolicyTriggered` does not mean a block or an allow by default. It means that a policy was triggered, and in the `AdditionalFields` column more details can be found.
 
-Microsoft's [documentation](https://learn.microsoft.com/en-us/defender-endpoint/exploit-protection#exploit-protection-and-advanced-hunting) does not include the Control Flow Guard (CFG) DeviceEvents ActionTypes, it only includes the Exploit Protection measures ActionTypes actually starting with the substring `ExploitGuard`. The actual complete list is found in the following table.
+### Exploit Protection
+
+When looking for Exploit Protection detections, keep the following in mind:
+
+Ignore `DeviceEvents` with `ActionType` `ExploitGuardNetworkProtectionAudited` or `ExploitGuardNetworkProtectionBlocked` when checking for Exploit Protection, as these Action Types correspond to detection done by Network Protection, which is a different ASR, and will be described in the next section.
+
+Some Exploit Protection measures do not create events, because they do not detect. For example, with Mandatory ASLR and Bottom-up ASLR, a program's code and libraries and loaded at a random memory address instead of a predictable one. This measure does not detect anything to create an event for.
+
+Microsoft's [documentation](https://learn.microsoft.com/en-us/defender-endpoint/exploit-protection#exploit-protection-and-advanced-hunting) does not include the Control Flow Guard (CFG) DeviceEvents ActionType, it only includes the Exploit Protection measures ActionTypes actually starting with the substring `ExploitGuard`. The actual complete list is found in the following table.
 
 |DeviceEvents ActionType|Description|Exploit Protection Measure|
 |-|-|-|
@@ -147,3 +167,19 @@ Unfortunately, it seems that for the following Exploit Protection measures, ther
 - Validate image dependency integrity
 - Hardware-enforced stack protection
 
+The KQL query to search for Exploit Protection detections is the following:
+
+```kql
+DeviceEvents
+| where ActionType startswith ("ExploitGuard") or ActionType == "ControlFlowGuard"
+```
+### Network Protection and Web Protection
+
+
+
+### MDAV Detections
+
+DeviceEvents ActionType
+AntivirusDetection
+AntivirusMalwareBlocked
+and more
