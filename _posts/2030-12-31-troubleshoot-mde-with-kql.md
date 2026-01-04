@@ -2,7 +2,7 @@
 
 ## Introduction
 
-
+This post includes how to investigate for blocks/detections done by MDE.
 
 If you want to get a tl;dr KQL query from this blog post, check the last section.
 
@@ -57,13 +57,13 @@ In the following table the ASR Rules action types are listed and the ASR rule th
 |AsrVulnerableSignedDriverAudited<br>AsrVulnerableSignedDriverBlocked<br>AsrVulnerableSignedDriverWarnBypassed|Block abuse of in-the-wild exploited vulnerable signed drivers|
 |AsrWebShellOnServerAudited<br>AsrWebShellOnServerBlocked<br>AsrWebShellWarnBypassed (does not have the "OnServer" substring like the other 2)|Block Webshell creation for Servers|
 
-Each ASR Rule has its own GUID. GUIDs are needed when configuring, e.g., a GPO to enable ASR rules in Audit or Block mode for machines. The ASR Rule to GUID matrix can be found in Microsoft's [Attack surface reduction rules reference](https://learn.microsoft.com/en-us/defender-endpoint/attack-surface-reduction-rules-reference#asr-rule-to-guid-matrix)
+Each ASR Rule has its own GUID. GUIDs are needed when configuring, e.g., a GPO to enable ASR rules in Audit or Block mode for machines. The ASR Rule to GUID matrix can be found in Microsoft"s [Attack surface reduction rules reference](https://learn.microsoft.com/en-us/defender-endpoint/attack-surface-reduction-rules-reference#asr-rule-to-guid-matrix)
 
 The KQL query to search for ASR Rule detections is the following:
 
 ```kql
 DeviceEvents
-| where ActionType startswith 'Asr'
+| where ActionType startswith "Asr"
 | extend RuleId=extractjson("$Ruleid", AdditionalFields, typeof(string)) //Parse the AdditionalFields column in order to extract the ASR Rule GUID.
 ```
 
@@ -80,8 +80,8 @@ The KQL query to search for CFA detections is the following:
 
 ```kql
 DeviceEvents
-//If you want only blocks, remove the 'ControlledFolderAccessViolationAudited'.
-| where ActionType in ('ControlledFolderAccessViolationAudited','ControlledFolderAccessViolationBlocked')
+//If you want only blocks, remove the "ControlledFolderAccessViolationAudited".
+| where ActionType in ("ControlledFolderAccessViolationAudited","ControlledFolderAccessViolationBlocked")
 ```
 
 ### Device Control
@@ -173,9 +173,49 @@ The KQL query to search for Exploit Protection detections is the following:
 DeviceEvents
 | where ActionType startswith ("ExploitGuard") or ActionType == "ControlFlowGuard"
 ```
-### Network Protection and Web Protection
+### Network Protection, Web Protection, and SmartScreen
+
+Network, Web Protection, and Smart Screen are in the same section because of their co-dependency.
+
+As mentioned in the previous section, Network and Web Protection have only 2 `ActionType` possible values reported in `DeviceEvents`:
+
+- ExploitGuardNetworkProtectionAudited
+- ExploitGuardNetworkProtectionBlocked
+
+Because Microsoft Defender SmartScreen is also involved in the detections, the following SmartScreen related `ActionType` values should also be searched for:
+
+|ActionType|Description|
+|-|-|
+|SmartScreenExploitWarning|SmartScreen warned about opening a **web page** that contains an exploit.|
+|SmartScreenUrlWarning|SmartScreen warned about opening a low-reputation **URL** that might be hosting malware or is a phishing site.|
+|SmartScreenAppWarning|SmartScreen warns about running a downloaded **application** that is untrusted or malicious.|
+|SmartScreenUserOverride|A user has overriden a SmartScreen warning and continued to open an untrusted **app** or a low-reputation **URL**.|
+
+As shown above, some SmartScreen detections are related to **URL** detections, **application** detections, or both.
+
+The KQL query to search for Network/Web Protection or SmartScreen detections is the following:
+
+```kql
+DeviceEvents
+|where ActionType in ("ExploitGuardNetworkProtectionAudited","ExploitGuardNetworkProtectionBlocked",
+"SmartScreenExploitWarning","SmartScreenUrlWarning","SmartScreenAppWarning","SmartScreenUserOverride")
+```
+Below is an example of how you can parse the JSON data in the `AdditionalFields` column when it comes to Network/Web Protection detections:
+
+```kql
+DeviceEvents
+|where ActionType in ("ExploitGuardNetworkProtectionAudited","ExploitGuardNetworkProtectionBlocked")
+|extend ParsedFields=parse_json(AdditionalFields)
+|project DeviceName, ActionType, Timestamp, RemoteUrl, InitiatingProcessFileName, IsAudit=tostring(ParsedFields.IsAudit), ResponseCategory=tostring(ParsedFields.ResponseCategory), DisplayName=tostring(ParsedFields.DisplayName)
+|sort by Timestamp desc
+```
+### Tamper Protection
+
+### Potential Unwanted Apps (PUA)
 
 
+
+### Windows Defender Application Control (WDAC)
 
 ### MDAV Detections
 
@@ -183,3 +223,11 @@ DeviceEvents ActionType
 AntivirusDetection
 AntivirusMalwareBlocked
 and more
+
+### MDE Alerts
+
+```kql
+AlertInfo
+| where Timestamp > ago(30d)
+| where ServiceSource == "Microsoft Defender for Endpoint"
+```
