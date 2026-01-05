@@ -211,11 +211,38 @@ DeviceEvents
 ```
 ### Tamper Protection
 
-### Potential Unwanted Apps (PUA)
+Regarding Tamper Protection, the Defender `AlertInfo` table can be searched for any Alert raised related to Defender tampering.
 
+The KQL query to search for Defender alerts is the following:
 
+```kql
+AlertInfo
+| where Title contains "tamper"
+```
 
-### Windows Defender Application Control (WDAC)
+The `DeviceEvents` table can also be used to identify tampering attempts. Tampering attempts could be done either by the user of by any other process, including Group Policies enforcment, Intune, etc.
+
+Keep in mind that when Tamper Protection is on, the following settings are blocked from being change by **any** means, including GPO, Intune, Configuration Manager, etc.
+
+- Virus and threat protection remains enabled.
+- Real-time protection remains turned on.
+- Behavior monitoring remains turned on.
+- Antivirus protection, including IOfficeAntivirus (IOAV) remains enabled.
+- Cloud protection remains enabled.
+- Security intelligence updates occur.
+- Automatic actions are taken on detected threats.
+- Notifications are visible in the Windows Security app on Windows devices.
+- Archived files are scanned.
+- Exclusions can't be modified or added
+
+So, most likely, some Tamper Attempts initiated by processes like `svchost.exe` will be reported, with commands like `svchost.exe -k GPSvcGroup`. These are attempts of defender settings changes done by processes like the Service Host `svchost.exe`.
+
+The KQL query to search for Tamper Protection related events is the following:
+
+```kql
+DeviceEvents
+| where ActionType contains "tamper"
+```
 
 ### MDAV Detections
 
@@ -224,10 +251,33 @@ AntivirusDetection
 AntivirusMalwareBlocked
 and more
 
+### Potential Unwanted Apps (PUA)
+
+PUA detections are under the ActionType "AntivirusDetection", and therefore you will find them with the KQL queries of the previous section.
+
+If there is a focus to investigate specifically for PUA detections/blocks, the following KQL query can be used:
+
+```kql
+DeviceEvents
+| where ActionType == "AntivirusDetection"
+| where tostring(AdditionalFields) contains "PUA"
+```
+
+Generally, it was noticed that the KQL queries provided by Microsoft's documentation sometimes have issues. For example, the KQL query provided [here](https://learn.microsoft.com/en-us/defender-endpoint/detect-block-potentially-unwanted-apps-microsoft-defender-antivirus#view-pua-events-using-advanced-hunting) to view PUA events only checks for a subset of PUA events, because it checks for the "PUA:" substring instead of "PUA" (without the column), missing many events like "PUABundler". Therefore, please use the KQL query provided in this post.
+
+### Windows Defender Application Control (WDAC)
+
+
+
 ### MDE Alerts
 
 ```kql
 AlertInfo
 | where Timestamp > ago(30d)
 | where ServiceSource == "Microsoft Defender for Endpoint"
+```
+
+### General KQL query for all detections
+
+```kql
 ```
