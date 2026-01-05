@@ -283,6 +283,7 @@ Generally, it was noticed that the KQL queries provided by Microsoft's documenta
 WDAC and AppLocker have a lot of different possible `ActionType` values, which are depicted in the table below:
 
 |ActionType|Description|
+|-|-|
 |AppControlAppInstallationAudited<br>AppControlAppInstallationBlocked|App control detected/blocked the installation of an untrusted app.|
 |AppControlCIScriptAudited<br>AppControlCIScriptBlocked|A script MSI file genrated by Windows LockDown Policy was audited/blocked.|
 |AppControlCodeIntegrityDriverRevoked|Application control found a driver with a revoked certificate.|
