@@ -246,10 +246,23 @@ DeviceEvents
 
 ### MDAV Detections
 
-DeviceEvents ActionType
-AntivirusDetection
-AntivirusMalwareBlocked
-and more
+When it comes to detections from Microsoft Defender Antivirus, there are five different `ActionType` possible values:
+
+|ActionType|Description|
+|-|-|
+|AntivirusDetection|Windows Defender Antivirus detected a threat.|
+|AntivirusError|Windows Defender Antivirus encountered an error while taking action on malware or a potentially unwanted application.|
+|AntivirusMalwareActionFailed|Windows Defender Antivirus attempted to take action on malware or a potentially unwanted application but the action failed.|
+|AntivirusMalwareBlocked|Windows Defender Antivirus blocked files or activity involving malware or potentially unwanted applications or suspicious behavior.|
+|AntivirusReport|This should be ignored. It creates too many events without any useful info. It reports event of when Microsoft Defender Antivirus reported a threat, which can be a memory, boot sector, or rootkit threat.|
+
+The KQL query to search for MDAV detections is the following:
+
+```kql
+DeviceEvents
+| where ActionType in ("AntivirusDetection","AntivirusError",
+"AntivirusMalwareActionFailed","AntivirusMalwareBlocked")
+```
 
 ### Potential Unwanted Apps (PUA)
 
@@ -265,9 +278,36 @@ DeviceEvents
 
 Generally, it was noticed that the KQL queries provided by Microsoft's documentation sometimes have issues. For example, the KQL query provided [here](https://learn.microsoft.com/en-us/defender-endpoint/detect-block-potentially-unwanted-apps-microsoft-defender-antivirus#view-pua-events-using-advanced-hunting) to view PUA events only checks for a subset of PUA events, because it checks for the "PUA:" substring instead of "PUA" (without the column), missing many events like "PUABundler". Therefore, please use the KQL query provided in this post.
 
-### Windows Defender Application Control (WDAC)
+### Windows Defender Application Control (WDAC) and AppLocker
 
+WDAC and AppLocker have a lot of different possible `ActionType` values, which are depicted in the table below:
 
+|ActionType|Description|
+|AppControlAppInstallationAudited<br>AppControlAppInstallationBlocked|App control detected/blocked the installation of an untrusted app.|
+|AppControlCIScriptAudited<br>AppControlCIScriptBlocked|A script MSI file genrated by Windows LockDown Policy was audited/blocked.|
+|AppControlCodeIntegrityDriverRevoked|Application control found a driver with a revoked certificate.|
+|AppControlCodeIntegrityImageAudited|Application control detected an executable file that violated code integrity policies.|
+|AppControlCodeIntegrityImageRevoked|Application control found an executable file with a revoked certificate.|
+|AppControlCodeIntegrityOriginAllowed|App control allowed a file due to its good reputation (ISG) or installation source (managed installer).|
+|AppControlCodeIntegrityOriginAudited<br>AppControlCodeIntegrityOriginBlocked|App control detected/blocked a file due to its bad reputation (ISG) or installation source (managed installer).|
+|AppControlCodeIntegrityAudited<br>AppControlCodeIntegrityBlocked|App control detected/blocked a code integrity policy violation.|
+|AppControlCodeIntegrityLoaded|An app control code integrity policy was loaded.|
+|AppControlCodeIntegritySigningInformation|App control signed information was generated.|
+|AppControlExecutableAudited<br>AppControlExecutableBlocked|App control detected/blocked the use of an untrusted executable.|
+|AppControlPackagedAppAudited<br>AppControlPackagedAppBlocked|App control detected/blocked the use of an untrusted packages app.|
+|AppControlPolicyApplied|An app control policy was applied to the device.|
+|AppControlScriptAudited<br>AppControlScriptBlocked|App control detected/blocked the use of an untrusted script.|
+|AppLockerBlockExecutable|AppLocker prevented an untrusted executable from running.|
+|AppLockerBlockPackagedApp|AppLocker prevented an untrusted packaged app from running.|
+|AppLockerBlockPackagedAppInstallation|AppLocker prevented the installation of an untrusted packaged app.|
+|AppLockerBlockScript|AppLocker prevent an untrusted script from running.|
+
+The KQL query to search for WDAC and AppLocker detections is the following:
+
+```kql
+DeviceEvents
+| where ActionType startswith "AppControl" or ActionType startswith "AppLocker"
+```
 
 ### MDE Alerts
 
