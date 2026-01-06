@@ -8,7 +8,9 @@ Please, take a look at the first post named [What is Microsoft Defender for Endp
 
 In this post, the focus is on KQL and what queries to run, to investigate for blocks/detections done by MDE.
 
-If you want to get a tl;dr KQL query from this blog post, check the last section.
+In each scetion, a brief description of a different MDE capability is described, including what to look for when running KQL queries, and a simple KQL query searching for events of that capability.
+
+If you want to get a tl;dr KQL query from this blog post which includes all the detections, check the last section.
 
 All the information is based on official documentation of Microsoft, which you can find [here](https://learn.microsoft.com/en-us/defender-endpoint/).
 
@@ -338,5 +340,26 @@ AlertInfo
 There are almost too many Action Types to look for when investigating the behavior of Defender on a machine. In order to have a headstart, the following KQL query is written to search for most, if not all, of them:
 
 ```kql
-
+DeviceEvents
+| where DeviceId == "<Enter Device ID here>" //If you are investigating a specific device, then enter its Device ID in this filter
+| extend MDEMeasure = case(ActionType startswith "Asr" and (ActionType endswith "Blocked" or ActionType endswith "WarnBypassed"), "ASR",
+ActionType == "ControlledFolderAccessViolationBlocked", "CFA",
+ActionType in ("BluetoothPolicyTriggered", "PnPDeviceBlocked", "PrintJobBlocked", "RemovableStorageFileEvent", "RemovableStoragePolicyTriggered"), "DeviceControl", //Device Control, these need to be checked for Allow actions
+(ActionType startswith "ExploitGuard" and (ActionType endswith "Enforced" or ActionType contains "Blocked")) and ActionType !contains "NetworkProtection" or ActionType =="ControlFlowGuardViolation" , "ExploitProtection",
+ActionType in ("ExploitGuardNetworkProtectionBlocked","SmartScreenExploitWarning","SmartScreenUrlWarning","SmartScreenAppWarning","SmartScreenUserOverride"),"Network_Web_SmartScreen",
+ActionType contains "tamper","TamperProtection",
+ActionType in ("AntivirusDetection","AntivirusError","AntivirusMalwareActionFailed","AntivirusMalwareBlocked") and tostring(AdditionalFields) !contains "PUA","MDAV",
+ActionType == "AntivirusDetection" and tostring(AdditionalFields) contains "PUA","PUA",
+(ActionType startswith "AppControl" or ActionType startswith "AppLocker") and ActionType contains "block","WDAC_AppLocker",
+"NonMDE")
+| where MDEMeasure != "NonMDE"
+// | summarize count() by MDEMeasure, ActionType
 ```
+
+## Conclusion
+
+It is always a complex task to definitively reply to the question "Did Defender block something?". With this post, hopefully is has become at least a little bit easier.
+
+Stick around for the next posts, where we will dive deep into looking Windows Event Logs and how to Troubleshoot Performance Issues for MDE.
+
+I hope to see you again.
