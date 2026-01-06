@@ -2,11 +2,13 @@
 
 ## Introduction
 
-Welcome to the 2nd part of the blog post series "Getting to know MDE"! In this series, each post contains a different component/feature/methodology when it comes to understanding and managing Microsoft Defender for Endpoint (MDE).
+Welcome to the 2nd part of the blog post series "Getting to know MDE"!
+
+In this series, each post contains a different component/feature/methodology when it comes to understanding and managing Microsoft Defender for Endpoint (MDE).
 
 Please, take a look at the first post named [What is Microsoft Defender for Endpoint, for the Endpoint](https://kostaskoutrou.github.io/2025/12/17/what-is-mde.html), where the different capabilities of MDE are listed to provide a clear picture of what's included.
 
-In this post, the focus is on KQL and what queries to run, to investigate for blocks/detections done by MDE.
+In this post, the focus is **on KQL and what queries to run to investigate for blocks/detections done by MDE**.
 
 In each scetion, a brief description of a different MDE capability is described, including what to look for when running KQL queries, and a simple KQL query searching for events of that capability.
 
@@ -27,14 +29,16 @@ So let's get started.
 
 ### DeviceEvents table
 
-The detections by MDE are reported under the DeviceEvents table in Advanced Hunting.
+Before starting with each MDE capability, it is important to focus on the Advanced Hunting table which includes all the MDE detection events.
+
+The detections by MDE are reported under the `DeviceEvents` table in Advanced Hunting.
 
 Two important columns of the DeviceEvents table are the following:
 
-- ActionType: The `ActionType` column shows what action triggered the `DeviceEvents` event. When it comes to MDE, the `ActionType` column shows which MDE detection tirggered the event.
-- AdditionalFields: The `AdditionalFields` column contains, as its name suggests, additional information regarding the event which does not fit any of the other columns. When it comes to MDE detections, the `AdditionalFields` column contains necessary information about the detection, such as whether something was blocked or audited, or what policy triggered the event. It is in JSON format, and, depending on what is being searched for, the `AdditionalFields` JSON data will need to be parsed in order to retrieve the correct information. In the queries below, there are some examples to get a better idea of how to parse the column.
+- **ActionType**: The `ActionType` column shows what action triggered the `DeviceEvents` event. When it comes to MDE, the `ActionType` column shows which MDE detection tirggered the event.
+- **AdditionalFields**: The `AdditionalFields` column contains, as its name suggests, additional information regarding the event, information which does not fit any of the other columns. When it comes to MDE detections, the `AdditionalFields` column contains necessary information about the detection, such as whether something was blocked or audited, or what policy triggered the event. It is in JSON format and, depending on what is being searched for, the `AdditionalFields` JSON data will need to be parsed in order to retrieve the correct information. In the queries below, there are some examples to get a better idea of how to parse the column.
 
-You can always refer to the `DeviceEvents` Schema reference directly from the Advanced Hunting page in Defender to review the different available values:
+You can always refer to the `DeviceEvents` Schema reference directly from the Advanced Hunting page in Defender to review the different available columns and their values:
 
 <img alt="image" src="https://github.com/user-attachments/assets/d43c04c7-c212-49b4-8e5e-767a6b20decd" />
 
@@ -46,9 +50,9 @@ For each ASR Rule detection, there can be one of three possible `ActionType` val
 
 |ActionType|Description|
 |-|-|
-|Asr\<RuleName\>Audited|ASR Rule of <RuleName> was triggered but did not block.|
-|Asr\<RuleName\>Blocked|ASR Rule of <RuleName> was triggered and blocked.|
-|Asr\<RuleName\>WarnBypassed|ASR Rule of <RuleName> was triggered in Warn mode, and the user excluded themselves from it.|
+|Asr\<RuleName\>Audited|ASR Rule of \<RuleName\> was triggered but did not block.|
+|Asr\<RuleName\>Blocked|ASR Rule of \<RuleName\> was triggered and blocked.|
+|Asr\<RuleName\>WarnBypassed|ASR Rule of \<RuleName\> was triggered in Warn mode, and the user excluded themselves from it.|
 
 In the following table the ASR Rules action types are listed and the ASR rule that they correspond to.
 
@@ -74,7 +78,7 @@ In the following table the ASR Rules action types are listed and the ASR rule th
 |AsrVulnerableSignedDriverAudited<br>AsrVulnerableSignedDriverBlocked<br>AsrVulnerableSignedDriverWarnBypassed|Block abuse of in-the-wild exploited vulnerable signed drivers|
 |AsrWebShellOnServerAudited<br>AsrWebShellOnServerBlocked<br>AsrWebShellWarnBypassed (does not have the "OnServer" substring like the other 2)|Block Webshell creation for Servers|
 
-Each ASR Rule has its own GUID. GUIDs are needed when configuring, e.g., a GPO to enable ASR rules in Audit or Block mode for machines. The ASR Rule to GUID matrix can be found in Microsoft"s [Attack surface reduction rules reference](https://learn.microsoft.com/en-us/defender-endpoint/attack-surface-reduction-rules-reference#asr-rule-to-guid-matrix)
+Each ASR Rule has its own GUID. GUIDs are needed when configuring, e.g., a GPO to enable ASR rules in Audit or Block mode for machines. The ASR Rule to GUID matrix can be found in Microsoft's [Attack surface reduction rules reference](https://learn.microsoft.com/en-us/defender-endpoint/attack-surface-reduction-rules-reference#asr-rule-to-guid-matrix)
 
 The KQL query to search for ASR Rule detections is the following:
 
@@ -90,8 +94,10 @@ When looking for CFA detections, keep the following in mind:
 
 CFA has only 2 `ActionType` possible values reported in `DeviceEvents`:
 
-- ControlledFolderAccessViolationAudited
-- ControlledFolderAccessViolationBlocked
+|ActionType|Description|
+|-|-|
+|ControlledFolderAccessViolationAudited|Controlled folder accesses detected an attempt to modify a protected folder.|
+|ControlledFolderAccessViolationBlocked|Controlled folder access blocked an attempt to modify a protected folder.|
 
 The KQL query to search for CFA detections is the following:
 
@@ -125,7 +131,7 @@ DeviceEvents
 "PrintJobBlocked","RemovableStorageFileEvent","RemovableStoragePolicyTriggered") //You may want to search for "PnPDeviceAllowed" and "PnPDeviceConnected", too, after configuring Device Control policies, to make sure that the desired activities are allowed and to investigate further activities. But for checking for Device Control Blocks, it is not needed.
 ```
 
-Keep in mind that even after excluding the `PnPDeviceAllowed` `ActionType`, the other possible `ActionType` values still contain activities which may indicating not blocking, but allowing.
+Keep in mind that even after excluding the `PnPDeviceAllowed` `ActionType`, the other possible `ActionType` values still contain activities which may not indicate blocking, but allowing.
 
 For example, take a look at the following KQL query:
 
@@ -148,7 +154,7 @@ DeviceEvents
 | order by Timestamp desc
 ```
 
-The `ActionType` `RemovableStoragePolicyTriggered` does not mean a block or an allow by default. It means that a policy was triggered, and in the `AdditionalFields` column more details can be found.
+The `ActionType` `RemovableStoragePolicyTriggered` does not mean a block or an allow action by default. It means that a policy was triggered, and more details can be found in the `AdditionalFields` column.
 
 ### Exploit Protection
 
@@ -158,7 +164,7 @@ Ignore `DeviceEvents` with `ActionType` `ExploitGuardNetworkProtectionAudited` o
 
 Some Exploit Protection measures do not create events, because they do not detect. For example, with Mandatory ASLR and Bottom-up ASLR, a program's code and libraries and loaded at a random memory address instead of a predictable one. This measure does not detect anything to create an event for.
 
-Microsoft's [documentation](https://learn.microsoft.com/en-us/defender-endpoint/exploit-protection#exploit-protection-and-advanced-hunting) does not include the Control Flow Guard (CFG) DeviceEvents ActionType, it only includes the Exploit Protection measures ActionTypes actually starting with the substring `ExploitGuard`. The actual complete list is found in the following table.
+Microsoft's [documentation](https://learn.microsoft.com/en-us/defender-endpoint/exploit-protection#exploit-protection-and-advanced-hunting) does not include the Control Flow Guard (CFG) DeviceEvents ActionType, it only includes the Exploit Protection measures ActionTypes actually starting with the substring `ExploitGuard`. The complete list is depicted in the following table.
 
 |DeviceEvents ActionType|Description|Exploit Protection Measure|
 |-|-|-|
