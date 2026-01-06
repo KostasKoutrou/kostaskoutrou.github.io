@@ -115,7 +115,7 @@ Device Control has 7 `ActionType` possible values reported in `DeviceEvents`:
 
 |DeviceEvents ActionType|Description|
 |-|-|
-|BluetoothPolicyTriggered|A Bluetooth service llowed or blocked by a device control policy.|
+|BluetoothPolicyTriggered|A Bluetooth service was allowed or blocked by a device control policy.|
 |PnpDeviceConnected|This event appears when a PnP device is connected on an onboarded device, regardless of whether Device Control is enabled or not.|
 |PnPDeviceAllowed|Device control allowed a trusted plug and play (PnP) device. Note that when a device installation restrictions are configured and a device is installed, an event with `ActionType` of `PnPDeviceAllowed` is created.|
 |PnPDeviceBlocked|Device control blocked an untrusted plug and play (PnP) device.|
@@ -133,7 +133,7 @@ DeviceEvents
 
 Keep in mind that even after excluding the `PnPDeviceAllowed` `ActionType`, the other possible `ActionType` values still contain activities which may not indicate blocking, but allowing.
 
-For example, take a look at the following KQL query:
+For example, take a look at the following KQL query, taken from [here](https://learn.microsoft.com/en-us/defender-endpoint/device-control-overview#control-access-to-removable-media-using-device-control):
 
 ```kql
 DeviceEvents
@@ -164,7 +164,7 @@ Ignore `DeviceEvents` with `ActionType` `ExploitGuardNetworkProtectionAudited` o
 
 Some Exploit Protection measures do not create events, because they do not detect. For example, with Mandatory ASLR and Bottom-up ASLR, a program's code and libraries and loaded at a random memory address instead of a predictable one. This measure does not detect anything to create an event for.
 
-Microsoft's [documentation](https://learn.microsoft.com/en-us/defender-endpoint/exploit-protection#exploit-protection-and-advanced-hunting) does not include the Control Flow Guard (CFG) DeviceEvents ActionType, it only includes the Exploit Protection measures ActionTypes actually starting with the substring `ExploitGuard`. The complete list is depicted in the following table.
+Microsoft's [documentation](https://learn.microsoft.com/en-us/defender-endpoint/exploit-protection#exploit-protection-and-advanced-hunting) does not include the Control Flow Guard (CFG) DeviceEvents `ActionType`, it only includes the Exploit Protection measures Action Types actually with the substring `ExploitGuard`. The complete list of the possible `ActionType` values for Exploit Protection is depicted in the following table.
 
 |DeviceEvents ActionType|Description|Exploit Protection Measure|
 |-|-|-|
@@ -202,8 +202,10 @@ Network, Web Protection, and Smart Screen are in the same section because of the
 
 As mentioned in the previous section, Network and Web Protection have only 2 `ActionType` possible values reported in `DeviceEvents`:
 
-- ExploitGuardNetworkProtectionAudited
-- ExploitGuardNetworkProtectionBlocked
+|ActionType|Description|
+|-|-|
+|ExploitGuardNetworkProtectionAudited|Network protection detected an attempt to access a malicious or unwanted IP address domain or URL.|
+|ExploitGuardNetworkProtectionBlocked|Network protection blocked a malicious or unwanted IP address domain or URL.|
 
 Because Microsoft Defender SmartScreen is also involved in the detections, the following SmartScreen related `ActionType` values should also be searched for:
 
@@ -223,7 +225,7 @@ DeviceEvents
 |where ActionType in ("ExploitGuardNetworkProtectionAudited","ExploitGuardNetworkProtectionBlocked",
 "SmartScreenExploitWarning","SmartScreenUrlWarning","SmartScreenAppWarning","SmartScreenUserOverride")
 ```
-Below is an example of how you can parse the JSON data in the `AdditionalFields` column when it comes to Network/Web Protection detections:
+Below is an example of how you can parse the JSON data in the `AdditionalFields` column when it comes to Network/Web Protection detections (ref. Microsoft's [Documentation](https://learn.microsoft.com/en-us/defender-endpoint/network-protection#advanced-hunting)):
 
 ```kql
 DeviceEvents
@@ -243,9 +245,9 @@ AlertInfo
 | where Title contains "tamper"
 ```
 
-The `DeviceEvents` table can also be used to identify tampering attempts. Tampering attempts could be done either by the user of by any other process, including Group Policies enforcment, Intune, etc.
+The `DeviceEvents` table can also be used to identify tampering attempts. Tampering attempts could be done either by the user of by any other process, including Group Policies enforcement, Intune, etc.
 
-Keep in mind that when Tamper Protection is on, the following settings are blocked from being change by **any** means, including GPO, Intune, Configuration Manager, etc.
+Keep in mind that when Tamper Protection is on, the following settings are blocked from being changed by **any** means, including GPO, Intune, Configuration Manager, etc.
 
 - Virus and threat protection remains enabled.
 - Real-time protection remains turned on.
@@ -277,7 +279,7 @@ When it comes to detections from Microsoft Defender Antivirus, there are five di
 |AntivirusError|Windows Defender Antivirus encountered an error while taking action on malware or a potentially unwanted application.|
 |AntivirusMalwareActionFailed|Windows Defender Antivirus attempted to take action on malware or a potentially unwanted application but the action failed.|
 |AntivirusMalwareBlocked|Windows Defender Antivirus blocked files or activity involving malware or potentially unwanted applications or suspicious behavior.|
-|AntivirusReport|This should be ignored. It creates too many events without any useful info. It reports event of when Microsoft Defender Antivirus reported a threat, which can be a memory, boot sector, or rootkit threat.|
+|AntivirusReport|This should be ignored. It creates too many events without any useful info. It reports events of when Microsoft Defender Antivirus reported a threat, which can be a memory, boot sector, or rootkit threat.|
 
 The KQL query to search for MDAV detections is the following:
 
@@ -289,7 +291,7 @@ DeviceEvents
 
 ### Potential Unwanted Apps (PUA)
 
-PUA detections are under the ActionType "AntivirusDetection", and therefore you will find them with the KQL queries of the previous section.
+PUA detections are under the `ActionType` of value `AntivirusDetection`, and therefore its detections can be found with the KQL queries of the previous section.
 
 If there is a focus to investigate specifically for PUA detections/blocks, the following KQL query can be used:
 
@@ -299,7 +301,7 @@ DeviceEvents
 | where tostring(AdditionalFields) contains "PUA"
 ```
 
-Generally, it was noticed that the KQL queries provided by Microsoft's documentation sometimes have issues. For example, the KQL query provided [here](https://learn.microsoft.com/en-us/defender-endpoint/detect-block-potentially-unwanted-apps-microsoft-defender-antivirus#view-pua-events-using-advanced-hunting) to view PUA events only checks for a subset of PUA events, because it checks for the "PUA:" substring instead of "PUA" (without the column), missing many events like "PUABundler". Therefore, please use the KQL query provided in this post.
+Generally, it was noticed that the KQL queries provided by Microsoft's documentation sometimes have issues. For example, the KQL query provided [here](https://learn.microsoft.com/en-us/defender-endpoint/detect-block-potentially-unwanted-apps-microsoft-defender-antivirus#view-pua-events-using-advanced-hunting) to view PUA events only checks for a subset of PUA events, because it checks for the "PUA:" substring instead of "PUA" (without the column), missing many events like "PUABundler". Therefore, it is better to use the above KQL query provided in this post.
 
 ### Windows Defender Application Control (WDAC) and AppLocker
 
@@ -308,7 +310,7 @@ WDAC and AppLocker have a lot of different possible `ActionType` values, which a
 |ActionType|Description|
 |-|-|
 |AppControlAppInstallationAudited<br>AppControlAppInstallationBlocked|App control detected/blocked the installation of an untrusted app.|
-|AppControlCIScriptAudited<br>AppControlCIScriptBlocked|A script MSI file genrated by Windows LockDown Policy was audited/blocked.|
+|AppControlCIScriptAudited<br>AppControlCIScriptBlocked|A script MSI file generated by Windows LockDown Policy was audited/blocked.|
 |AppControlCodeIntegrityDriverRevoked|Application control found a driver with a revoked certificate.|
 |AppControlCodeIntegrityImageAudited|Application control detected an executable file that violated code integrity policies.|
 |AppControlCodeIntegrityImageRevoked|Application control found an executable file with a revoked certificate.|
@@ -335,6 +337,8 @@ DeviceEvents
 
 ### MDE Alerts
 
+MDE Alerts can be queried to investigate for detections which were not reported by the above queries, with the following KQL.
+
 ```kql
 AlertInfo
 | where Timestamp > ago(30d)
@@ -343,12 +347,23 @@ AlertInfo
 
 ### General KQL query for all detections
 
-There are almost too many Action Types to look for when investigating the behavior of Defender on a machine. In order to have a headstart, the following KQL query is written to search for most, if not all, of them:
+There are almost too many Action Types to look for when investigating the behavior of Defender on a machine. In order to have a headstart, the following KQL query is written to search for most, if not all, of them. The query creates a new column named `MDEMeasure `based on the MDE capability, with the following possible values:
+
+|MDEMeasure Value|MDE Capability|
+|-|-|
+|ASRRules|Attack Surface Reduction Rules|
+|CFA|Controlled Folder Access|
+|DeviceControl|Device Control|
+|ExploitProtection|Exploit Protection|
+|TamperProtection|Tamper Protection|
+|PUA|Potentially Unwanted Apps|
+|MDAV|Microsoft Defender Antivirus|
+|WDAC_AppLocker|Windows Defender App Control and AppLocker|
 
 ```kql
 DeviceEvents
 | where DeviceId == "<Enter Device ID here>" //If you are investigating a specific device, then enter its Device ID in this filter
-| extend MDEMeasure = case(ActionType startswith "Asr" and (ActionType endswith "Blocked" or ActionType endswith "WarnBypassed"), "ASR",
+| extend MDEMeasure = case(ActionType startswith "Asr" and (ActionType endswith "Blocked" or ActionType endswith "WarnBypassed"), "ASRRules",
 ActionType == "ControlledFolderAccessViolationBlocked", "CFA",
 ActionType in ("BluetoothPolicyTriggered", "PnPDeviceBlocked", "PrintJobBlocked", "RemovableStorageFileEvent", "RemovableStoragePolicyTriggered"), "DeviceControl", //Device Control, these need to be checked for Allow actions
 (ActionType startswith "ExploitGuard" and (ActionType endswith "Enforced" or ActionType contains "Blocked")) and ActionType !contains "NetworkProtection" or ActionType =="ControlFlowGuardViolation" , "ExploitProtection",
