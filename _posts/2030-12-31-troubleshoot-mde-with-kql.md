@@ -307,7 +307,7 @@ The KQL query to search for WDAC and AppLocker detections is the following:
 
 ```kql
 DeviceEvents
-| where ActionType (startswith "AppControl" or ActionType startswith "AppLocker") and ActionType contains "block"
+| where (ActionType startswith "AppControl" or ActionType startswith "AppLocker") and ActionType contains "block"
 ```
 
 ### MDE Alerts
