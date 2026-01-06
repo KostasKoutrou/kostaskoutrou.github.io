@@ -8,9 +8,9 @@ In this series, each post contains a different component/feature/methodology whe
 
 Please, take a look at the first post named [What is Microsoft Defender for Endpoint, for the Endpoint](https://kostaskoutrou.github.io/2025/12/17/what-is-mde.html), where the different capabilities of MDE are listed to provide a clear picture of what's included.
 
-In this post, the focus is **on KQL and what queries to run to investigate for blocks/detections done by MDE**.
+> In this post, the focus is **on KQL and what queries to run to investigate for blocks/detections done by MDE**.
 
-In each scetion, a brief description of a different MDE capability is described, including what to look for when running KQL queries, and a simple KQL query searching for events of that capability.
+In each section, a brief description of a different MDE capability is described, including what to look for when running KQL queries, and a simple KQL query searching for events of that capability.
 
 If you want to get a tl;dr KQL query from this blog post which includes all the detections, check the last section.
 
@@ -236,7 +236,8 @@ Below is an example of how you can parse the JSON data in the `AdditionalFields`
 DeviceEvents
 |where ActionType in ("ExploitGuardNetworkProtectionAudited","ExploitGuardNetworkProtectionBlocked")
 |extend ParsedFields=parse_json(AdditionalFields)
-|project DeviceName, ActionType, Timestamp, RemoteUrl, InitiatingProcessFileName, IsAudit=tostring(ParsedFields.IsAudit), ResponseCategory=tostring(ParsedFields.ResponseCategory), DisplayName=tostring(ParsedFields.DisplayName)
+|project DeviceName, ActionType, Timestamp, RemoteUrl, InitiatingProcessFileName,IsAudit=tostring(ParsedFields.IsAudit),
+ResponseCategory=tostring(ParsedFields.ResponseCategory), DisplayName=tostring(ParsedFields.DisplayName)
 |sort by Timestamp desc
 ```
 ### Tamper Protection
