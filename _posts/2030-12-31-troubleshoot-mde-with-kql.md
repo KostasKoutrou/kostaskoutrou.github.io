@@ -17,7 +17,7 @@ Two important columns of the DeviceEvents table are the following:
 - ActionType: The `ActionType` column shows what action triggered the `DeviceEvents` event. When it comes to MDE, the `ActionType` column shows which MDE detection tirggered the event.
 - AdditionalFields: The `AdditionalFields` column contains, as its name suggests, additional information regarding the event which does not fit any of the other columns. When it comes to MDE detections, the `AdditionalFields` column contains necessary information about the detection, such as whether something was blocked or audited, or what policy triggered the event. It is in JSON format, and, depending on what is being searched for, the `AdditionalFields` JSON data will need to be parsed in order to retrieve the correct information. In the queries below, there are some examples to get a better idea of how to parse the column.
 
-You can always refer to the Device``Events Schema reference directly from the Advanced Hunting page in Defender to review the different available values:
+You can always refer to the `DeviceEvents` Schema reference directly from the Advanced Hunting page in Defender to review the different available values:
 
 <img alt="image" src="https://github.com/user-attachments/assets/d43c04c7-c212-49b4-8e5e-767a6b20decd" />
 
@@ -171,7 +171,7 @@ The KQL query to search for Exploit Protection detections is the following:
 
 ```kql
 DeviceEvents
-| where ActionType startswith ("ExploitGuard") or ActionType == "ControlFlowGuard"
+| where ActionType startswith "ExploitGuard" and ActionType !contains "NetworkProtection" or ActionType == "ControlFlowGuardViolation"
 ```
 ### Network Protection, Web Protection, and SmartScreen
 
@@ -320,5 +320,8 @@ AlertInfo
 
 ### General KQL query for all detections
 
+There are almost too many Action Types to look for when investigating the behavior of Defender on a machine. In order to have a headstart, the following KQL query is written to search for most, if not all, of them:
+
 ```kql
+
 ```
