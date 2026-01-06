@@ -6,8 +6,6 @@ Welcome to the 2nd part of the blog post series "Getting to know MDE"!
 
 In this series, each post contains a different component/feature/methodology when it comes to understanding and managing Microsoft Defender for Endpoint (MDE).
 
-Please, take a look at the first post named [What is Microsoft Defender for Endpoint, for the Endpoint](https://kostaskoutrou.github.io/2025/12/17/what-is-mde.html), where the different capabilities of MDE are listed to provide a clear picture of what's included.
-
 > In this post, the focus is **on KQL and what queries to run to investigate for blocks/detections done by MDE**.
 
 In each section, a brief description of a different MDE capability is described, including what to look for when running KQL queries, and a simple KQL query searching for events of that capability.
