@@ -85,7 +85,8 @@ The KQL query to search for ASR Rule detections is the following:
 ```kusto
 DeviceEvents
 | where ActionType startswith "Asr"
-| extend RuleId=extractjson("$Ruleid", AdditionalFields, typeof(string)) //Parse the AdditionalFields column in order to extract the ASR Rule GUID.
+| extend RuleId=extractjson("$Ruleid", AdditionalFields, typeof(string)) //Parse
+//the AdditionalFields column in order to extract the ASR Rule GUID.
 ```
 
 ### Controlled Folder Access Detections
@@ -128,7 +129,11 @@ The KQL query to search for Device Control detections is the following:
 ```kql
 DeviceEvents
 | where ActionType in ("BluetoothPolicyTriggered","PnPDeviceBlocked",
-"PrintJobBlocked","RemovableStorageFileEvent","RemovableStoragePolicyTriggered") //You may want to search for "PnPDeviceAllowed" and "PnPDeviceConnected", too, after configuring Device Control policies, to make sure that the desired activities are allowed and to investigate further activities. But for checking for Device Control Blocks, it is not needed.
+"PrintJobBlocked","RemovableStorageFileEvent","RemovableStoragePolicyTriggered")
+//You may want to search for "PnPDeviceAllowed" and "PnPDeviceConnected", too, after
+//configuring Device Control policies, to make sure that the desired activities are
+//allowed and to investigate further activities. But for checking for Device Control
+//Blocks, it is not needed.
 ```
 
 Keep in mind that even after excluding the `PnPDeviceAllowed` `ActionType`, the other possible `ActionType` values still contain activities which may not indicate blocking, but allowing.
@@ -174,8 +179,8 @@ Microsoft's [documentation](https://learn.microsoft.com/en-us/defender-endpoint/
 |ExploitGuardIafViolationAudited<br>ExploitGuardIafViolationBlocked|Import address filtering (IAF) **detected** or **blocked** possible exploitation activity.|Import address filtering (IAF)|
 |ExploitGuardLowIntegrityImageAudited<br>ExploitGuardLowIntegrityImageBlocked|Exploit protection **detected** or **blocked** the launch of a process from a low-integrity file.|Block low integrity images|
 |ExploitGuardNonMicrosoftSignedAudited<br>ExploitGuardNonMicrosoftSignedBlocked|Exploit protection **detected** or **blocked** the launch of a process from an image file that is not signed by Microsoft.|Code integrity guard|
-|ExploitGuardRopExploitAudited<br>ExploitGuardRopExploitBlocked|Exploit protection blocked possible return-object programming (ROP) exploitation.|Simulate execution (SimExec)<br>Validate API invocation (CallerCheck)<br>Validate stack integrity (StackPivot)|
-|ExploitGuardSharedBinaryAudited<br>ExploitGuardSharedBinaryBlocked|Exploit protection detected or blocked the launch of a process from a file in a remote shared file.|Block remote images|
+|ExploitGuardRopExploitAudited<br>ExploitGuardRopExploitBlocked|Exploit protection **detected** or **blocked** possible return-object programming (ROP) exploitation.|Simulate execution (SimExec)<br>Validate API invocation (CallerCheck)<br>Validate stack integrity (StackPivot)|
+|ExploitGuardSharedBinaryAudited<br>ExploitGuardSharedBinaryBlocked|Exploit protection **detected** or **blocked** the launch of a process from a file in a remote shared file.|Block remote images|
 |ExploitGuardWin32SystemCallAudited<br>ExploitGuardWin32SystemCallBlocked|Exploit protection **detected** or **blocked** a call to the Windows system AIP|Disable Win32k system calls|
 |ControlFlowGuardViolation|Control Flow Guard terminated an application after detecting an invalid function call|Control flow guard (CFG)|
 
