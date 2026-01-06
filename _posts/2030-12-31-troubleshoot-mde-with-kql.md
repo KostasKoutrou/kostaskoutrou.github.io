@@ -301,7 +301,7 @@ WDAC and AppLocker have a lot of different possible `ActionType` values, which a
 |AppLockerBlockExecutable|AppLocker prevented an untrusted executable from running.|
 |AppLockerBlockPackagedApp|AppLocker prevented an untrusted packaged app from running.|
 |AppLockerBlockPackagedAppInstallation|AppLocker prevented the installation of an untrusted packaged app.|
-|AppLockerBlockScript|AppLocker prevent an untrusted script from running.|
+|AppLockerBlockScript|AppLocker prevented an untrusted script from running.|
 
 The KQL query to search for WDAC and AppLocker detections is the following:
 
