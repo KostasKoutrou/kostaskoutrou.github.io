@@ -27,7 +27,7 @@ So let's get started.
 
 ---
 
-### DeviceEvents table
+### The DeviceEvents Table
 
 Before starting with each MDE capability, it is important to focus on the Advanced Hunting table which includes all the MDE detection events.
 
@@ -82,7 +82,7 @@ Each ASR Rule has its own GUID. GUIDs are needed when configuring, e.g., a GPO t
 
 The KQL query to search for ASR Rule detections is the following:
 
-```kql
+```kusto
 DeviceEvents
 | where ActionType startswith "Asr"
 | extend RuleId=extractjson("$Ruleid", AdditionalFields, typeof(string)) //Parse the AdditionalFields column in order to extract the ASR Rule GUID.
