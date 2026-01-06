@@ -1,10 +1,10 @@
-# What is Microsoft Defender for Endpoint, for the Endpoint
+# What is Microsoft Defender for Endpoint, for the Endpoint - Getting to know MDE Part 1
 
 ## Introduction
 
 What is MDE, for the Endpoint? I always wondered what is going on on the device after MDE is installed on it and it gets onboarded to MDE. There are so many capabilities that MDE and Defender Antivirus (MDAV) provides, that it is difficult to know what is happening in the background when something is blocked or the performance of the machine is degraded when running a specific process.
 
-In this series about MDE, I will try to gather and simplify all the concepts needed to know when running MDE on an endpoint. The purpose of the series is to have a better understanding of what exactly is being run on a machine onboarded to MDE, what is being checked/scanned and how, and how to approach a troubleshooting session effectively in case that it is needed.
+In this series about MDE named "Getting to know MDE", I will try to gather and simplify all the concepts needed to know when running MDE on an endpoint. The purpose of the series is to have a better understanding of what exactly is being run on a machine onboarded to MDE, what is being checked/scanned and how, and how to approach a troubleshooting session effectively in case that it is needed.
 
 > **Many of us have heard "is it Defender?" when a machine is performing poorly or an application is not running as expected. This series is an attempt to have an assistive cheatsheet in answering quickly and effectively.**
 
