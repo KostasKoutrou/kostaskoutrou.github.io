@@ -1,12 +1,27 @@
-# Using KQL to identify detections from MDE
+# Using KQL to identify detections from MDE - Getting to know MDE Part 2
 
 ## Introduction
 
-This post includes how to investigate for blocks/detections done by MDE.
+Welcome to the 2nd part of the blog post series "Getting to know MDE"! In this series, each post contains a different component/feature/methodology when it comes to understanding and managing Microsoft Defender for Endpoint (MDE).
+
+Please, take a look at the first post named [What is Microsoft Defender for Endpoint, for the Endpoint](https://kostaskoutrou.github.io/2025/12/17/what-is-mde.html), where the different capabilities of MDE are listed to provide a clear picture of what's included.
+
+In this post, the focus is on KQL and what queries to run, to investigate for blocks/detections done by MDE.
 
 If you want to get a tl;dr KQL query from this blog post, check the last section.
 
 All the information is based on official documentation of Microsoft, which you can find [here](https://learn.microsoft.com/en-us/defender-endpoint/).
+
+So let's get started.
+
+---
+
+## Contents
+
+* TOC
+{:toc}
+
+---
 
 ### DeviceEvents table
 
