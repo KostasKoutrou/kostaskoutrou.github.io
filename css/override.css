@@ -43,3 +43,11 @@ hr {
   font-size: 2.5em;
   opacity: 0.3;
 }
+
+/* KQL (Kusto) Syntax Highlighting Overrides */
+.highlight .k  { color: #0000ff; font-weight: bold; } /* Keywords (where, project) */
+.highlight .nf { color: #7a3e9d; }                    /* Functions (ago, count) */
+.highlight .s  { color: #a31515; }                    /* Strings */
+.highlight .p  { color: #2b91af; font-weight: bold; } /* Pipes | */
+.highlight .c1 { color: #008000; font-style: italic; } /* Comments // */
+.highlight .mi { color: #098658; }                    /* Numbers */
