@@ -29,11 +29,13 @@ DeviceProcessEvents
 DeviceFileCertificateInfo
 | where TimeGenerated > ago(30d) //putting 30 days because these events are not generated for every executation of a binary.
 | project SHA1, IsSigned, IsTrusted, Signer, Issuer, DeviceId
-| where isnull(IsSigned) or IsTrusted == 0 or IsSigned == 0
 ) on SHA1 and DeviceId
 | project TimeGenerated, DeviceName, DeviceId, SHA1, FileName, FolderPath, ProcessCommandLine, IsSigned, IsTrusted, Signer, Issuer, InitiatingProcessFileName
 | where isnull(IsSigned) or IsTrusted == 0 or IsSigned == 0
-| summarize count(), make_set(IsTrusted) by DeviceName, DeviceId, SHA1, FileName, Signer, Issuer//, FolderPath, IsSigned,IsTrusted
+| summarize count() by DeviceName, DeviceId, SHA1, FileName, Signer, Issuer, FolderPath, IsSigned, IsTrusted
+| sort by FileName asc, DeviceName asc
 ```
+
+Then you will have to manual click through the results of the detected files to see if they are actually signed, and what Defender mentions about their signature information.
 
 ## MPLog file parsing for performance impact
