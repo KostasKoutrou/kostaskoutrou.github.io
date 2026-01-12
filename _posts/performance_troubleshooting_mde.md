@@ -60,6 +60,70 @@ You can also add Certificates to the Indicators allow list.
 
 **File hash computation**: If you enable the File Hash computation feature, computes file hashes for every executable file that is scanned if it wasn’t previously computed. This has a performance cost especially when copying large files from a network share. This feature is needed when blocking file Indicators (IoCs) in defender. Keep in mind that this feature is a prerequisite for File Hash Indicators.
 
-
-
 ## MPLog file parsing for performance impact
+
+```powershell
+# Function to get the log file via dialog
+function Get-FileName($initialDirectory) {
+    [System.Reflection.Assembly]::LoadWithPartialName("System.windows.forms") | Out-Null
+    $OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog
+    $OpenFileDialog.initialDirectory = $initialDirectory
+    $OpenFileDialog.filter = "All files (*.*)| *.*"
+    $OpenFileDialog.ShowDialog() | Out-Null
+    $OpenFileDialog.filename
+}
+
+# Prompt the user to select a Windows Defender log file
+Write-Host "Select Windows Defender Log File to export Impactful Processes..."
+$logfile = Get-FileName
+Write-Host "File Selected: $logfile"
+
+# Extract relevant log entries, remove whitespaces, and process data
+$logs = Get-Content $logfile | `
+    Select-String "EstimatedImpact" | `
+    Select-String -Pattern '%$' | `
+    ForEach-Object {
+        # Remove all whitespace from the line
+        $_ -replace '\s', ''
+    } | `
+    ForEach-Object {
+        # Add a "Date:" prefix to each log entry
+        "Date:" + $_
+    } | `
+    ForEach-Object {
+        # Insert a comma after the 30th character for consistent formatting
+        $_.Insert(30, ',')
+    }
+
+# Convert the cleaned logs into structured objects for CSV export
+$logObjects = $logs | ForEach-Object {
+    # Split the cleaned line into fields (key-value pairs separated by ':')
+    $fields = $_ -split ',' | ForEach-Object {
+        $pair = $_ -split ':'
+        @{$pair[0] = $pair[1]}
+    }
+
+    # Combine all key-value pairs into a single hash table
+    $object = @{}
+    foreach ($field in $fields) {
+        foreach ($key in $field.Keys) {
+            $object[$key] = $field[$key]
+        }
+    }
+
+    # Remove the '%' from the "EstimatedImpact" field if it exists
+    if ($object["EstimatedImpact"]) {
+        $object["EstimatedImpact"] = $object["EstimatedImpact"] -replace '%', ''
+    }
+
+    # Return the final object as a PSCustomObject
+    [PSCustomObject]$object
+}
+
+# Export the processed data to a CSV file
+$outfile = $logfile -replace '\.log$', '.csv'
+$logObjects | Export-Csv -Path $outfile -NoTypeInformation -Encoding UTF8
+
+Write-Host "Process Logs exported to $outfile"
+Read-Host -Prompt "Press Enter to exit"
+```
