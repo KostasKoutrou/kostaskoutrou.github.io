@@ -60,6 +60,28 @@ You can also add Certificates to the Indicators allow list.
 
 **File hash computation**: If you enable the File Hash computation feature, computes file hashes for every executable file that is scanned if it wasn’t previously computed. This has a performance cost especially when copying large files from a network share. This feature is needed when blocking file Indicators (IoCs) in defender. Keep in mind that this feature is a prerequisite for File Hash Indicators.
 
+(probably not useful) To determine which component might be using CPU:
+
+RTP
+Scheduled scanning
+Scan after sec int updates
+COnflict with other sec SW
+Scanning large files / number of files
+
+## Performance Analyzer
+
+Some examples which can be useful
+Start with general search per category, and if you find a pattern in a category, then you can dig deeper.
+
+## Process Monitor
+
+
+## Windows Performance Recorder (WPRUI)
+
+[Reference](https://learn.microsoft.com/en-us/windows-hardware/test/wpt/introduction-to-wpr)
+
+Check the other troubleshooting section 13.
+
 ## MPLog file parsing for performance impact
 
 The Microsoft Protection Log (MPLog) file is one of a few files found under the path `C:\ProgramData\Microsoft\Windows Defender\Support`. Under this path, a few files which contain Defender logs can be found, including:
@@ -72,7 +94,7 @@ The Microsoft Protection Log (MPLog) file is one of a few files found under the 
 - MpWppCoreTracing
 - MpWppTracing
 
-These files are very useful when investigating what Defender and its different detection mechanisms did. When it comes to performance troubleshooting, the MPLog file contains a few useful lines, among others, which can assist in detecting processes and files which took a heavy toll on the machine's performance.
+These files are very useful when investigating what Defender and its different detection mechanisms did. When it comes to performance troubleshooting, the MPLog file contains a few useful lines, among others, which can assist in detecting processes and files which took a heavy toll on the machine's performance. Credits to the related [article](https://www.crowdstrike.com/en-us/blog/how-to-use-microsoft-protection-logging-for-forensic-investigations/) by CrowdStrike explaining these columns.
 
 These lines have the following format:
 
