@@ -74,7 +74,7 @@ Performance Analyzer is a tool that helps in determining which files, file exten
 
 Running the Performance Analyzer is straight-forward, by running the following cmdlet as an admin:
 
-`New-MpPerformanceRecording -RecordTo <recording.etl>`
+`New-MpPerformanceRecording -RecordTo \<recording.etl\>`
 
 The following is an example of the output of running that cmdlet:
 
@@ -92,15 +92,15 @@ Below is a series of cmdlets which can help pinpoint the issue:
 
 View the overview of the recording:
 
-`Get-MpPerformanceReport -Path .\recording.etl -Overview`
+`Get-MpPerformanceReport -Path .\\recording.etl -Overview`
 
 View the top 20 scans, paths, extensions, and processes (can increase the number to ):
 
-`Get-MpPerformanceReport -Path .\recording.etl -TopScans 20 -TopPaths 20 -TopExtensions 20 -TopProcesses 20`
+`Get-MpPerformanceReport -Path .\\recording.etl -TopScans 20 -TopPaths 20 -TopExtensions 20 -TopProcesses 20`
 
 After running the above command, if a specific category of top values or a specific value per-se is of interest, it is possible to then dive a bit deeper. For example, if a specific extension seems to be causing a lot of scans, to dive deeper the following cmdlet can be run:
 
-`Get-MpPerformanceReport -Path .\recording.etl -TopExtensions 20 -TopScansPerExtension 5 -TopPathsPerExtension 5 -TopScansPerPathPerExtension 5 -TopProcessesPerExtension 5 -TopScansPerProcessPerExtension 5 -TopScansPerFilePerExtension 5 -TopFilesPerExtension 5`
+`Get-MpPerformanceReport -Path .\\recording.etl -TopExtensions 20 -TopScansPerExtension 5 -TopPathsPerExtension 5 -TopScansPerPathPerExtension 5 -TopProcessesPerExtension 5 -TopScansPerProcessPerExtension 5 -TopScansPerFilePerExtension 5 -TopFilesPerExtension 5`
 
 This cmdlet uses all the parameters that end with "PerExtension", and will produce a much longer report focused on the top extensions, and their related paths, processes and files. This can help in pinpointing what is causing these scans, and either resolving the source of the issue or defining exclusions in MDE.
 
