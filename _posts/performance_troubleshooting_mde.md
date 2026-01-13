@@ -70,13 +70,51 @@ Scanning large files / number of files
 
 ## Performance Analyzer
 
-Some examples which can be useful
-Start with general search per category, and if you find a pattern in a category, then you can dig deeper.
+Performance Analyzer is a tool that helps in determining which files, file extensions, and processes may be causing performance issues in machines during antivirus scans. This information can be used as input towards potentially defining MDAV exclusions.
 
-## Process Monitor
+Running the Performance Analyzer is straight-forward, by running the following cmdlet as an admin:
 
+`New-MpPerformanceRecording -RecordTo <recording.etl>`
 
-## Windows Performance Recorder (WPRUI)
+The following is an example of the output of running that cmdlet:
+
+<img alt="image" src="https://github.com/user-attachments/assets/c843946d-e3ce-4175-a27b-8d109881f483" />
+
+The idea is to "turn on" Performance Analyzer, and while it is running and monitoring, the problematic scenario is reproduced. If it is a general issue which cannot be reproduced on demand, but happens sporadically, the only way to analyze that is by leaving Performance Analyzer running and hoping that the problematic behavior reappears.
+
+After capturing the problematic behavior, the recording can be stopped by pressing `Enter`, which results in the following output:
+
+<img alt="image" src="https://github.com/user-attachments/assets/1b914672-b7be-4e9c-8b72-02c369963feb" />
+
+The next step is to parse the Performance Anaylzer's report output. To do this the cmdlet `Get-MpPerformanceReport` is used. This cmdlet has a lot of different available parameters, which can be viewed at Microsoft's [Performance Analyzer Reference](https://learn.microsoft.com/en-us/defender-endpoint/performance-analyzer-reference).
+
+Below is a series of cmdlets which can help pinpoint the issue:
+
+View the overview of the recording:
+
+`Get-MpPerformanceReport -Path .\recording.etl -Overview`
+
+View the top 20 scans, paths, extensions, and processes (can increase the number to ):
+
+`Get-MpPerformanceReport -Path .\recording.etl -TopScans 20 -TopPaths 20 -TopExtensions 20 -TopProcesses 20`
+
+After running the above command, if a specific category of top values or a specific value per-se is of interest, it is possible to then dive a bit deeper. For example, if a specific extension seems to be causing a lot of scans, to dive deeper the following cmdlet can be run:
+
+`Get-MpPerformanceReport -Path .\recording.etl -TopExtensions 20 -TopScansPerExtension 5 -TopPathsPerExtension 5 -TopScansPerPathPerExtension 5 -TopProcessesPerExtension 5 -TopScansPerProcessPerExtension 5 -TopScansPerFilePerExtension 5 -TopFilesPerExtension 5`
+
+This cmdlet will produce a much longer report focused on the top extensions, and their related paths, processes and files. This can help in pinpointing what is causing these scans, and either resolving the source of the issue or defining exclusions in MDE.
+
+## Run MDECA with live response or manually
+
+parameters of MDECA, performance related parameters.
+
+## Other ways used in Microsoft Support tickets
+
+### Process Monitor
+
+Does not seem usful
+
+### Windows Performance Recorder (WPRUI)
 
 [Reference](https://learn.microsoft.com/en-us/windows-hardware/test/wpt/introduction-to-wpr)
 
