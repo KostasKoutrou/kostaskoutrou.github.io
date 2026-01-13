@@ -146,7 +146,7 @@ Let's go through this line:
 |ProcessImageName|Process Image Name|Razer Synapse Service Process.exe|
 |Pid|Process ID of the Process|9104|
 |TotalTime|The summary of all time periods spent in scans of files accessed by this process (milliseconds)|810|
-|Count|The number of scanned files accessed by this process|810|
+|Count|The number of scanned files accessed by this process|224|
 |MaxTime|The longest time spent in scanning a single file accessed by this process|15|
 |MaxTimeFile|The file which was scanned for `MaxTime` milliseconds|\Device\HarddiskVolume3\Program Files (x86)\Razer\Synapse3\UserProcess\Razer Synapse Service Process.exe.config|
 |EstimatedImpact|This value shows the impact that MDAV had on the performance of the above process. It is the percentage of (Total time spent in scans of files accessed by this process)/(Total time which this process experienced scan activity). For example, if you open a large file in File Explorer, all the files in it are being scanned via Real-Time Protection. The time it takes until the last file is finished being scanned was 10 seconds, but the time that MDAV was actually scanning files was 3 seconds. Here the Estimated Impact is about 3/10 = 30%.|53%|
