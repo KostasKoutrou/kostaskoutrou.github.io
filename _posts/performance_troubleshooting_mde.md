@@ -102,7 +102,7 @@ After running the above command, if a specific category of top values or a speci
 
 `Get-MpPerformanceReport -Path .\recording.etl -TopExtensions 20 -TopScansPerExtension 5 -TopPathsPerExtension 5 -TopScansPerPathPerExtension 5 -TopProcessesPerExtension 5 -TopScansPerProcessPerExtension 5 -TopScansPerFilePerExtension 5 -TopFilesPerExtension 5`
 
-This cmdlet will produce a much longer report focused on the top extensions, and their related paths, processes and files. This can help in pinpointing what is causing these scans, and either resolving the source of the issue or defining exclusions in MDE.
+This cmdlet uses all the parameters that end with "PerExtension", and will produce a much longer report focused on the top extensions, and their related paths, processes and files. This can help in pinpointing what is causing these scans, and either resolving the source of the issue or defining exclusions in MDE.
 
 ## Run MDECA with live response or manually
 
