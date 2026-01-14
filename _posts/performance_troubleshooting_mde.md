@@ -132,7 +132,7 @@ To run the MDECA via Live Response, follow the steps:
 3. Initiate a Live Response session for the endpoint that needs troubleshooting
 4. Upload a file to library by clicking on:
 <img alt="image" src="https://github.com/user-attachments/assets/cec0377f-98b5-4277-84d4-0b33f3cc6d58" />
-5. The parameters for getting a performance report will be added. Run the script with the command `run MDEClientAnalyzer.ps1 -parameters ""`
+5. ########REVIEW IF YOU CAN RUN LIVE ANALYZER WITH PARAMATERS ALREADY CONFIGURED, REVIEW WHICH PARAMETERS TO PUT FOR EASY PERFORMANCE TROUBLESHOOTING AND PUT THEM.########The parameters for getting a performance report will be added. Run the script with the command `run MDEClientAnalyzer.ps1 -parameters ""`
 6. Wait for the designated time.
 7. To get the report and results: `getfile "C:\\ProgramData\\Microsoft\\Windows Defender Advanced Threat Protection\\Downloads\\MDECA\\MDEClientAnalyzerResult.zip`
 
