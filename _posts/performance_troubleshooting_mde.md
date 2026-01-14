@@ -106,7 +106,36 @@ This cmdlet uses all the parameters that end with "PerExtension", and will produ
 
 ## Run MDECA with live response or manually
 
-parameters of MDECA, performance related parameters.
+Microsoft Defender for Endpoint Client Analyzer (MDECA) is a tool used for troubleshooting every aspect of devices onboarded to MDE. This includes troubleshooting sensor health, reliability issues, connectivity issues, as well as performance issues. In this post the focus will be on performance issues.
+
+MDECA can be run on a machine either locally or via MDE's Live Response. 
+
+When it comes to the available versions of MDECA, there is the non-preview [aka.ms/mdatpanalyzer](https://aka.ms/mdatpanalyzer) and the preview [aka.ms/MDEClientAnalyzerPreview](https://aka.ms/MDEClientAnalyzerPreview) version. The link [aka.ms/betamdeanalyzer](https://aka.ms/betamdeanalyzer) is also used for the preview version. In my experience from opening tickets to Microsoft, the engineer there would recommend running the preview version, so that's enough of a reason to choose this one.
+
+The downloaded zip file contains the following files:
+
+<img width="215" height="101" alt="image" src="https://github.com/user-attachments/assets/a8cbee0c-e3fe-4a1f-b59d-dbb6914736c4" />
+
+The files related to this post are:
+
+- MDEClientAnalyzer.ps1: This one is used to run MDECA locally. It is required to have all the files in the same path to run it.
+- MDELiveAnalyzer.ps1: This one runs MDECA remotelly or in general without required other files. When running it, it firstly downloads the full MDECA version, and then runs it.
+
+Several other tools are included in the Tools folder, which are out of scope for this post.
+
+In the following very useful [link](https://learn.microsoft.com/en-us/defender-endpoint/data-collection-analyzer) the different parameters that the MDECA supports are presented. Even in this link it is shown to run the preview version.
+
+To run the MDECA via Live Response, follow the steps:
+
+1. Download MDECA
+2. Get the PowerShell file wanted
+3. Initiate a Live Response session for the endpoint that needs troubleshooting
+4. Upload a file to library by clicking on:
+<img alt="image" src="https://github.com/user-attachments/assets/cec0377f-98b5-4277-84d4-0b33f3cc6d58" />
+5. The parameters for getting a performance report will be added. Run the script with the command `run MDEClientAnalyzer.ps1 -parameters ""`
+6. Wait for the designated time.
+7. To get the report and results: `getfile "C:\\ProgramData\\Microsoft\\Windows Defender Advanced Threat Protection\\Downloads\\MDECA\\MDEClientAnalyzerResult.zip`
+
 
 ## Other ways used in Microsoft Support tickets
 
