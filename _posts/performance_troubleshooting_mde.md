@@ -110,7 +110,7 @@ Microsoft Defender for Endpoint Client Analyzer (MDECA) is a tool used for troub
 
 MDECA can be run on a machine either locally or via MDE's Live Response. 
 
-When it comes to the available versions of MDECA, there is the non-preview [aka.ms/mdatpanalyzer](https://aka.ms/mdatpanalyzer) and the preview [aka.ms/MDEClientAnalyzerPreview](https://aka.ms/MDEClientAnalyzerPreview) version. The link [aka.ms/betamdeanalyzer](https://aka.ms/betamdeanalyzer) is also used for the preview version. In my experience from opening tickets to Microsoft, the engineer there would recommend running the preview version, so that's enough of a reason to choose this one.
+When it comes to the available versions of MDECA, there is the non-preview [aka.ms/mdatpanalyzer](https://aka.ms/mdatpanalyzer) and the preview [aka.ms/MDEClientAnalyzerPreview](https://aka.ms/MDEClientAnalyzerPreview) version. The link [aka.ms/betamdeanalyzer](https://aka.ms/betamdeanalyzer) is also used for the preview version. In my experience from opening tickets to Microsoft, the engineer there would recommend running the preview version, so that's enough of a reason to choose it.
 
 The downloaded zip file contains the following files:
 
@@ -119,21 +119,22 @@ The downloaded zip file contains the following files:
 The files related to this post are:
 
 - MDEClientAnalyzer.ps1: This one is used to run MDECA locally. It is required to have all the files in the same path to run it.
-- MDELiveAnalyzer.ps1: This one runs MDECA remotelly or in general without required other files. When running it, it firstly downloads the full MDECA version, and then runs it.
-
+- MDELiveAnalyzer.ps1: This one runs MDECA via live response. It is required to follow the steps described below to run it.
 Several other tools are included in the Tools folder, which are out of scope for this post.
 
-In the following very useful [link](https://learn.microsoft.com/en-us/defender-endpoint/data-collection-analyzer) the different parameters that the MDECA supports are presented. Even in this link it is shown to run the preview version.
+In the following very useful [documentation](https://learn.microsoft.com/en-us/defender-endpoint/data-collection-analyzer) the different parameters that the MDECA supports are presented. Even in this link it is shown to run the preview version.
 
 To run the MDECA via Live Response, follow the steps:
 
 1. Download MDECA
-2. Get the PowerShell file wanted
+2. Get the PowerShell file wanted (MDELiveAnalyzer.ps1)
 3. Initiate a Live Response session for the endpoint that needs troubleshooting
 4. Upload a file to library by clicking on:
 <img alt="image" src="https://github.com/user-attachments/assets/cec0377f-98b5-4277-84d4-0b33f3cc6d58" />
-5. ########REVIEW IF YOU CAN RUN LIVE ANALYZER WITH PARAMATERS ALREADY CONFIGURED, REVIEW WHICH PARAMETERS TO PUT FOR EASY PERFORMANCE TROUBLESHOOTING AND PUT THEM.########The parameters for getting a performance report will be added. Run the script with the command `run MDEClientAnalyzer.ps1 -parameters ""`
-6. Wait for the designated time.
+5. Repeat for the whole zip file that you downloaded (e.g. MDEClientAnalyzerPreview.zip)
+6. Run the command `putfile MDEClientAnalyzerPreview.zip`. This puts the zip file at the path `C:\\ProgramData\\Microsoft\\Windows Defender Advanced Threat Protection\\Downloads`, which is a path used for Live Response sessions.
+5. ########REVIEW IF YOU CAN RUN LIVE ANALYZER WITH PARAMATERS ALREADY CONFIGURED, REVIEW WHICH PARAMETERS TO PUT FOR EASY PERFORMANCE TROUBLESHOOTING AND PUT THEM.########The parameters for getting a performance report will be added. Run the script with the command `run MDELiveAnalyzer.ps1 -parameters ""`
+6. Reproduce the issue and wait for the designated time.
 7. To get the report and results: `getfile "C:\\ProgramData\\Microsoft\\Windows Defender Advanced Threat Protection\\Downloads\\MDECA\\MDEClientAnalyzerResult.zip`
 
 
