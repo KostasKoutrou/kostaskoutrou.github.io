@@ -149,7 +149,7 @@ In the following very useful [documentation](https://learn.microsoft.com/en-us/d
 For a quick reference, the parameters table is posted here as well:
 
 |Switch|Description|When to use|
-|-|-|
+|-|-|-|
 |-h|Calls into Windows Performance Recorder to collect a verbose general performance trace in addition to the standard log set.|Slow application start/launch. When clicking on a button on the app, taking x seconds longer.|
 |-l|Calls into built-in Windows Performance Monitor to collect a lightweight perfmon trace. This scenario can be useful when diagnosing slow performance degradation issues that occur over time but hard to reproduce on demand.|Troubleshooting application performance that could be slow to reproduce (manifest) itself. We recommend capturing up to three minutes (at most five minutes), because your data set could get too large.|
 |-c|Calls into process monitor for advanced monitoring of real-time file system, registry, and process/thread activity. This is especially useful when troubleshooting various application compatibility scenarios.|Process Monitor (ProcMon) to initiate a boot trace when investigating a driver or service or application startup delay related issue. Or applications hosted on a network share that aren't using SMB Opportunistic Locking (Oplock) properly causing application compatibility problems.|
