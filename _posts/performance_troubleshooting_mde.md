@@ -96,13 +96,31 @@ View the overview of the recording:
 
 View the top 20 scans, paths, extensions, and processes (can increase the number to ):
 
-`Get-MpPerformanceReport -Path .\\recording.etl -TopScans 20 -TopPaths 20 -TopExtensions 20 -TopProcesses 20`
+`Get-MpPerformanceReport -Path .\recording.etl -TopScans 20 -TopPaths 20 -TopExtensions 20 -TopProcesses 20`
 
 After running the above command, if a specific category of top values or a specific value per-se is of interest, it is possible to then dive a bit deeper. For example, if a specific extension seems to be causing a lot of scans, to dive deeper the following cmdlet can be run:
 
-`Get-MpPerformanceReport -Path .\\recording.etl -TopExtensions 20 -TopScansPerExtension 5 -TopPathsPerExtension 5 -TopScansPerPathPerExtension 5 -TopProcessesPerExtension 5 -TopScansPerProcessPerExtension 5 -TopScansPerFilePerExtension 5 -TopFilesPerExtension 5`
+`Get-MpPerformanceReport -Path .\recording.etl -TopExtensions 20 -TopScansPerExtension 5 -TopPathsPerExtension 5 -TopScansPerPathPerExtension 5 -TopProcessesPerExtension 5 -TopScansPerProcessPerExtension 5 -TopScansPerFilePerExtension 5 -TopFilesPerExtension 5`
 
 This cmdlet uses all the parameters that end with "PerExtension", and will produce a much longer report focused on the top extensions, and their related paths, processes and files. This can help in pinpointing what is causing these scans, and either resolving the source of the issue or defining exclusions in MDE.
+
+### Run Performance Analyzer via Live Response
+
+```powershell
+param (
+    [Parameter(Mandatory=$false)]
+    [int]$Seconds = 120
+)
+
+$Hostname = $env:COMPUTERNAME
+$Datetime = Get-Date -Format "yyyyMMdd_HHmmss"
+$OutputPath = "C:\Temp\PerformanceRecording_${Hostname}_${Datetime}.etl"
+
+Write-Host "Initiating recording for $Seconds seconds..."
+New-MpPerformanceRecording -Seconds $Seconds -RecordTo $OutputPath
+
+Write-Host "Performance Recording for $Hostname for $Seconds seconds was written at $OutputPath"
+```
 
 ## Run MDECA with live response or manually
 
@@ -132,10 +150,10 @@ To run the MDECA via Live Response, follow the steps:
 4. Upload a file to library by clicking on:
 <img alt="image" src="https://github.com/user-attachments/assets/cec0377f-98b5-4277-84d4-0b33f3cc6d58" />
 5. Repeat for the whole zip file that you downloaded (e.g. MDEClientAnalyzerPreview.zip)
-6. Run the command `putfile MDEClientAnalyzerPreview.zip`. This puts the zip file at the path `C:\\ProgramData\\Microsoft\\Windows Defender Advanced Threat Protection\\Downloads`, which is a path used for Live Response sessions.
-5. ########REVIEW IF YOU CAN RUN LIVE ANALYZER WITH PARAMATERS ALREADY CONFIGURED, REVIEW WHICH PARAMETERS TO PUT FOR EASY PERFORMANCE TROUBLESHOOTING AND PUT THEM.########The parameters for getting a performance report will be added. Run the script with the command `run MDELiveAnalyzer.ps1 -parameters ""`
-6. Reproduce the issue and wait for the designated time.
-7. To get the report and results: `getfile "C:\\ProgramData\\Microsoft\\Windows Defender Advanced Threat Protection\\Downloads\\MDECA\\MDEClientAnalyzerResult.zip`
+6. Run the command `putfile MDEClientAnalyzerPreview.zip`. This puts the zip file at the path `C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\Downloads`, which is a path used for Live Response sessions.
+7. ########REVIEW IF YOU CAN RUN LIVE ANALYZER WITH PARAMATERS ALREADY CONFIGURED, REVIEW WHICH PARAMETERS TO PUT FOR EASY PERFORMANCE TROUBLESHOOTING AND PUT THEM.########The parameters for getting a performance report will be added. Run the script with the command `run MDELiveAnalyzer.ps1 -parameters ""`
+8. Reproduce the issue and wait for the designated time.
+9. To get the report and results: `getfile "C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\Downloads\MDECA\MDEClientAnalyzerResult.zip`
 
 
 ## Other ways used in Microsoft Support tickets
