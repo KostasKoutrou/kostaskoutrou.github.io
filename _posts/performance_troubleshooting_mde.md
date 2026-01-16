@@ -106,6 +106,10 @@ This cmdlet uses all the parameters that end with "PerExtension", and will produ
 
 ### Run Performance Analyzer via Live Response
 
+upload powershell to library
+remember the parameter
+get the file from C:\Temp
+
 ```powershell
 param (
     [Parameter(Mandatory=$false)]
@@ -142,7 +146,27 @@ Several other tools are included in the Tools folder, which are out of scope for
 
 In the following very useful [documentation](https://learn.microsoft.com/en-us/defender-endpoint/data-collection-analyzer) the different parameters that the MDECA supports are presented. Even in this link it is shown to run the preview version.
 
-To run the MDECA via Live Response, follow the steps:
+For a quick reference, the parameters table is posted here as well:
+
+|Switch|Description|When to use|
+|-|-|
+|-h|Calls into Windows Performance Recorder to collect a verbose general performance trace in addition to the standard log set.|Slow application start/launch. When clicking on a button on the app, taking x seconds longer.|
+|-l|Calls into built-in Windows Performance Monitor to collect a lightweight perfmon trace. This scenario can be useful when diagnosing slow performance degradation issues that occur over time but hard to reproduce on demand.|Troubleshooting application performance that could be slow to reproduce (manifest) itself. We recommend capturing up to three minutes (at most five minutes), because your data set could get too large.|
+|-c|Calls into process monitor for advanced monitoring of real-time file system, registry, and process/thread activity. This is especially useful when troubleshooting various application compatibility scenarios.|Process Monitor (ProcMon) to initiate a boot trace when investigating a driver or service or application startup delay related issue. Or applications hosted on a network share that aren't using SMB Opportunistic Locking (Oplock) properly causing application compatibility problems.|
+|-i|Calls into built-in netsh.exe command to start a network and Windows Firewall trace that is useful when troubleshooting various network-related issues.|When troubleshooting network related issues such as Defender for Endpoint EDR telemetry or CnC data submission issues. Microsoft Defender Antivirus Cloud Protection (MAPS) reporting issues. Network protection related issues, and so forth.|
+|-b|Same as -c but the process monitor trace will be initiated during next boot and stopped only when the -b is used again.|Process Monitor (ProcMon) to initiate a boot trace when investigating a driver or service or application startup delay related issue. This scenario can also be used to investigate a slow boot or slow sign-in.|
+|-e|Calls into Windows Performance Recorder to collect Defender AV Client tracing (AM-Engine and AM-Service) for analysis of Antivirus cloud connectivity issues.|When troubleshooting Cloud Protection (MAPS) reporting failures.|
+|-a|Calls into Windows Performance Recorder to collect a verbose performance trace specific to analysis of high CPU issues related to the antivirus process (MsMpEng.exe).|When troubleshooting high cpu utilization with Microsoft Defender Antivirus (Antimalware Service Executable or MsMpEng.exe) if you already used the Microsoft Defender Antivirus Performance Analyzer to narrow down the /path/process or /path or file extension contributing to the high cpu utilization. This scenario enables further investigate what the application or service is doing to contribute to the high cpu utilization.|
+|-v|Uses antivirus MpCmdRun.exe command line argument with most verbose -trace flags.|Anytime an advanced troubleshooting is needed. Such as when troubleshooting Cloud Protection (MAPS) reporting failures, Platform Update failures, Engine update failures, Security Intelligence Update failures, False negatives, etc. Can also be used with -b, -c, -h, or -l.|
+|-t|Starts verbose trace of all client-side components relevant to Endpoint DLP, which is useful for scenarios where DLP actions aren't happening as expected for files.|When running into issues where the Microsoft Endpoint Data Loss Prevention (DLP) actions expected aren't occurring.|
+|-q|Calls into DLPDiagnose.ps1 script from the analyzer Tools directory that validates the basic configuration and requirements for Endpoint DLP.|Checks the basic configuration and requirements for Microsoft Endpoint DLP|
+|-d|Collects a memory dump of MsSenseS.exe (the sensor process on Windows Server 2016 or older OS) and related processes. - * This flag can be used with above mentioned flags. - ** Capturing a memory dump of PPL protected processes such as MsSense.exe or MsMpEng.exe isn't supported by the analyzer at this time.|On Windows 7 SP1, Windows 8.1, Windows Server 2008 R2, Windows Server 2012 R2, or Windows Server 2016 running w/ the MMA agent and having performance (high cpu or high memory usage) or application compatibility issues.|
+|-z|Configures registry keys on the machine to prepare it for full machine memory dump collection via CrashOnCtrlScroll. This would be useful for analysis of computer freeze issues. * Hold down the rightmost CTRL key, then press the SCROLL LOCK key twice.|Machine hanging or being unresponsive or slow. High memory usage (Memory leak): a) User mode: Private bytes b) Kernel mode: paged pool or nonpaged pool memory, handle leaks.|
+|-k|Uses NotMyFault tool to force the system to crash and generate a machine memory dump. This would be useful for analysis of various OS stability issues.|Same as above.|
+
+### Running MDECA via Live Response
+
+Running MDECA via Live Response does not support parameters, so it cannot be used for performance troubleshooting, unlike running it locally. To run the MDECA via Live Response, follow the steps:
 
 1. Download MDECA
 2. Get the PowerShell file wanted (MDELiveAnalyzer.ps1)
@@ -155,6 +179,9 @@ To run the MDECA via Live Response, follow the steps:
 8. Reproduce the issue and wait for the designated time.
 9. To get the report and results: `getfile "C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\Downloads\MDECA\MDEClientAnalyzerResult.zip`
 
+### Running MDECA locally
+
+MDEClientAnalyzer.ps1 -l -a probably
 
 ## Other ways used in Microsoft Support tickets
 
