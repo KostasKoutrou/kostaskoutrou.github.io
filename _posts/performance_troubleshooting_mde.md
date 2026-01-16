@@ -74,7 +74,7 @@ Performance Analyzer is a tool that helps in determining which files, file exten
 
 Running the Performance Analyzer is straight-forward, by running the following cmdlet as an admin:
 
-`New-MpPerformanceRecording -RecordTo \<recording.etl\>`
+`New-MpPerformanceRecording -RecordTo <recording.etl>`
 
 The following is an example of the output of running that cmdlet:
 
@@ -90,9 +90,11 @@ The next step is to parse the Performance Anaylzer's report output. To do this t
 
 Below is a series of cmdlets which can help pinpoint the issue:
 
+#######################ADD SCREENSHOTS EVERYWHERE####################
+
 View the overview of the recording:
 
-`Get-MpPerformanceReport -Path .\\recording.etl -Overview`
+`Get-MpPerformanceReport -Path .\recording.etl -Overview`
 
 View the top 20 scans, paths, extensions, and processes (can increase the number to ):
 
