@@ -60,8 +60,7 @@ DeviceFileCertificateInfo
 
 The results of the detected files should then be filtered to see if they are actually signed, and what Defender mentions about their signature information. This can be done by clicking on the hashes in the resulting table, and checking the signature information:
 
-<img alt="image" src="https://github.com/user-attachments/assets/0dabe944-15fb-48b4-9918-d8c23cd0a2a8" />
-
+<img alt="image" src="https://github.com/user-attachments/assets/e6b3f143-cade-4e43-aed4-d3b1449bd3d0" />
 
 You can also add Certificates to the Indicators allow list.
 
