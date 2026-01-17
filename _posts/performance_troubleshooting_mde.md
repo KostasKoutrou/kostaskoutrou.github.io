@@ -96,21 +96,36 @@ View the overview of the recording:
 
 `Get-MpPerformanceReport -Path .\recording.etl -Overview`
 
+<img alt="image" src="https://github.com/user-attachments/assets/ecaebaf3-2885-4a86-837c-54b80b1f7e09" />
+
 View the top 20 scans, paths, extensions, and processes (can increase the number to ):
 
 `Get-MpPerformanceReport -Path .\recording.etl -TopScans 20 -TopPaths 20 -TopExtensions 20 -TopProcesses 20`
+
+<img alt="image" src="https://github.com/user-attachments/assets/996b5778-0df9-4519-98c3-836e5a8cb373" />
 
 After running the above command, if a specific category of top values or a specific value per-se is of interest, it is possible to then dive a bit deeper. For example, if a specific extension seems to be causing a lot of scans, to dive deeper the following cmdlet can be run:
 
 `Get-MpPerformanceReport -Path .\recording.etl -TopExtensions 20 -TopScansPerExtension 5 -TopPathsPerExtension 5 -TopScansPerPathPerExtension 5 -TopProcessesPerExtension 5 -TopScansPerProcessPerExtension 5 -TopScansPerFilePerExtension 5 -TopFilesPerExtension 5`
 
-This cmdlet uses all the parameters that end with "PerExtension", and will produce a much longer report focused on the top extensions, and their related paths, processes and files. This can help in pinpointing what is causing these scans, and either resolving the source of the issue or defining exclusions in MDE.
+This cmdlet uses all the parameters that end with "PerExtension", and will produce a much longer report focused on the top extensions, and for each top extension, its top scans, paths, processes and files. This can help in pinpointing what is causing these scans, and either resolving the source of the issue or defining exclusions in MDE.
+
+<img alt="image" src="https://github.com/user-attachments/assets/cb938f45-dc6a-409d-b87c-f8480b080082" />
+
+The report can get lengthy. It is possible to make the output machine readable with the `-Raw` parameter, and then possibly convert it to exportable formats, like JSON:
+
+`Get-MpPerformanceReport -Path .\recording.etl -TopExtensions 20 -TopScansPerExtension 5 -TopPathsPerExtension 5 -TopScansPerPathPerExtension 5 -TopProcessesPerExtension 5 -TopScansPerProcessPerExtension 5 -TopScansPerFilePerExtension 5 -TopFilesPerExtension 5 -Raw | ConvertTo-Json`
+
+<img alt="image" src="https://github.com/user-attachments/assets/e780314d-7a8d-477f-a74e-f717087d4fd5" />
 
 ### Run Performance Analyzer via Live Response
 
+It is also possible to run Performance Analyzer via Live Response, by creating a custom script and uploading it to the Live Response library.
 upload powershell to library
 remember the parameter
 get the file from C:\Temp
+
+
 
 ```powershell
 param (
@@ -127,6 +142,8 @@ New-MpPerformanceRecording -Seconds $Seconds -RecordTo $OutputPath
 
 Write-Host "Performance Recording for $Hostname for $Seconds seconds was written at $OutputPath"
 ```
+
+After getting the file, the analysis steps described in the previous section can then be followed.
 
 ## Run MDECA with live response or manually
 
