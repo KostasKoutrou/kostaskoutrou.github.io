@@ -146,11 +146,15 @@ The steps to run Performance Analyzer via Live Response are:
 
 1. Initiate a Live Response session for the endpoint that needs troubleshooting
 2. Upload a file to library by clicking on:
+
 <img alt="image" src="https://github.com/user-attachments/assets/cec0377f-98b5-4277-84d4-0b33f3cc6d58" />
+
 3. Run the Performance Analyzer with the following command in Live Response: `run LivePerfAnalyzer.ps1 -parameters "-Seconds 120"` You can change the value of `Seconds` to the time period in seconds that you need to run the analyzer, or skip the parameters completely, with the default value being 120 seconds.
 4. Try to reproduce the activity that causes performance issues. Wait for the designated time.
 5. After the Performance Analyzer finishes, the following is printed:
+
 <img alt="image" src="https://github.com/user-attachments/assets/9746896a-c1b6-45f7-a6b1-6e416224374e" />
+
 6. Get the file from the path written in the script output: `getfile \<recordingpath\recording.etl\>`
 7. After getting the file, the analysis steps described in the previous section can then be followed.
 
