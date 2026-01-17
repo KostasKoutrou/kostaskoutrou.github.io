@@ -64,22 +64,17 @@ The results of the detected files should then be filtered to see if they are act
 
 <img alt="image" src="https://github.com/user-attachments/assets/e6b3f143-cade-4e43-aed4-d3b1449bd3d0" />
 
-If binaries are signed by CAs not trusted by Microsoft or that need to be excluded, they can be added to the Indicators allow list.
+If the binaries have certificates signed by CAs not trusted by Microsoft or need to be excluded for any reason, they can be added to the Certificates Indicators allow list.
 
 <img width="1359" height="759" alt="image" src="https://github.com/user-attachments/assets/bb9da54c-ddbb-4e71-8ef4-6d311a207956" />
-
-
-### **Using different files as databases**
-
-Files like HTML Applications (HTA), or Compiled HTML (CHM), if MDAV has to scan complex file formats, it will use much more CPU. Consider using actual databased if needed to save info.
 
 ### **Obfuscated scripts**
 
 Obfuscated scripts require much more CPU to be scanned, so obfuscation should be used only if necessary.
 
-### **Not letting MDAV cache finish before sealing the image**
+### **Not letting MDAV cache finish before sealing a VDI image**
 
-If you are creating a VDI image for a persistent or non-persistent image, make sure the cache maintenance completes before sealing the image. To do this:
+If creating a VDI image for a persistent or non-persistent image, ensure that the cache maintenance completes before sealing the image. To do this:
 
 1. Open up the Task Scheduler mmc (taskschd.msc).
 2. Expand Task Scheduler Library > Microsoft > Windows > Windows Defender, and then right-click on Windows Defender Cache Maintenance.
@@ -87,19 +82,25 @@ If you are creating a VDI image for a persistent or non-persistent image, make s
 
 ### **Misspelled exclusions**
 
-Double check that the exclusions as spelled correctly.
+Double check that the exclusions are spelled correctly.
 
 ### **Path exclusions only work for scanning flows**
 
-Behavior Monitoring and Network Real-time Inspection can still cause performance issues. As a workaround:
+Behavior Monitoring and Network Real-time Inspection can still cause performance issues. As a workaround, one of the following can be done:
 
-- Either add the exe or dll to the Indicators file hash allow list, or
-- Add the certificate to the Indicators certificates allow list, or
+- Add the exe or dll to the Indicators file hash allow list
+- Add the certificate to the Indicators certificates allow list
 - Add MDAV exclusions for the process, too.
 
 ### **File hash computation**
 
-If you enable the File Hash computation feature, computes file hashes for every executable file that is scanned if it wasn’t previously computed. This has a performance cost especially when copying large files from a network share. This feature is needed when blocking file Indicators (IoCs) in defender. Keep in mind that this feature is a prerequisite for File Hash Indicators.
+If the File Hash computation feature is enabled, file hashes for every executable file that is scanned is computed, if it wasn’t previously computed. This has a performance cost especially when copying large files from a network share. Keep in mind that this feature is a prerequisite for File Hash Indicators in Defender.
+
+<img alt="image" src="https://github.com/user-attachments/assets/9628f6f6-4fcf-4d07-9b10-c1adf7119ec3" />
+
+If it decided that it is not needed, it can be disabled via PowerShell or any management solution used in the organization (Intune, AD GPO, Configuration Management, etc.). To disable it with PowerShell run the following cmdlet:
+
+`Set-MpPreference -EnableFileHashComputation $false`
 
 ### **Scheduled scanning**
 
@@ -107,10 +108,10 @@ When it comes to scheduled scanning, the following scan settings should be check
 
 - Configure low CPU priority for scheduled scans. This lowers the scheduled scan thread priority from 9 to 8.
 - Specify CPU usage limit per scan from 50 to 20 or 30.
-- Start scheduled scan when device is idle with `ScanOnlyIfIdle`. In the context of scheduled scans, a device is considered Idle when the CPU usage is lower than 80%.
+- Start scheduled scan when the device is idle with `ScanOnlyIfIdle`. In the context of scheduled scans, a device is considered Idle when the CPU usage is lower than 80%.
 - Specify the interval to run quick scans per day to `Not configured`.
 - Specify the time for a daily quick scan to a time when the machine is least used.
-- Disable the Scheduled Scan settings. The Daily Quick Scan is enough:
+- Consider disabling the Scheduled Scan settings. The Daily Quick Scan is enough:
     - Specify the scan type to use for a scheduled scan to `Not configured`.
     - Specify the time of day to run scheduled scan to `Not configured`.
     - Specify the day of the week to `Not configured`.
@@ -119,31 +120,33 @@ More information about how to configure the scheduled scan settings can be found
 
 ### **Scan after security intelligence updates**
 
-By default, a scan happens after the updates. If scheduled scans are enabled, maybe this is not needed and can be disabled.
+By default, a scan happens after MDAV receives its latest security intelligence updates. If scheduled scans are enabled, maybe this is not needed and can be disabled.
+
+To disable it in Group Policy (or another management tool, such as MDM), go to Computer Configuration > Administrative Templates > Microsoft Defender Antivirus > Security Intelligence Updates, and set Turn on scan after security intelligence update to `Disabled`.
 
 ### **Conflicts with other security software**
 
 If other security software, like AV, EDR, and DLP, are used, the proper exclusions need to be defined on both MDE and the other software's side.
 
-### **Scanning a large number of files or folders**
-
-In cases where large files like ISOs, VHDX, etc. are stored on the user profile, and that profile is redirected to network shares like OneDrive, then scans can take longer to run, because the scanning occurs over the network. The files can either be moved to a local storage, or removed if not needed.
+More info about using third party security software with MDE can be found in [Microsoft Defender Antivirus compatibility with other security products](https://learn.microsoft.com/en-us/defender-endpoint/microsoft-defender-antivirus-compatibility) and exclusions that need to be added can be found in Microsoft's [MDE Exclusion List](https://learn.microsoft.com/en-us/defender-endpoint/switch-to-mde-phase-2?tabs=Windows#step-2-add-microsoft-defender-for-endpoint-to-the-exclusion-list-for-your-existing-solution)
 
 ## Troubleshooting Mode
 
-An easy way to confirm that Defender could be a reason for performance issues is to disable Real-Time Protection. If Tamper Protection is on, then Troubleshooting mode can be used on the machine to allow Tamper Protection to be disabled.
+An easy way to investigate if Defender could be a reason for performance issues is to disable Real-Time Protection. If Tamper Protection is on, then Troubleshooting mode can be used on the machine to allow Tamper Protection to be disabled.
 
 After Troubleshooting Mode is turned on, the following cmdlets can be run to disable Real-Time Protection:
 
 1. Disable Tamper Protection: `Set-MPPreference -DisableTamperProtection $true`
-2. Confirm that Tamper Protection is disabled: `Get-MpPreference | fl DisableTamperProtection` - It should output a value of "True".
+2. Confirm that Tamper Protection is disabled: `Get-MpPreference | fl DisableTamperProtection` - The output should have a value of "True".
 3. Disable Real-Time Protection: `Set-MPPreference -DisableRealtimeMonitoring $true`
-4. Confirm that Real-Time Protection is disabled: `Get-MpPreference | fl DisableRealtimeMonitoring` - It should output a value of "True".
+4. Confirm that Real-Time Protection is disabled: `Get-MpPreference | fl DisableRealtimeMonitoring` - The output should have a value of "True".
 
-Afterwards, a check should be done on the machine again to see if the issue is resolved. If it is, then Defender Antivirus should be investigated further following the steps described in the following sections. Otherwise, there could another reason for the CPU usage of Defender, and probably a ticket to Microsoft should be opened for further investigation.
+Afterwards, a check should be done on the machine again to see if the issue is resolved. If it is, then Defender Antivirus should be investigated further, by following the steps described in the next sections. Otherwise, there could another reason for the CPU usage of Defender, and probably a ticket to Microsoft should be opened for further investigation.
 
-More info on PowerShell options for Defender can be found [here](https://learn.microsoft.com/en-us/powershell/module/defender/set-mppreference?view=windowsserver2025-ps)
+More info on PowerShell cmdlet for configuring Defender settings can be found [here](https://learn.microsoft.com/en-us/powershell/module/defender/set-mppreference?view=windowsserver2025-ps).
+
 More info on Troubleshooting Mode can be found [here](https://learn.microsoft.com/en-us/defender-endpoint/enable-troubleshooting-mode).
+
 In the follow link, additional scenarios where Troubleshooting Mode may help are described [Troubleshooting mode scenarios](https://learn.microsoft.com/en-us/defender-endpoint/troubleshooting-mode-scenarios).
 
 ## Performance Analyzer
