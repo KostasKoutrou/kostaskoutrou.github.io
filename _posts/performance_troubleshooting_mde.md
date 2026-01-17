@@ -27,11 +27,11 @@ So let's get started.
 
 ## Common reasons for higher CPU by MDAV:
 
-
+There may be several reasons which cause MDAV to utilize a higher percentage of CPU power. In this section, a few common reasons are briefly described.
 
 **Binaries not signed**: When a binary (exe, dll, etc.) that is not digitally signed is launched, MDAV will start a Real-Time Protection Scan.
 
-Generally, properly identifying such cases is difficult. If you know a robust method, please let me know. You can use the KQL table `DeviceFileCertificateInfo` to identify certificate-related issues:
+Generally, properly identifying such cases is difficult. If you know a robust method, please let me know. The KQL table `DeviceFileCertificateInfo` can be used to identify certificate-related issues:
 
 ```kql
 DeviceFileCertificateInfo
@@ -39,7 +39,7 @@ DeviceFileCertificateInfo
 | where IsTrusted == 0
 ```
 
-You can also run the following KQL query to potentially identify running of such cases.
+The following KQL query can also be run to potentially identify cases of unsigned binaries being executed.
 
 ```kql
 DeviceProcessEvents
@@ -58,7 +58,10 @@ DeviceFileCertificateInfo
 | sort by FileName asc, DeviceName asc
 ```
 
-Then you will have to filter through the results of the detected files to see if they are actually signed, and what Defender mentions about their signature information.
+The results of the detected files should then be filtered to see if they are actually signed, and what Defender mentions about their signature information. This can be done by clicking on the hashes in the resulting table, and checking the signature information:
+
+<img alt="image" src="https://github.com/user-attachments/assets/0dabe944-15fb-48b4-9918-d8c23cd0a2a8" />
+
 
 You can also add Certificates to the Indicators allow list.
 
