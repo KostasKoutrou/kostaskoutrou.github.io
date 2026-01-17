@@ -62,7 +62,10 @@ The results of the detected files should then be filtered to see if they are act
 
 <img alt="image" src="https://github.com/user-attachments/assets/e6b3f143-cade-4e43-aed4-d3b1449bd3d0" />
 
-You can also add Certificates to the Indicators allow list.
+If binaries are signed by CAs not trusted by Microsoft or that need to be excluded, they can be added to the Indicators allow list.
+
+<img width="1359" height="759" alt="image" src="https://github.com/user-attachments/assets/bb9da54c-ddbb-4e71-8ef4-6d311a207956" />
+
 
 **Using different files as databases**: Files like HTML Applications (HTA), or Compiled HTML (CHM), if MDAV has to scan complex file formats, it will use much more CPU. Consider using actual databased if needed to save info.
 
