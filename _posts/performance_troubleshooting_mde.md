@@ -1,11 +1,33 @@
-# Title
+# MDE Performance Troubleshooting - Getting to know MDE Part 3
 
 ## Introduction
 
+A frequently reported issue in MDE is its performance impact on machines. Many engineers have seen the following screenshot, being asked to fix it.
+
+<img alt="image" src="https://github.com/user-attachments/assets/4e3f30e4-2b9c-4731-ab5b-989b04eb2b49" />
+
+Welcome to the 3rd part of the blog post series “Getting to know MDE”!
+
+In this series, each post contains a different component/feature/methodology when it comes to understanding and managing Microsoft Defender for Endpoint (MDE).
+
+> In this post, the focus is on troubleshooting issues that cause a performance impact on machines caused by Defender processes.
+
+All the information is based on official documentation of Microsoft, which you can find [here](https://learn.microsoft.com/en-us/defender-endpoint/).
+
+So let's get started.
+
+---
+
 ## Contents
 
+* TOC
+{:toc}
 
-## Some common reasons for higher CPU by MDAV:
+---
+
+## Common reasons for higher CPU by MDAV:
+
+
 
 **Binaries not signed**: When a binary (exe, dll, etc.) that is not digitally signed is launched, MDAV will start a Real-Time Protection Scan.
 
@@ -60,13 +82,42 @@ You can also add Certificates to the Indicators allow list.
 
 **File hash computation**: If you enable the File Hash computation feature, computes file hashes for every executable file that is scanned if it wasn’t previously computed. This has a performance cost especially when copying large files from a network share. This feature is needed when blocking file Indicators (IoCs) in defender. Keep in mind that this feature is a prerequisite for File Hash Indicators.
 
-(probably not useful) To determine which component might be using CPU:
+**Scheduled scanning**: When it comes to scheduled scanning, the following scan settings should be checked, depending on the way they are pushed to machines:
 
-RTP
-Scheduled scanning
-Scan after sec int updates
-COnflict with other sec SW
-Scanning large files / number of files
+(more information about how to configure the scheduled scan settings can be found in [Microsoft's documentation](https://learn.microsoft.com/en-us/defender-endpoint/configure-advanced-scan-types-microsoft-defender-antivirus).
+
+- Configure low CPU priority for scheduled scans. This lowers the scheduled scan thread priority from 9 to 8.
+- Specify CPU usage limit per scan from 50 to 20 or 30.
+- Start scheduled scan when device is idle with `ScanOnlyIfIdle`. In the context of scheduled scans, a device is considered Idle when the CPU usage is lower than 80%.
+- Specify the interval to run quick scans per day to `Not configured`.
+- Specify the time for a daily quick scan to a time when the machine is least used.
+- Disable the Scheduled Scan settings. The Daily Quick Scan is enough:
+    - Specify the scan type to use for a scheduled scan to `Not configured`.
+    - Specify the time of day to run scheduled scan to `Not configured`.
+    - Specify the day of the week to `Not configured`.
+
+**Scan after security intelligence updates**: By default, a scan happens after the updates. If scheduled scans are enabled, maybe this is not needed and can be disabled.
+
+**Conflicts with other security software**: If other security software, like AV, EDR, and DLP, are used, the proper exclusions need to be defined on both MDE and the other software's side.
+
+**Scanning a large number of files or folders**: In cases where large files like ISOs, VHDX, etc. are stored on the user profile, and that profile is redirected to network shares like OneDrive, then scans can take longer to run, because the scanning occurs over the network. The files can either be moved to a local storage, or removed if not needed.
+
+### Troubleshooting Mode
+
+An easy way to confirm that Defender could be a reason for performance issues is to disable Real-Time Protection. If Tamper Protection is on, then Troubleshooting mode can be used on the machine to allow Tamper Protection to be disabled.
+
+After Troubleshooting Mode is turned on, the following cmdlets can be run to disable Real-Time Protection:
+
+1. Disable Tamper Protection: `Set-MPPreference -DisableTamperProtection $true`
+2. Confirm that Tamper Protection is disabled: `Get-MpPreference | fl DisableTamperProtection` - It should output a value of "True".
+3. Disable Real-Time Protection: `Set-MPPreference -DisableRealtimeMonitoring $true`
+4. Confirm that Real-Time Protection is disabled: `Get-MpPreference | fl DisableRealtimeMonitoring` - It should output a value of "True".
+
+Afterwards, a check should be done on the machine again to see if the issue is resolved. If it is, then Defender Antivirus should be investigated further following the steps described in the following sections. Otherwise, there could another reason for the CPU usage of Defender, and probably a ticket to Microsoft should be opened for further investigation.
+
+More info on PowerShell options for Defender can be found [here](https://learn.microsoft.com/en-us/powershell/module/defender/set-mppreference?view=windowsserver2025-ps)
+More info on Troubleshooting Mode can be found [here](https://learn.microsoft.com/en-us/defender-endpoint/enable-troubleshooting-mode).
+In the follow link, additional scenarios where Troubleshooting Mode may help are described [Troubleshooting mode scenarios](https://learn.microsoft.com/en-us/defender-endpoint/troubleshooting-mode-scenarios).
 
 ## Performance Analyzer
 
