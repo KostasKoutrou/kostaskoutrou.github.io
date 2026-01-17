@@ -207,11 +207,12 @@ Running MDECA via Live Response does not support parameters, so it cannot be use
 <img alt="image" src="https://github.com/user-attachments/assets/cec0377f-98b5-4277-84d4-0b33f3cc6d58" />
 5. Repeat for the whole zip file that you downloaded (e.g. MDEClientAnalyzerPreview.zip)
 6. Run the command `putfile MDEClientAnalyzerPreview.zip`. This puts the zip file at the path `C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\Downloads`, which is a path used for Live Response sessions.
-7. ########REVIEW IF YOU CAN RUN LIVE ANALYZER WITH PARAMATERS ALREADY CONFIGURED, REVIEW WHICH PARAMETERS TO PUT FOR EASY PERFORMANCE TROUBLESHOOTING AND PUT THEM.########The parameters for getting a performance report will be added. Run the script with the command `run MDELiveAnalyzer.ps1 -parameters ""`
-8. Reproduce the issue and wait for the designated time.
-9. To get the report and results: `getfile "C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\Downloads\MDECA\MDEClientAnalyzerResult.zip`
+7. Run the script with the command `run MDELiveAnalyzer.ps1`
+8. To get the report and results: `getfile "C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\Downloads\MDECA\MDEClientAnalyzerResult.zip`
 
 ### Running MDECA locally
+
+When running MDECA locally, there are many more options when it comes to parameters, producing useful
 
 MDEClientAnalyzer.ps1 -l -a probably
 
