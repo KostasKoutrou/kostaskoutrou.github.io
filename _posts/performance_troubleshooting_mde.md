@@ -36,7 +36,7 @@ DeviceFileCertificateInfo
 | sort by FileName asc, DeviceName asc
 ```
 
-Then you will have to manual click through the results of the detected files to see if they are actually signed, and what Defender mentions about their signature information.
+Then you will have to filter through the results of the detected files to see if they are actually signed, and what Defender mentions about their signature information.
 
 You can also add Certificates to the Indicators allow list.
 
@@ -90,8 +90,6 @@ The next step is to parse the Performance Anaylzer's report output. To do this t
 
 Below is a series of cmdlets which can help pinpoint the issue:
 
-#######################ADD SCREENSHOTS EVERYWHERE####################
-
 View the overview of the recording:
 
 `Get-MpPerformanceReport -Path .\recording.etl -Overview`
@@ -122,13 +120,11 @@ The report can get lengthy. It is possible to make the output machine readable w
 
 It is also possible to run Performance Analyzer via Live Response, by creating a custom script and uploading it to the Live Response library.
 
-It is required to allow unsigned scripts to run this.
+A prerequisite is to allow unsigned scripts to run it, by going to the MDE Portal > System > Settings > Endpoints > Live Response unsigned script execution
 
-upload powershell to library
-remember the parameter
-get the file from C:\Temp
+<img alt="image" src="https://github.com/user-attachments/assets/f61f7ff8-c91d-4813-a938-67bb9652a91e" />
 
-
+The following script will need to be saved in a file. For this post, the file will be named "LivePerfAnalyser.ps1"
 
 ```powershell
 param (
@@ -146,7 +142,17 @@ New-MpPerformanceRecording -Seconds $Seconds -RecordTo $OutputPath
 Write-Host "Performance Recording for $Hostname for $Seconds seconds was written at $OutputPath"
 ```
 
-After getting the file, the analysis steps described in the previous section can then be followed.
+The steps to run Performance Analyzer via Live Response are:
+
+1. Initiate a Live Response session for the endpoint that needs troubleshooting
+2. Upload a file to library by clicking on:
+<img alt="image" src="https://github.com/user-attachments/assets/cec0377f-98b5-4277-84d4-0b33f3cc6d58" />
+3. Run the Performance Analyzer with the following command in Live Response: `run LivePerfAnalyzer.ps1 -parameters "-Seconds 120"` You can change the value of `Seconds` to the time period in seconds that you need to run the analyzer, or skip the parameters completely, with the default value being 120 seconds.
+4. Try to reproduce the activity that causes performance issues. Wait for the designated time.
+5. After the Performance Analyzer finishes, the following is printed:
+<img alt="image" src="https://github.com/user-attachments/assets/9746896a-c1b6-45f7-a6b1-6e416224374e" />
+6. Get the file from the path written in the script output: `getfile \<recordingpath\recording.etl\>`
+7. After getting the file, the analysis steps described in the previous section can then be followed.
 
 ## Run MDECA with live response or manually
 
