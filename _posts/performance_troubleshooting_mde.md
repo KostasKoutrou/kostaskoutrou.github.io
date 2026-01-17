@@ -361,3 +361,6 @@ A similar analysis can also be done by inserting a Pivot Table, and adding `Proc
 <img alt="image" src="https://github.com/user-attachments/assets/60a864b3-db49-42c4-8569-95d58670bac8" />
 
 As shown above, the MPLog is yet another way of identifying processes which may impact the performance of the machine or may suffer from MDAV scans themselves.
+
+## Conclusion
+
