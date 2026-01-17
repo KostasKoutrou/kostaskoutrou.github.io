@@ -108,7 +108,7 @@ When it comes to scheduled scanning, the following scan settings should be check
 
 - Configure low CPU priority for scheduled scans. This lowers the scheduled scan thread priority from 9 to 8.
 - Specify CPU usage limit per scan from 50 to 20 or 30.
-- Start scheduled scan when the device is idle with `ScanOnlyIfIdle`. In the context of scheduled scans, a device is considered Idle when the CPU usage is lower than 80%.
+- Start scheduled scan when the device is idle with `ScanOnlyIfIdle`.
 - Specify the interval to run quick scans per day to `Not configured`.
 - Specify the time for a daily quick scan to a time when the machine is least used.
 - Consider disabling the Scheduled Scan settings. The Daily Quick Scan is enough:
