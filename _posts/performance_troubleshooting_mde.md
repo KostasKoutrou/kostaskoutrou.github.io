@@ -151,11 +151,13 @@ In the follow link, additional scenarios where Troubleshooting Mode may help are
 
 ## Performance Analyzer
 
-Performance Analyzer is a tool that helps in determining which files, file extensions, and processes may be causing performance issues in machines during antivirus scans. This information can be used as input towards potentially defining MDAV exclusions.
+Performance Analyzer is a tool that helps in determining which files, file extensions, and processes may be causing performance issues in machines during Defender Antivirus scans. This information can be used as input towards potentially defining Defender exclusions.
 
 Running the Performance Analyzer is straight-forward, by running the following cmdlet as an admin:
 
 `New-MpPerformanceRecording -RecordTo <recording.etl>`
+
+The `RecordTo` parameter defines the file where the Performance Analyzer recording is written.
 
 The following is an example of the output of running that cmdlet:
 
@@ -167,19 +169,21 @@ After capturing the problematic behavior, the recording can be stopped by pressi
 
 <img alt="image" src="https://github.com/user-attachments/assets/1b914672-b7be-4e9c-8b72-02c369963feb" />
 
-The next step is to parse the Performance Anaylzer's report output. To do this the cmdlet `Get-MpPerformanceReport` is used. This cmdlet has a lot of different available parameters, which can be viewed at Microsoft's [Performance Analyzer Reference](https://learn.microsoft.com/en-us/defender-endpoint/performance-analyzer-reference).
+The next step is to parse the Performance Analyzer's report. To do this the cmdlet `Get-MpPerformanceReport` is used. This cmdlet has a lot of different available parameters, which can be viewed at Microsoft's [Performance Analyzer Reference](https://learn.microsoft.com/en-us/defender-endpoint/performance-analyzer-reference).
 
-Below is a series of cmdlets which can help pinpoint the issue:
+Below a series of cmdlets which can help pinpoint the issue is depicted:
 
-View the overview of the recording:
+To view the overview of the recording:
 
 `Get-MpPerformanceReport -Path .\recording.etl -Overview`
 
 <img alt="image" src="https://github.com/user-attachments/assets/ecaebaf3-2885-4a86-837c-54b80b1f7e09" />
 
-View the top 20 scans, paths, extensions, and processes (can increase the number to ):
+To view the top 20 scans, paths, extensions, and processes:
 
 `Get-MpPerformanceReport -Path .\recording.etl -TopScans 20 -TopPaths 20 -TopExtensions 20 -TopProcesses 20`
+
+The screenshot is cut short because the output of too long:
 
 <img alt="image" src="https://github.com/user-attachments/assets/996b5778-0df9-4519-98c3-836e5a8cb373" />
 
@@ -187,11 +191,11 @@ After running the above command, if a specific category of top values or a speci
 
 `Get-MpPerformanceReport -Path .\recording.etl -TopExtensions 20 -TopScansPerExtension 5 -TopPathsPerExtension 5 -TopScansPerPathPerExtension 5 -TopProcessesPerExtension 5 -TopScansPerProcessPerExtension 5 -TopScansPerFilePerExtension 5 -TopFilesPerExtension 5`
 
-This cmdlet uses all the parameters that end with "PerExtension", and will produce a much longer report focused on the top extensions, and for each top extension, its top scans, paths, processes and files. This can help in pinpointing what is causing these scans, and either resolving the source of the issue or defining exclusions in MDE.
+This cmdlet uses all the parameters that end with "PerExtension", and will produce a much longer report focused on the top extensions, and for each top extension, its top scans, paths, processes and files. This can help in pinpointing what is causing these scans, which may lead to either resolving the source of the issue or defining exclusions in MDE.
 
 <img alt="image" src="https://github.com/user-attachments/assets/cb938f45-dc6a-409d-b87c-f8480b080082" />
 
-The report can get lengthy. It is possible to make the output machine readable with the `-Raw` parameter, and then possibly convert it to exportable formats, like JSON:
+The report can get lengthy. It is possible to make the output machine readable with the `-Raw` parameter, and then possibly convert it to exportable formats, like JSON, which can then be exported, saved, and analyzed:
 
 `Get-MpPerformanceReport -Path .\recording.etl -TopExtensions 20 -TopScansPerExtension 5 -TopPathsPerExtension 5 -TopScansPerPathPerExtension 5 -TopProcessesPerExtension 5 -TopScansPerProcessPerExtension 5 -TopScansPerFilePerExtension 5 -TopFilesPerExtension 5 -Raw | ConvertTo-Json`
 
