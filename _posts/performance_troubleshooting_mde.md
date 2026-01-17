@@ -29,7 +29,9 @@ So let's get started.
 
 There may be several reasons which cause MDAV to utilize a higher percentage of CPU power. In this section, a few common reasons are briefly described.
 
-***Binaries not signed***: When a binary (exe, dll, etc.) that is not digitally signed is launched, MDAV will start a Real-Time Protection Scan.
+### **Binaries not signed**
+
+When a binary (exe, dll, etc.) that is not digitally signed is launched, MDAV will start a Real-Time Protection Scan.
 
 Generally, properly identifying such cases is difficult. If you know a robust method, please let me know. The KQL table `DeviceFileCertificateInfo` can be used to identify certificate-related issues:
 
@@ -67,29 +69,41 @@ If binaries are signed by CAs not trusted by Microsoft or that need to be exclud
 <img width="1359" height="759" alt="image" src="https://github.com/user-attachments/assets/bb9da54c-ddbb-4e71-8ef4-6d311a207956" />
 
 
-**Using different files as databases**: Files like HTML Applications (HTA), or Compiled HTML (CHM), if MDAV has to scan complex file formats, it will use much more CPU. Consider using actual databased if needed to save info.
+### **Using different files as databases**
 
-**Obfuscated scripts**: Obfuscated script required much more CPU to be scanned, so obfuscation should be used only if necessary.
+Files like HTML Applications (HTA), or Compiled HTML (CHM), if MDAV has to scan complex file formats, it will use much more CPU. Consider using actual databased if needed to save info.
 
-**Not letting MDAV cache finish before sealing the image**: If you are creating a VDI image for a persistent or non-persistent image, make sure the cache maintenance completes before sealing the image. To do this:
+### **Obfuscated scripts**
+
+Obfuscated scripts require much more CPU to be scanned, so obfuscation should be used only if necessary.
+
+### **Not letting MDAV cache finish before sealing the image**
+
+If you are creating a VDI image for a persistent or non-persistent image, make sure the cache maintenance completes before sealing the image. To do this:
 
 1. Open up the Task Scheduler mmc (taskschd.msc).
 2. Expand Task Scheduler Library > Microsoft > Windows > Windows Defender, and then right-click on Windows Defender Cache Maintenance.
 3. Select Run, and let the scheduled task finish.
 
-**Misspelled exclusions**: Double check that the exclusions as spelled correctly.
+### **Misspelled exclusions**
 
-**Path exclusions only work for scanning flows**: Behavior MOnitoring and Network Real-time Inspection can still cause performance issues. As a workaround:
+Double check that the exclusions as spelled correctly.
+
+### **Path exclusions only work for scanning flows**
+
+Behavior Monitoring and Network Real-time Inspection can still cause performance issues. As a workaround:
 
 - Either add the exe or dll to the Indicators file hash allow list, or
 - Add the certificate to the Indicators certificates allow list, or
 - Add MDAV exclusions for the process, too.
 
-**File hash computation**: If you enable the File Hash computation feature, computes file hashes for every executable file that is scanned if it wasn’t previously computed. This has a performance cost especially when copying large files from a network share. This feature is needed when blocking file Indicators (IoCs) in defender. Keep in mind that this feature is a prerequisite for File Hash Indicators.
+### **File hash computation**
 
-**Scheduled scanning**: When it comes to scheduled scanning, the following scan settings should be checked, depending on the way they are pushed to machines:
+If you enable the File Hash computation feature, computes file hashes for every executable file that is scanned if it wasn’t previously computed. This has a performance cost especially when copying large files from a network share. This feature is needed when blocking file Indicators (IoCs) in defender. Keep in mind that this feature is a prerequisite for File Hash Indicators.
 
-(more information about how to configure the scheduled scan settings can be found in [Microsoft's documentation](https://learn.microsoft.com/en-us/defender-endpoint/configure-advanced-scan-types-microsoft-defender-antivirus).
+### **Scheduled scanning**
+
+When it comes to scheduled scanning, the following scan settings should be checked, depending on the way they are pushed to machines:
 
 - Configure low CPU priority for scheduled scans. This lowers the scheduled scan thread priority from 9 to 8.
 - Specify CPU usage limit per scan from 50 to 20 or 30.
@@ -101,13 +115,21 @@ If binaries are signed by CAs not trusted by Microsoft or that need to be exclud
     - Specify the time of day to run scheduled scan to `Not configured`.
     - Specify the day of the week to `Not configured`.
 
-**Scan after security intelligence updates**: By default, a scan happens after the updates. If scheduled scans are enabled, maybe this is not needed and can be disabled.
+More information about how to configure the scheduled scan settings can be found in [Microsoft's documentation](https://learn.microsoft.com/en-us/defender-endpoint/configure-advanced-scan-types-microsoft-defender-antivirus).
 
-**Conflicts with other security software**: If other security software, like AV, EDR, and DLP, are used, the proper exclusions need to be defined on both MDE and the other software's side.
+### **Scan after security intelligence updates**
 
-**Scanning a large number of files or folders**: In cases where large files like ISOs, VHDX, etc. are stored on the user profile, and that profile is redirected to network shares like OneDrive, then scans can take longer to run, because the scanning occurs over the network. The files can either be moved to a local storage, or removed if not needed.
+By default, a scan happens after the updates. If scheduled scans are enabled, maybe this is not needed and can be disabled.
 
-### Troubleshooting Mode
+### **Conflicts with other security software**
+
+If other security software, like AV, EDR, and DLP, are used, the proper exclusions need to be defined on both MDE and the other software's side.
+
+### **Scanning a large number of files or folders**
+
+In cases where large files like ISOs, VHDX, etc. are stored on the user profile, and that profile is redirected to network shares like OneDrive, then scans can take longer to run, because the scanning occurs over the network. The files can either be moved to a local storage, or removed if not needed.
+
+## Troubleshooting Mode
 
 An easy way to confirm that Defender could be a reason for performance issues is to disable Real-Time Protection. If Tamper Protection is on, then Troubleshooting mode can be used on the machine to allow Tamper Protection to be disabled.
 
