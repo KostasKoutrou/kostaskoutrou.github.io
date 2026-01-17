@@ -121,6 +121,9 @@ The report can get lengthy. It is possible to make the output machine readable w
 ### Run Performance Analyzer via Live Response
 
 It is also possible to run Performance Analyzer via Live Response, by creating a custom script and uploading it to the Live Response library.
+
+It is required to allow unsigned scripts to run this.
+
 upload powershell to library
 remember the parameter
 get the file from C:\Temp
