@@ -153,7 +153,7 @@ The steps to run Performance Analyzer via Live Response are:
 4. Try to reproduce the activity that causes performance issues. Wait for the designated time.
 5. After the Performance Analyzer finishes, the following is printed:
 
-<img alt="image" src="https://github.com/user-attachments/assets/9746896a-c1b6-45f7-a6b1-6e416224374e" />
+<img alt="image" src="https://github.com/user-attachments/assets/bdffe3dd-437d-422e-b039-3ec73fb4fe35" />
 
 6. Get the file from the path written in the script output: `getfile \<recordingpath\recording.etl\>`
 7. After getting the file, the analysis steps described in the previous section can then be followed.
