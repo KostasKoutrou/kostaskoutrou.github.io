@@ -2,7 +2,7 @@
 
 ## Introduction
 
-A frequently reported issue in MDE is its performance impact on machines. Many engineers have seen the following screenshot, being asked to fix it.
+A frequently reported issue in MDE is its performance impact on machines. Many engineers have seen the task manager of a machine looking like the following, and are asked to fix it.
 
 <img alt="image" src="https://github.com/user-attachments/assets/4e3f30e4-2b9c-4731-ab5b-989b04eb2b49" />
 
