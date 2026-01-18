@@ -7,6 +7,7 @@ A frequently reported issue in MDE is its performance impact on machines. Many e
 <img alt="image" src="https://github.com/user-attachments/assets/4e3f30e4-2b9c-4731-ab5b-989b04eb2b49" />
 
 
+
 Welcome to the 3rd part of the blog post series “Getting to know MDE”!
 
 In this series, each post contains a different component/feature/methodology when it comes to understanding and managing Microsoft Defender for Endpoint (MDE).
