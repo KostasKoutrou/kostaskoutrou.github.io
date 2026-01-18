@@ -279,20 +279,7 @@ Therefore, using the above lines and the `EstimatedImpact` value, it is possible
 The following PowerShell script parses the MPLog file, takes only the lines which include the `EstimatedImpact` values, and exports it all to a CSV.
 
 ```powershell
-# Function to get the log file via dialog
-function Get-FileName($initialDirectory) {
-    [System.Reflection.Assembly]::LoadWithPartialName("System.windows.forms") | Out-Null
-    $OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog
-    $OpenFileDialog.initialDirectory = $initialDirectory
-    $OpenFileDialog.filter = "All files (*.*)| *.*"
-    $OpenFileDialog.ShowDialog() | Out-Null
-    $OpenFileDialog.filename
-}
-
-# Prompt the user to select a Windows Defender log file
-Write-Host "Select Windows Defender Log File to export Impactful Processes..."
-$logfile = Get-FileName
-Write-Host "File Selected: $logfile"
+$logfile = Read-Host "Enter log MPLog file"
 
 # Extract relevant log entries, remove whitespaces, and process data
 $logs = Get-Content $logfile | `
