@@ -98,7 +98,7 @@ If the File Hash computation feature is enabled, file hashes for every executabl
 
 <img alt="image" src="https://github.com/user-attachments/assets/9628f6f6-4fcf-4d07-9b10-c1adf7119ec3" />
 
-If it decided that it is not needed, it can be disabled via PowerShell or any management solution used in the organization (Intune, AD GPO, Configuration Management, etc.). To disable it with PowerShell run the following cmdlet:
+If it is decided that it is not needed, it can be disabled via PowerShell or any management solution used in the organization (Intune, AD GPO, Configuration Management, etc.). To disable it with PowerShell run the following cmdlet:
 
 `Set-MpPreference -EnableFileHashComputation $false`
 
