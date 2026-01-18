@@ -183,7 +183,7 @@ To view the top 20 scans, paths, extensions, and processes:
 
 `Get-MpPerformanceReport -Path .\recording.etl -TopScans 20 -TopPaths 20 -TopExtensions 20 -TopProcesses 20`
 
-The screenshot is cut short because the output of too long:
+The screenshot is cut short because the output is too long:
 
 <img alt="image" src="https://github.com/user-attachments/assets/996b5778-0df9-4519-98c3-836e5a8cb373" />
 
@@ -230,12 +230,12 @@ Write-Host "Performance Recording for $Hostname for $Seconds seconds was written
 The steps to run Performance Analyzer via Live Response are:
 
 1. Initiate a Live Response session for the endpoint that needs troubleshooting
-2. Upload a file to library by clicking on:
+2. Upload the script to library by clicking on:
 
 <img alt="image" src="https://github.com/user-attachments/assets/cec0377f-98b5-4277-84d4-0b33f3cc6d58" />
 
-3. Run the Performance Analyzer with the following command in Live Response: `run LivePerfAnalyzer.ps1 -parameters "-Seconds 120"` You can change the value of `Seconds` to the time period in seconds that you need to run the analyzer, or skip the parameters completely, with the default value being 120 seconds.
-4. Try to reproduce the activity that causes performance issues. Wait for the designated time.
+3. Run the Performance Analyzer with the following command in Live Response: `run LivePerfAnalyzer.ps1 -parameters "-Seconds 120"`. You can change the value of `Seconds` to the time period in seconds that you need to run the analyzer, or skip the parameters completely, with the default value being 120 seconds.
+4. Try to reproduce the activity that causes performance issues on the endpoint. Wait for the designated time.
 5. After the Performance Analyzer finishes, the following is printed:
 
 <img alt="image" src="https://github.com/user-attachments/assets/bdffe3dd-437d-422e-b039-3ec73fb4fe35" />
@@ -245,7 +245,7 @@ The steps to run Performance Analyzer via Live Response are:
 
 ## MPLog file parsing for performance impact
 
-The Microsoft Protection Log (MPLog) file is one of a few files found under the path `C:\ProgramData\Microsoft\Windows Defender\Support`. Under this path, a few files which contain Defender logs can be found, including:
+The Microsoft Protection Log (MPLog) file is one of a few files found under the path `C:\ProgramData\Microsoft\Windows Defender\Support`. Under this path, a few files which contain different Defender logs can be found, including:
 
 - MPDetection
 - MPDeviceControl
@@ -255,7 +255,7 @@ The Microsoft Protection Log (MPLog) file is one of a few files found under the 
 - MpWppCoreTracing
 - MpWppTracing
 
-These files are very useful when investigating what Defender and its different detection mechanisms did. When it comes to performance troubleshooting, the MPLog file contains a few useful lines, among others, which can assist in detecting processes and files which took a heavy toll on the machine's performance. Credits to the related [article](https://www.crowdstrike.com/en-us/blog/how-to-use-microsoft-protection-logging-for-forensic-investigations/) by CrowdStrike explaining these columns.
+These files are very useful when investigating what Defender and its different detection mechanisms did. When it comes to performance troubleshooting, the MPLog file contains a few useful lines, among others, which can assist in detecting processes and files which took a heavy toll on the machine's performance. Credits to the related [article](https://www.crowdstrike.com/en-us/blog/how-to-use-microsoft-protection-logging-for-forensic-investigations/) by CrowdStrike explaining these logs.
 
 These lines have the following format:
 
