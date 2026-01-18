@@ -10,7 +10,7 @@ Welcome to the 3rd part of the blog post series “Getting to know MDE”!
 
 In this series, each post contains a different component/feature/methodology when it comes to understanding and managing Microsoft Defender for Endpoint (MDE).
 
-> In this post, the focus is on troubleshooting issues that cause a performance impact on machines caused by Defender processes.
+> In this post, the focus is on troubleshooting issues that have a performance impact on machines caused by Defender processes.
 
 All the information is based on official documentation of Microsoft, which you can find [here](https://learn.microsoft.com/en-us/defender-endpoint/).
 
