@@ -53,7 +53,7 @@ DeviceProcessEvents
 | project TimeGenerated, DeviceName, DeviceId, SHA1, FileName, FolderPath, ProcessCommandLine, InitiatingProcessFileName
 | join kind=leftouter (
 DeviceFileCertificateInfo
-| where TimeGenerated > ago(30d) //putting 30 days because these events are not generated for every executation of a binary.
+| where TimeGenerated > ago(30d) //putting 30 days because these events are not generated for every execution of a binary.
 | project SHA1, IsSigned, IsTrusted, Signer, Issuer, DeviceId
 ) on SHA1 and DeviceId
 | project TimeGenerated, DeviceName, DeviceId, SHA1, FileName, FolderPath, ProcessCommandLine, IsSigned, IsTrusted, Signer, Issuer, InitiatingProcessFileName
@@ -143,7 +143,7 @@ After Troubleshooting Mode is turned on, the following cmdlets can be run to dis
 3. Disable Real-Time Protection: `Set-MPPreference -DisableRealtimeMonitoring $true`
 4. Confirm that Real-Time Protection is disabled: `Get-MpPreference | fl DisableRealtimeMonitoring` - The output should have a value of "True".
 
-Afterwards, a check should be done on the machine again to see if the issue is resolved. If it is, then Defender Antivirus should be investigated further, by following the steps described in the next sections. Otherwise, there could another reason for the CPU usage of Defender, and probably a ticket to Microsoft should be opened for further investigation.
+Afterwards, a check should be done on the machine again to see if the issue is resolved. If it is, then Defender Antivirus should be investigated further, by following the steps described in the next sections. Otherwise, there could be another reason for the CPU usage of Defender, and probably a ticket to Microsoft should be opened for further investigation.
 
 More info on PowerShell cmdlet for configuring Defender settings can be found [here](https://learn.microsoft.com/en-us/powershell/module/defender/set-mppreference?view=windowsserver2025-ps).
 
@@ -173,7 +173,7 @@ After capturing the problematic behavior, the recording can be stopped by pressi
 
 The next step is to parse the Performance Analyzer's report. To do this the cmdlet `Get-MpPerformanceReport` is used. This cmdlet has a lot of different available parameters, which can be viewed at Microsoft's [Performance Analyzer Reference](https://learn.microsoft.com/en-us/defender-endpoint/performance-analyzer-reference).
 
-Below a series of cmdlets which can help pinpoint the issue is depicted:
+Below, a series of cmdlets which can help pinpoint the issue are depicted:
 
 To view the overview of the recording:
 
@@ -353,7 +353,7 @@ As shown above, the MPLog is yet another way of identifying processes which may 
 
 ## Conclusion
 
-Sometimes, MDE and its components may utilize a higher-than-normal CPU percentage. Identifying the reason could be proved difficult. Hopefully, with this post it will be a little bit easier.
+Sometimes, MDE and its components may utilize a higher-than-normal CPU percentage. Identifying the root cause can prove difficult. Hopefully, with this post it will be a little bit easier.
 
 Stick around for the next posts, where we will dive deep into looking Windows Event Logs, and also may move to other Microsoft Security products like Purview.
 
