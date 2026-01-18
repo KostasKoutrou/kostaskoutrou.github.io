@@ -25,7 +25,7 @@ So let's get started.
 
 ---
 
-## Common reasons for higher CPU by MDAV:
+## Common reasons for higher CPU by MDAV
 
 There may be several reasons which cause MDAV to utilize a higher percentage of CPU power. In this section, a few common reasons are briefly described.
 
