@@ -147,7 +147,7 @@ More info on PowerShell cmdlet for configuring Defender settings can be found [h
 
 More info on Troubleshooting Mode can be found [here](https://learn.microsoft.com/en-us/defender-endpoint/enable-troubleshooting-mode).
 
-In the follow link, additional scenarios where Troubleshooting Mode may help are described [Troubleshooting mode scenarios](https://learn.microsoft.com/en-us/defender-endpoint/troubleshooting-mode-scenarios).
+In the following link, additional scenarios where Troubleshooting Mode may help are described [Troubleshooting mode scenarios](https://learn.microsoft.com/en-us/defender-endpoint/troubleshooting-mode-scenarios).
 
 ## Performance Analyzer
 
