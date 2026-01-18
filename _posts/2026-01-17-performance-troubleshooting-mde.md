@@ -29,7 +29,7 @@ So let's get started.
 
 There may be several reasons which cause MDAV to utilize a higher percentage of CPU power. In this section, a few common reasons are briefly described.
 
-### **Binaries not signed**
+### Binaries not signed
 
 When a binary (exe, dll, etc.) that is not digitally signed is launched, MDAV will start a Real-Time Protection Scan.
 
@@ -68,11 +68,11 @@ If the binaries have certificates signed by CAs not trusted by Microsoft or need
 
 <img width="1359" height="759" alt="image" src="https://github.com/user-attachments/assets/bb9da54c-ddbb-4e71-8ef4-6d311a207956" />
 
-### **Obfuscated scripts**
+### Obfuscated scripts
 
 Obfuscated scripts require much more CPU to be scanned, so obfuscation should be used only if necessary.
 
-### **Not letting MDAV cache finish before sealing a VDI image**
+### Not letting MDAV cache finish before sealing a VDI image
 
 If creating a VDI image for a persistent or non-persistent image, ensure that the cache maintenance completes before sealing the image. To do this:
 
@@ -80,11 +80,11 @@ If creating a VDI image for a persistent or non-persistent image, ensure that th
 2. Expand Task Scheduler Library > Microsoft > Windows > Windows Defender, and then right-click on Windows Defender Cache Maintenance.
 3. Select Run, and let the scheduled task finish.
 
-### **Misspelled exclusions**
+### Misspelled exclusions
 
 Double check that the exclusions are spelled correctly.
 
-### **Path exclusions only work for scanning flows**
+### Path exclusions only work for scanning flows
 
 Behavior Monitoring and Network Real-time Inspection can still cause performance issues. As a workaround, one of the following can be done:
 
@@ -92,7 +92,7 @@ Behavior Monitoring and Network Real-time Inspection can still cause performance
 - Add the certificate to the Indicators certificates allow list
 - Add MDAV exclusions for the process, too.
 
-### **File hash computation**
+### File hash computation
 
 If the File Hash computation feature is enabled, file hashes for every executable file that is scanned is computed, if it wasn’t previously computed. This has a performance cost especially when copying large files from a network share. Keep in mind that this feature is a prerequisite for File Hash Indicators in Defender.
 
@@ -102,7 +102,7 @@ If it decided that it is not needed, it can be disabled via PowerShell or any ma
 
 `Set-MpPreference -EnableFileHashComputation $false`
 
-### **Scheduled scanning**
+### Scheduled scanning
 
 When it comes to scheduled scanning, the following scan settings should be checked, depending on the way they are pushed to machines:
 
@@ -118,13 +118,13 @@ When it comes to scheduled scanning, the following scan settings should be check
 
 More information about how to configure the scheduled scan settings can be found in [Microsoft's documentation](https://learn.microsoft.com/en-us/defender-endpoint/configure-advanced-scan-types-microsoft-defender-antivirus).
 
-### **Scan after security intelligence updates**
+### Scan after security intelligence updates
 
 By default, a scan happens after MDAV receives its latest security intelligence updates. If scheduled scans are enabled, maybe this is not needed and can be disabled.
 
 To disable it in Group Policy (or another management tool, such as MDM), go to Computer Configuration > Administrative Templates > Microsoft Defender Antivirus > Security Intelligence Updates, and set Turn on scan after security intelligence update to `Disabled`.
 
-### **Conflicts with other security software**
+### Conflicts with other security software
 
 If other security software, like AV, EDR, and DLP, are used, the proper exclusions need to be defined on both MDE and the other software's side.
 
