@@ -6,6 +6,7 @@ A frequently reported issue in MDE is its performance impact on machines. Many e
 
 <img alt="image" src="https://github.com/user-attachments/assets/4e3f30e4-2b9c-4731-ab5b-989b04eb2b49" />
 
+
 Welcome to the 3rd part of the blog post series “Getting to know MDE”!
 
 In this series, each post contains a different component/feature/methodology when it comes to understanding and managing Microsoft Defender for Endpoint (MDE).
@@ -255,7 +256,7 @@ The Microsoft Protection Log (MPLog) file is one of a few files found under the 
 - MpWppCoreTracing
 - MpWppTracing
 
-These files are very useful when investigating what Defender and its different detection mechanisms did. When it comes to performance troubleshooting, the MPLog file contains a few useful logs, among others, which can assist in detecting processes which experienced high scanning activity, potentially impacting their performance. Credits to the related [article](https://www.crowdstrike.com/en-us/blog/how-to-use-microsoft-protection-logging-for-forensic-investigations/) by CrowdStrike explaining these logs.
+These files are very useful when investigating what Defender and its different detection mechanisms did. When it comes to performance troubleshooting, the `MPLog` file contains a few useful logs, among others, which can assist in detecting processes which experienced high scanning activity, potentially impacting their performance. Credits to the related [article](https://www.crowdstrike.com/en-us/blog/how-to-use-microsoft-protection-logging-for-forensic-investigations/) by CrowdStrike explaining these logs. Remember that there is always the option of getting these files via Live Response and the `getfile` command.
 
 These logs have the following format:
 
