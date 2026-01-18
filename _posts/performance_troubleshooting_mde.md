@@ -272,11 +272,11 @@ Let's go through this line:
 |Count|The number of scanned files accessed by this process|224|
 |MaxTime|The longest time spent in scanning a single file accessed by this process|15|
 |MaxTimeFile|The file which was scanned for `MaxTime` milliseconds|\Device\HarddiskVolume3\Program Files (x86)\Razer\Synapse3\UserProcess\Razer Synapse Service Process.exe.config|
-|EstimatedImpact|This value shows the impact that MDAV had on the performance of the above process. It is the percentage of (Total time spent in scans of files accessed by this process)/(Total time which this process experienced scan activity). For example, if you open a large file in File Explorer, all the files in it are being scanned via Real-Time Protection. The time it takes until the last file is finished being scanned was 10 seconds, but the time that MDAV was actually scanning files was 3 seconds. Here the Estimated Impact is about 3/10 = 30%.|53%|
+|EstimatedImpact|This value shows the impact that MDAV had on the performance of the above process. It is the percentage of (Total time spent in scans of files accessed by this process)/(Total time which this process experienced scan activity). For example, if you open a large folder in File Explorer, all the files in it are being scanned via Real-Time Protection. The time it takes until the last file is finished being scanned was 10 seconds, but the time that MDAV was actually scanning files was 3 seconds. Here the Estimated Impact is about 3/10 = 30%.|53%|
 
-Therefore, using the above lines and the `EstimatedImpact` value, it is possible to review processes which experience heavy scanning load. Note that this does not mean necessarily that these processes result in higher CPU for the machine.
+Therefore, using the above lines and the `EstimatedImpact` value, it is possible to review processes which experience heavy scanning load. Note that this does not mean necessarily that these processes result in higher CPU for the machine, but rather that that specific process experienced a performance hit due to scanning.
 
-The following PowerShell script parses the MPLog file, takes only the lines which include the `EstimatedImpact` values, and exports it all in a CSV.
+The following PowerShell script parses the MPLog file, takes only the lines which include the `EstimatedImpact` values, and exports it all to a CSV.
 
 ```powershell
 # Function to get the log file via dialog
@@ -296,8 +296,8 @@ Write-Host "File Selected: $logfile"
 
 # Extract relevant log entries, remove whitespaces, and process data
 $logs = Get-Content $logfile | `
-    Select-String "EstimatedImpact" | `
-    Select-String -Pattern '%$' | `
+    Select-String "EstimatedImpact" | ` # Select lines that contain the string "EstimatedImpact"
+    Select-String -Pattern '%$' | ` # Select lines that end with "%". Sometimes the logs are not recorded properly and 2 logs are written in the same line, which makes it difficult to parse.
     ForEach-Object {
         # Remove all whitespace from the line
         $_ -replace '\s', ''
@@ -356,7 +356,7 @@ Another option is to sort by `EstimatedImpact` to view processes which are affec
 
 <img alt="image" src="https://github.com/user-attachments/assets/db1be4db-92a2-4453-99f3-583ab42d39f6" />
 
-A similar analysis can also be done by inserting a Pivot Table, and adding `ProcessImageName` in Rows, and `TotalTime` in Values, on which you can sort again by the Sum of TotalTime. This will produce a table like the following:
+A similar analysis can also be done by inserting a Pivot Table, and adding `ProcessImageName` in Rows, and `TotalTime` or `EstimatedImpact` in Values, on which you can sort again by the `Sum of TotalTime` or `Sum of EstimatedImpact`. This will produce a table like the following:
 
 <img alt="image" src="https://github.com/user-attachments/assets/60a864b3-db49-42c4-8569-95d58670bac8" />
 
@@ -364,3 +364,8 @@ As shown above, the MPLog is yet another way of identifying processes which may 
 
 ## Conclusion
 
+Sometimes, MDE and its components may utilize a higher-than-normal CPU percentage. Identifying the reason could be proved difficult. Hopefully, with this post it will be a little bit easier.
+
+Stick around for the next posts, where we will dive deep into looking Windows Event Logs, and also may move to other Microsoft Security products like Purview.
+
+I hope to see you back in the next one!
