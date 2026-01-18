@@ -257,7 +257,7 @@ The Microsoft Protection Log (MPLog) file is one of a few files found under the 
 
 These files are very useful when investigating what Defender and its different detection mechanisms did. When it comes to performance troubleshooting, the MPLog file contains a few useful logs, among others, which can assist in detecting processes which experienced high scanning activity, potentially impacting their performance. Credits to the related [article](https://www.crowdstrike.com/en-us/blog/how-to-use-microsoft-protection-logging-for-forensic-investigations/) by CrowdStrike explaining these logs.
 
-These lines have the following format:
+These logs have the following format:
 
 `2025-12-31T15:45:19.964 ProcessImageName: Razer Synapse Service Process.exe, Pid: 9104, TotalTime: 810, Count: 224, MaxTime: 15, MaxTimeFile: \Device\HarddiskVolume3\Program Files (x86)\Razer\Synapse3\UserProcess\Razer Synapse Service Process.exe.config, EstimatedImpact: 53%`
 
@@ -274,9 +274,9 @@ Let's go through this line:
 |MaxTimeFile|The file which was scanned for `MaxTime` milliseconds|\Device\HarddiskVolume3\Program Files (x86)\Razer\Synapse3\UserProcess\Razer Synapse Service Process.exe.config|
 |EstimatedImpact|This value shows the impact that MDAV had on the performance of the above process. It is the percentage of (Total time spent in scans of files accessed by this process)/(Total time which this process experienced scan activity). For example, if you open a large folder in File Explorer, all the files in it are being scanned via Real-Time Protection. The time it takes until the last file is finished being scanned was 10 seconds, but the time that MDAV was actually scanning files was 3 seconds. Here the Estimated Impact is about 3/10 = 30%.|53%|
 
-Therefore, using the above lines and the `EstimatedImpact` value, it is possible to review processes which experience heavy scanning load. Note that this does not mean necessarily that these processes result in higher CPU for the machine, but rather that that specific process experienced a performance hit due to scanning.
+Therefore, using the above logs and the `EstimatedImpact` value, it is possible to review processes which experience heavy scanning load. Note that this does not mean necessarily that these processes result in higher CPU for the machine, but rather that that specific process experienced a performance hit due to scanning.
 
-The following PowerShell script parses the MPLog file, takes only the lines which include the `EstimatedImpact` values, and exports it all to a CSV.
+The following PowerShell script parses the MPLog file, takes only the logs which include the `EstimatedImpact` values, and exports it all to a CSV.
 
 ```powershell
 $logfile = Read-Host "Enter log MPLog file"
