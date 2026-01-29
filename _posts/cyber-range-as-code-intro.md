@@ -64,7 +64,7 @@ The initial plan is to deploy the following:
   - nginx
 - AD and windows workstations
 - atomic red / kali linux
-- openpolicy agent
+- openpolicy agent / hashicorp sentinel
 
 ## Architecture
 
