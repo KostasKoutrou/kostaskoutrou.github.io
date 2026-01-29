@@ -49,3 +49,9 @@ install opnsense + config
 IaC PoC
 packer/terraform/ansible
 with pitfalls.
+
+## Next Steps
+
+Make proxmox and opnsense into IaC.
+
+## Conclusion
