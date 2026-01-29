@@ -51,7 +51,7 @@ For this project, a wide variety of systems and technologies will be used, as th
 
 The initial plan is to deploy the following:
 
-- [Proxmox](https://www.proxmox.com/en/): The whole infrastructure will be deploy on a physical server running Proxmox Virtual Environment (PVE) as a Type-1 Hypervisor.
+- [Proxmox](https://www.proxmox.com/en/): The whole infrastructure will be deployed on a physical server running Proxmox Virtual Environment (PVE) as a Type-1 Hypervisor.
 - packer
 - terraform
 - ansible
