@@ -6,13 +6,6 @@ What is a Cyber Range?
 
 > A [Cyber Range](https://www.ibm.com/think/topics/cyber-range) is a virtual environment for cybersecurity training, testing, and research that simulates real-world networks and cyberattacks.
 
-Purpose is to create a lab to:
-
-- test attacks
-- implementing standards like iso, nist, cis
-- hardening infrastructure
-- Recover seamlessly. All Infra is automated: if i get a new server, i can be up and running with the minimum number of manual work
-
 The end goal of this project is to **create** and **maintain** a real-world infrastructure to:
 
 - Test attack scenarios and
@@ -37,13 +30,19 @@ So let's get started!
 
 ---
 
-## All Infra is automated
+## Automated Infrastructure
 
-- IaC
-- For hardening and implementing standards:
-  - compliance as code
-  - policy as code
-- detection as code
+As mentioned above, one core aspect of this project is to be able to have the whole infrastructure deployed automatically. This means that the following will be utilized.
+- Infrastructure as Code (IaC): All the infrastructure will be managed and provisioned using code and configuration files, instead of manual processes. This enables automation, consistency, version control, and swift, repeatable deployments. In the case specifically of this Cyber Range project, this will also allow quick recovery in case of an attack resulting in part of the infrastructure or the whole infrastructure being compromised and damaged unrecoverably.
+- For security hardening and implementing security standards, in addition to IaC, the following practices will also be utilized:
+  - Policy as Code (PaC): PaC ([ref1](https://www.paloaltonetworks.com/cyberpedia/what-is-policy-as-code), [ref2](https://developer.hashicorp.com/sentinel/docs/concepts/policy-as-code) , [ref3](https://www.hashicorp.com/en/blog/policy-as-code-explained)) is the practice of defining, updating, sharing and enforcing policies using code. With this approach, instead of relying on manual processes to manage policies, the benefits are:
+    - Sandboxing: Policies provide guardrails for other automated systems. By defining Policies as Code, the verification by the policies is automated, reducing the time needed of manual work.
+    - Codification: Because the policy is defined as code, it is possible to describe the logic about the policy directly on the code with comments, which results in better understand and knowledge sharing of these policies.
+    - Version Control: The benefits of version control are well known (history, diffs, pull requests, etc.).
+    - Testing: Because the policies are defined as code, they can be tested by utilizing automated testing such as through a CI/CD pipeline. This allows for testing if a policy will result in the expected outcome before deploying to production.
+    - Automation: Similarly to IaC, with PaC, tools can be used to automatically deploy the policies to specified systems.
+    - Compliance as Code (CaC) / Security as Code (SaC): This is where the concepts of [CaC](https://www.puppet.com/blog/compliance-as-code) and [SaC](https://www.isaca.org/resources/news-and-trends/isaca-now-blog/2024/security-as-code-a-key-building-block-for-devsecops) are also related.
+- Detection as Code (DaC): [DaC](https://www.legitsecurity.com/aspm-knowledge-base/detection-as-code) enables the writing, maintenance, and automation of the threat detection logic as if it were software code, making security a built-in part of the development pipeline.
 
 ## Tech stack
 
