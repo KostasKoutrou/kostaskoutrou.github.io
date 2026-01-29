@@ -11,6 +11,15 @@ Purpose is to create a lab to:
 - hardening infrastructure
 - All Infra is automated: if i get a new server, i can be up and running with the minimum number of manual work
 
+---
+
+## Contents
+
+* TOC
+{:toc}
+
+---
+
 ## All Infra is automated
 
 - IaC
