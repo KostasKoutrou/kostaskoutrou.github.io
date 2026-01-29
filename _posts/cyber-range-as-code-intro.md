@@ -51,11 +51,11 @@ For this project, a wide variety of systems and technologies will be used, as th
 
 The initial plan is to deploy the following:
 
-- [Proxmox](https://www.proxmox.com/en/): The whole infrastructure will be deployed on a physical server running Proxmox Virtual Environment (PVE) as a Type-1 Hypervisor.
-- packer
-- terraform
-- ansible
-- openpolicy agent
+- [Proxmox](https://www.proxmox.com/en/): The whole infrastructure will be deployed on a physical server running Proxmox Virtual Environment (PVE) as a Type-1 Hypervisor. The infrastructure will be built with VMs and Containers.
+- For the IaC aspect, the following 3 tools will be used:
+  - [Packer](https://developer.hashicorp.com/packer): Packer is a community tool for creating identical machine images for multiple platforms from a single source configuration. What Packer essentially does is it takes an ISO file of an OS, installs it on a temporary VM, applies any defined action during the installation, applies any configuration defined, installs any package defined and converts that VM to a template. That template is made for the platform on which the temporary VM was created on. In the case of this project, since the VM is created in Proxmox, the template will be a Proxmox VM template. This template is then used by Terraform to provision VMs which will have that configuration ready immediately. Packer provides the freedom of utilizing any ISO and converting it to a template exactly for the needs of the task at hand.
+  - [Terraform](https://developer.hashicorp.com/terraform): HashiCorp Terraform is an infrastructure as code tool that lets you define both cloud and on-prem resources in human-readable configuration files that you can version, reuse, and share. You can then use a consistent workflow to provision and manage all of your infrastructure throughout its lifecycle. Terraform can manage low-level components like compute, storage, and networking resources, as well as high-level components like DNS entries and SaaS features. In the context of the project, the templates created by Packer will used by Terraform to provision all the infrastructure defined. Note here that many of the configurations of the template defined by Packer can be changed during the provisioning by Terraform (e.g., RAM, CPU cores, installed packages, etc.), which provides more freedom during provisioning. But with Packer the benefit with the resulting template is that there is no need to install the packages already installed and execute any time consuming action every time a new VM is provisioned, because it was already done during the Packer VM template creation.
+  - [Ansible](https://docs.ansible.com/): 
 - opnsense + suricata for ips
 - wazuh / MDXDR
 - linux servers
@@ -64,6 +64,7 @@ The initial plan is to deploy the following:
   - nginx
 - AD and windows workstations
 - atomic red / kali linux
+- openpolicy agent
 
 ## Architecture
 
