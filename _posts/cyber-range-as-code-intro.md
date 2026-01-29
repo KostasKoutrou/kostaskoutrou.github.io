@@ -9,7 +9,15 @@ Purpose is to create a lab to:
 - test attacks
 - implementing standards like iso, nist, cis
 - hardening infrastructure
-- All Infra is automated: if i get a new server, i can be up and running with the minimum number of manual work
+- Recover seamlessly. All Infra is automated: if i get a new server, i can be up and running with the minimum number of manual work
+
+The end goal of this project is to create and maintain a real-world infrastructure to:
+
+- Test attack scenarios and
+  - Monitor the result of the attack first-hand
+  - Review the generated logs to understand what happened on the backend, what could be detected and created as a detection rule
+- Implement security standards like ISO27001, NIS2, NIST, and CIS
+- 
 
 ---
 
