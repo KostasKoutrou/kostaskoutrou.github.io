@@ -46,8 +46,12 @@ As mentioned above, one core aspect of this project is to be able to have the wh
 
 ## Tech stack
 
-- physical server
-- proxmox
+For this project, a wide variety of systems and technologies will be used, as the purpose is, among others, to simulate a real-world IT infrastructure.
+
+
+The initial plan is to deploy the following:
+
+- [Proxmox](https://www.proxmox.com/en/): The whole infrastructure will be deploy on a physical server running Proxmox Virtual Environment (PVE) as a Type-1 Hypervisor.
 - packer
 - terraform
 - ansible
