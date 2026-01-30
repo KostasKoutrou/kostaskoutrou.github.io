@@ -6,7 +6,7 @@ What is a Cyber Range?
 
 > A [Cyber Range](https://www.ibm.com/think/topics/cyber-range) is a virtual environment for cybersecurity training, testing, and research that simulates real-world networks and cyberattacks.
 
-The end goal of this project is to **create** and **maintain** a real-world infrastructure to:
+The end goal of this project is to **create** and **maintain** a _real-world infrastructure_ to:
 
 - Test attack scenarios and
   - Monitor the result of the attack first-hand
