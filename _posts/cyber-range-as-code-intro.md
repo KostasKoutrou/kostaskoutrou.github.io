@@ -100,11 +100,18 @@ The initial plan is to deploy the following:
     - Active Directory Domain Services
     - Windows Workstations
     - Windows Servers with different configured roles
-- atomic red / kali linux
+- For the Red Team side, a few potential and very useful candidates are the following:
+  - [Atomic Red Team](https://www.atomicredteam.io/)
+  - [MITRE Caldera](https://caldera.mitre.org/)
+  - [PurpleSharp](https://www.purplesharp.com/en/latest/)
+  - [Injection Monkey](https://github.com/guardicore/monkey)
 - Policy as Code: In the later stages of the project, after the IaC part is at a mature state, the next step will be to proceed with the Policy as Code. For now, the potential candidates for PaC are the following:
   - [Open Policy Agent](https://www.openpolicyagent.org/): 
   - hashicorp sentinel
-- sigma / yara / kestrel https://github.com/opencybersecurityalliance/kestrel-lang
+- Detection as Code: Similarly to PaC, DaC is something that will be implemented later on. A few candidates identified are the following:
+  - [Sigma Rules](https://sigmahq.io/docs/guide/about.html): Sigma rules are YAML files that contain all the information required to detect specified malicious behaviour when inspecting log files.
+  - [YARA](https://virustotal.github.io/yara/): YARA is a tool that assists in defining malware samples. A YARA rule includes meta-information about the malware, and a set of strings and conditions to detect the malware (signatures).
+  - [Kestrel](https://kestrel.readthedocs.io/en/latest/): 
 
 ## Architecture
 
