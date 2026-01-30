@@ -42,7 +42,15 @@ As mentioned above, one core aspect of this project is to be able to have the wh
     - Testing: Because the policies are defined as code, they can be tested by utilizing automated testing such as through a CI/CD pipeline. This allows for testing if a policy will result in the expected outcome before deploying to production.
     - Automation: Similarly to IaC, with PaC, tools can be used to automatically deploy the policies to specified systems.
     - Compliance as Code (CaC) / Security as Code (SaC): This is where the concepts of [CaC](https://www.puppet.com/blog/compliance-as-code) and [SaC](https://www.isaca.org/resources/news-and-trends/isaca-now-blog/2024/security-as-code-a-key-building-block-for-devsecops) are also related.
-- Detection as Code (DaC): [DaC](https://www.legitsecurity.com/aspm-knowledge-base/detection-as-code) enables the writing, maintenance, and automation of the threat detection logic as if it were software code, making security a built-in part of the development pipeline.
+    - Some examples of what rules can be enforced as policy with PaC are the following:
+      - All 'victim' VMs must be on the isolated VLAN, not the management VLAN.
+      - No single VM can be assigned more than 4 CPU cores or 8GB RAM.
+      - All VMs must clone from the template X.
+      - Terraform must not use the default OS users to perform actions.
+      - Specific fields in Terraform must not be left empty.
+      - Every VM must have a description field explaining its purpose.
+  PaC will something that will be implemented at a later phase of the project, after the IaC phase is at a mature state.
+- Detection as Code (DaC): [DaC](https://www.legitsecurity.com/aspm-knowledge-base/detection-as-code) enables the writing, maintenance, and automation of the threat detection logic as if it were software code, making security a built-in part of the development pipeline. Similar to PaC, DaC will start being implemented at a later phase of the project.
 
 ## Tech stack
 
@@ -83,13 +91,19 @@ The initial plan is to deploy the following:
     - Host visibiltiy with [Elastic agent](https://www.elastic.co/elastic-agent)
     - Centralized management with [Elastic Fleet](https://www.elastic.co/docs/reference/fleet)
 - [ModSecurity](https://modsecurity.org/) + OWASP Core Rule Set (CRS)
-- linux servers
-  - DVWA / juice shop / owasp webgoat
-  - mysql / postgresql
-  - nginx
-- AD and windows workstations
+- Actual "Infrastructure" the will be secured and attacked:
+  - Linux servers:
+    - [DVWA](https://github.com/digininja/DVWA): Damn Vulnerable Web Application (DVWA) is a PHP/MariaDB web application which can be configured to be vulnerable against different types of web-based attacks. This will be used for simulating attacks, as well as attempting to protect the application with different measures even though it is vulnerable.
+    - [OWASP Juice Shop](https://owasp.org/www-project-juice-shop/): Similar to DVWA, it is another vulnerable web application.
+    - [OWASP WebGoat](https://owasp.org/www-project-webgoat/): Another Java-based vulnerable application.
+  - Windows: In order to get close to a real-world infrastructure, different Windows components will also need to be configured:
+    - Active Directory Domain Services
+    - Windows Workstations
+    - Windows Servers with different configured roles
 - atomic red / kali linux
-- openpolicy agent / hashicorp sentinel
+- Policy as Code: In the later stages of the project, after the IaC part is at a mature state, the next step will be to proceed with the Policy as Code. For now, the potential candidates for PaC are the following:
+  - [Open Policy Agent](https://www.openpolicyagent.org/): 
+  - hashicorp sentinel
 - sigma / yara / kestrel https://github.com/opencybersecurityalliance/kestrel-lang
 
 ## Architecture
