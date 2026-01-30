@@ -82,6 +82,7 @@ The initial plan is to deploy the following:
     - File analysis with [Strelka](https://github.com/target/strelka)
     - Host visibiltiy with [Elastic agent](https://www.elastic.co/elastic-agent)
     - Centralized management with [Elastic Fleet](https://www.elastic.co/docs/reference/fleet)
+- ModSecurity + OWASP Core Rule Set (CRS)
 - linux servers
   - DVWA / juice shop / owasp webgoat
   - mysql / postgresql
@@ -89,6 +90,7 @@ The initial plan is to deploy the following:
 - AD and windows workstations
 - atomic red / kali linux
 - openpolicy agent / hashicorp sentinel
+- sigma / yara / kestrel https://github.com/opencybersecurityalliance/kestrel-lang
 
 ## Architecture
 
