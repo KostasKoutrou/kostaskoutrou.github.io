@@ -118,7 +118,7 @@ When it comes to scheduled scanning, the following scan settings should be check
     - Specify the time of day to run scheduled scan to `Not configured`.
     - Specify the day of the week to `Not configured`.
 
-More information about how to configure the scheduled scan settings can be found in [Microsoft's do**cumenta**tion](https://learn.microsoft.com/en-us/defender-endpoint/configure-advanced-scan-types-microsoft-defender-antivirus).
+More information about how to configure the scheduled scan settings can be found in [Microsoft's documentation](https://learn.microsoft.com/en-us/defender-endpoint/configure-advanced-scan-types-microsoft-defender-antivirus).
 
 ### Scan after security intelligence updates
 
