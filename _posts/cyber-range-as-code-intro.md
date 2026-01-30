@@ -60,7 +60,7 @@ For this project, a wide variety of systems and technologies will be used, as th
 
 The following technologies, for now, are strong contenders to be deployed. Since the project is just starting now, some technologies are only thought of as ideas, and may or may not actually be deployed when the time comes. I am looking for recommendations, though. Send me a message if you have something to recommend:
 
-- [Pr**oxm**ox](https://www.proxmox.com/en/): The whole infrastructure will be deployed on a physical server running Proxmox Virtual Environment (PVE) as a Type-1 Hypervisor. The infrastructure will be built with VMs and Containers.
+- [**Proxmox**](https://www.proxmox.com/en/): The whole infrastructure will be deployed on a physical server running Proxmox Virtual Environment (PVE) as a Type-1 Hypervisor. The infrastructure will be built with VMs and Containers.
 - For the **IaC** aspect, the following 3 tools will be used:
   - [**Packer**](https://developer.hashicorp.com/packer): Packer is a community tool for **creating identical machine images** for multiple platforms from a single source configuration. What Packer essentially does is
   1. it takes an ISO file of an OS
