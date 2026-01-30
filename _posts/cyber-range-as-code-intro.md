@@ -72,7 +72,7 @@ The initial plan is to deploy the following:
     - Containers Security
     - Posture Management
     - Workload Protection
-  - Microsoft Defender XDR: 
+  - [Microsoft Defender XDR](https://www.microsoft.com/en-us/security/business/siem-and-xdr/microsoft-defender-xdr#capabilities): One of the most widely used XDR solutions in the market. It provides a full commercial XDR solution, and it would require multiple posts to describe it fully. While this is not a free solution, hopefully I will figure out how to implement it in a lab environment because I would be really interested in including Microsoft Defender XDR in this Cyber Range project.
   - [Security Onion](https://securityonionsolutions.com/): Security Onion is a free platform providing a series of features, including:
     - Network visibility using Suricata
     - Intrusion detection honeypots based on [OpenCanary](https://github.com/thinkst/opencanary)
@@ -82,7 +82,7 @@ The initial plan is to deploy the following:
     - File analysis with [Strelka](https://github.com/target/strelka)
     - Host visibiltiy with [Elastic agent](https://www.elastic.co/elastic-agent)
     - Centralized management with [Elastic Fleet](https://www.elastic.co/docs/reference/fleet)
-- ModSecurity + OWASP Core Rule Set (CRS)
+- [ModSecurity](https://modsecurity.org/) + OWASP Core Rule Set (CRS)
 - linux servers
   - DVWA / juice shop / owasp webgoat
   - mysql / postgresql
