@@ -55,9 +55,33 @@ The initial plan is to deploy the following:
 - For the IaC aspect, the following 3 tools will be used:
   - [Packer](https://developer.hashicorp.com/packer): Packer is a community tool for creating identical machine images for multiple platforms from a single source configuration. What Packer essentially does is it takes an ISO file of an OS, installs it on a temporary VM, applies any defined action during the installation, applies any configuration defined, installs any package defined and converts that VM to a template. That template is made for the platform on which the temporary VM was created on. In the case of this project, since the VM is created in Proxmox, the template will be a Proxmox VM template. This template is then used by Terraform to provision VMs which will have that configuration ready immediately. Packer provides the freedom of utilizing any ISO and converting it to a template exactly for the needs of the task at hand.
   - [Terraform](https://developer.hashicorp.com/terraform): HashiCorp Terraform is an infrastructure as code tool that lets you define both cloud and on-prem resources in human-readable configuration files that you can version, reuse, and share. You can then use a consistent workflow to provision and manage all of your infrastructure throughout its lifecycle. Terraform can manage low-level components like compute, storage, and networking resources, as well as high-level components like DNS entries and SaaS features. In the context of the project, the templates created by Packer will used by Terraform to provision all the infrastructure defined. Note here that many of the configurations of the template defined by Packer can be changed during the provisioning by Terraform (e.g., RAM, CPU cores, installed packages, etc.), which provides more freedom during provisioning. But with Packer the benefit with the resulting template is that there is no need to install the packages already installed and execute any time consuming action every time a new VM is provisioned, because it was already done during the Packer VM template creation.
-  - [Ansible](https://docs.ansible.com/): 
-- opnsense + suricata for ips
-- wazuh / MDXDR
+  - [Ansible](https://docs.ansible.com/): Ansible is an automation language which allows for automating essentially any IT task. For the project, Ansible is used for further configuring all the VMs provisioned by Terraform. Ansible uses SSH or WinRM to execute remote commands on machines. One of the benefits of Ansible is what is called Idempotency. This means that Ansible only makes changes if necessary, preventing unintended side effects. An Ansible playbook is written in YAML, and in a playbook the final desired state of the target machine is described. Then it is up to Ansible to make any changes or no changes if the target machine already has the final desired state.
+- [OPNsense](https://opnsense.org/): OPNsense is an open-source full firewall and routing platform, which brings all the features provided by commercial products to the open-source world. It is the most widely used open-source firewall, and has all the features required for this project.
+  - [Suricata](https://suricata.io/): Suricata is an open-source network analysis and threat detection software. Suricata will be the network-based IDS/IPS solution of this project. OPNsense provides an integration with Suricata, which will allow for an experience of a next-gen firewall with a few easy steps.
+- SIEM/XDR: When it comes to the XDR solution to be deployed for this project, a few alternatives are taken into consideration:
+  - [Wazuh](https://wazuh.com/): Wazuh is an open-source security platform, which brings a lot of features under the XDR and SIEM umbrella. This includes:
+    - Configuration Assessment
+    - Malware Detection
+    - File Integrity Monitoring
+    - Threat Hunting
+    - Log Data Analysis
+    - Vulnerability Detection
+    - Incident Response
+    - Regulatory Compliance
+    - IT Hygiene
+    - Containers Security
+    - Posture Management
+    - Workload Protection
+  - Microsoft Defender XDR: 
+  - [Security Onion](https://securityonionsolutions.com/): Security Onion is a free platform providing a series of features, including:
+    - Network visibility using Suricata
+    - Intrusion detection honeypots based on [OpenCanary](https://github.com/thinkst/opencanary)
+    - Log management with the [Elastic Stack](https://www.elastic.co/elastic-stack)
+    - File extraction with [Zeek](https://zeek.org/) or Suricata
+    - Full packet capture with [Stenographer](https://docs.securityonion.net/en/2.4/stenographer.html)
+    - File analysis with [Strelka](https://github.com/target/strelka)
+    - Host visibiltiy with [Elastic agent](https://www.elastic.co/elastic-agent)
+    - Centralized management with [Elastic Fleet](https://www.elastic.co/docs/reference/fleet)
 - linux servers
   - DVWA / juice shop / owasp webgoat
   - mysql / postgresql
