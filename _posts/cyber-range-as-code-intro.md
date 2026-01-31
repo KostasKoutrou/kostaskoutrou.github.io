@@ -1,4 +1,4 @@
-# Cyber Range as Code: Automating Security Lab with IaC - Part 1
+![NetworkDesign-FW Rules drawio](https://github.com/user-attachments/assets/22f49e67-f994-4931-9af2-55a89bcf7d24)![NetworkDesign-FW Rules drawio](https://github.com/user-attachments/assets/85bc1040-42e3-46df-9315-8c46f6cb12a3)![NetworkDesign-FW Rules drawio](https://github.com/user-attachments/assets/e72fced5-d70f-4366-bf35-c9681b9fcab7)# Cyber Range as Code: Automating Security Lab with IaC - Part 1
 
 ## Introduction
 
@@ -125,18 +125,21 @@ The following technologies, for now, are strong contenders to be deployed. Since
 
 ## Architecture
 
-The initial infrastrcuture architecture is the following. It is important to note here that this is the initial architecture idea, and there may very well be changes during implementation.
+The initial infrastrcuture architecture is the following. It is important to note here that this is the initial architecture idea, it is not final, and there may very well be changes during implementation.
 
-![NetworkDesign-FW Rules drawio](https://github.com/user-attachments/assets/2333db9a-c1e4-4e69-b505-7899fdadd845)
+![Uploading NetworkDesign-FW Rules.drawio.svg…]()
 
-As shown above, the architecture is a relatively simple and typical network infrastructure, with three separate zones:
+As shown above, the architecture is a relatively simple and typical network infrastructure, with the following components:
 
-- **Demilitarized Zone (DMZ)**: The zone that exposes services which are to be served to the Internet. In the context of the project, these will be served to the local network, and, most importantly for the project, will be accessible by the "External Attacker", enabling for attack scenarios initiated from the "Internet".
-- **Internal Zone**: The zone where all there internal servers and services will reside.
-- **End Users**: The last zone will be for the End Users, where typical workstation VMs will reside, and have defined access to specific servers/services and to the internet.
-
-explain the graph.
-it is not final, we add more as we go.
+- The central Firewall, controlling the network traffic among the four network zones:
+  1. **Demilitarized Zone (DMZ)**: The zone that exposes services which are to be served to the Internet. In the context of the project, these will be served to the local network, and, most importantly for the project, will be accessible by the "External Attacker", enabling for attack scenarios initiated from the "Internet".
+  2. **Internal Zone**: The zone where all there internal servers and services will reside. This includes:
+    - Any internal servers, e.g., SQL Servers and AD DC, hosting and serving information which is destined to be consumed by internal resources only.
+    - Security Tools, including the SIEM/XDR/Monitoring tools.
+  3. **End Users**: The last zone will be for the End Users, where typical workstation VMs will reside, and have defined access to specific servers/services and to the internet.
+  4. **WAN Zone**: This is there the "Internet", in the context of the Infrastructure, lives. This is where:
+    - The PC from which the Proxmox management will be done, running the Packer, Terraform, and Ansible.
+    - The External Attacks will occur from.
 
 ## PoC
 
