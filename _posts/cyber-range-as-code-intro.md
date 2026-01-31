@@ -1,4 +1,4 @@
-![NetworkDesign-FW Rules drawio](https://github.com/user-attachments/assets/22f49e67-f994-4931-9af2-55a89bcf7d24)![NetworkDesign-FW Rules drawio](https://github.com/user-attachments/assets/85bc1040-42e3-46df-9315-8c46f6cb12a3)![NetworkDesign-FW Rules drawio](https://github.com/user-attachments/assets/e72fced5-d70f-4366-bf35-c9681b9fcab7)# Cyber Range as Code: Automating Security Lab with IaC - Part 1
+# Cyber Range as Code: Automating Security Lab with IaC - Part 1
 
 ## Introduction
 
@@ -127,7 +127,7 @@ The following technologies, for now, are strong contenders to be deployed. Since
 
 The initial infrastrcuture architecture is the following. It is important to note here that this is the initial architecture idea, it is not final, and there may very well be changes during implementation.
 
-![Uploading NetworkDesign-FW Rules.drawio.svg…]()
+![NetworkDesign-FW Rules drawio](https://github.com/user-attachments/assets/22f49e67-f994-4931-9af2-55a89bcf7d24)
 
 As shown above, the architecture is a relatively simple and typical network infrastructure, with the following components:
 
