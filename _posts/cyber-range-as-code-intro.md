@@ -127,12 +127,13 @@ The following technologies, for now, are strong contenders to be deployed. Since
 
 The initial infrastrcuture architecture is the following. It is important to note here that this is the initial architecture idea, and there may very well be changes during implementation.
 
-![NetworkDesign-FW Rules drawio](https://github.com/user-attachments/assets/e2bc4414-052a-4be8-a214-d6cbd4dcc21e)
+![NetworkDesign-FW Rules drawio](https://github.com/user-attachments/assets/2333db9a-c1e4-4e69-b505-7899fdadd845)
 
 As shown above, the architecture is a relatively simple and typical network infrastructure, with three separate zones:
 
 - **Demilitarized Zone (DMZ)**: The zone that exposes services which are to be served to the Internet. In the context of the project, these will be served to the local network, and, most importantly for the project, will be accessible by the "External Attacker", enabling for attack scenarios initiated from the "Internet".
-- **Internal Zone**: The zone where all there internal servers and services will reside. 
+- **Internal Zone**: The zone where all there internal servers and services will reside.
+- **End Users**: The last zone will be for the End Users, where typical workstation VMs will reside, and have defined access to specific servers/services and to the internet.
 
 explain the graph.
 it is not final, we add more as we go.
