@@ -141,10 +141,65 @@ As shown above, the architecture is a relatively simple and typical network infr
       - The PC from which the Proxmox management will be done, running the Packer, Terraform, and Ansible.
       - The External Attacks will occur from.
 
-## PoC
+## Initial Configuration / PoC
 
-install proxmox + config
-install opnsense + config
+In this section, an initial configuration of the infrastructure is described, with only the bare minimum of components, as well as a PoC of the infrastructure working as described in the previous sections, i.e., with IaC practictes.
+
+### Proxmox Configuration
+
+The installation of Proxmox is a typical installation of any OS. Because the physical machine is connected to the home router, the following network configuration was added:
+
+- IP Address: Static 192.168.0.50/24 - Outside of the DHCP range of the home router, but in the same subnet.
+- Gateway: 192.168.0.1 - The IP Address of the home router.
+- DNS: 1.1.1.1 - Used Cloudflare's general use DNS IP address.
+
+<img alt="image" src="https://github.com/user-attachments/assets/d4e74abb-2a23-48a6-8d1a-d5d63a1840a8" />
+
+#### Network Configuration
+
+Proxmox VE is using the [Linux network stack](https://pve.proxmox.com/wiki/Network_Configuration). A Linux bridge interface (usually named _vmbrX_) is needed to connect guests to the underlying physical network. It can be thought of as a **virtual switch** which the **guests** and **physical interfaces** are connected to.
+
+The network configuration for the project utilized Linux Bridges to create the defined zones.
+
+<img width="1569" height="393" alt="image" src="https://github.com/user-attachments/assets/8121de5d-694b-4668-a7d9-fabdb06bc79b" />
+
+In the screenshot above, the utilized objects are the following:
+
+|Name|Type|Description|
+|-|-|
+|nic1|Network Device|This is the physical interface which physically connects from the Proxmox VE server to the home router, enabling connectivity to the home PC and to the internet.|
+|vmbr0|Linux Bridge|It is through this Linux Bridge that the Proxmox VE server actually connects to the home router, as depicted in the `Ports/Slaves` column, where the `nic1` is defined. The default gateway for the Proxmox server is also defined through this bridge.|
+|vmbrDMZ20|Linux Bridge|The Linux Bridge for the DMZ. The "20" in the name is there for convenience of knowing which subnet the zone has (10.0.20.0/24). The IP of the bridge is 10.0.20.2/24, because the .1 will be assigned to the OPNsense interface.|
+|vmbrEUZ40|Linux Bridge|The Linux Bridge for the End Users zone. The "40" in the name is there for convenience of knowing which subnet the zone has (10.0.40.0/24). The IP of the bridge is 10.0.40.2/24, because the .1 will be assigned to the OPNsense interface.|
+|vmbrIZ30|Linux Bridge|The Linux Bridge for the Internal Zone. The "30" in the name is there for convenience of knowing which subnet the zone has (10.0.30.0/24). The IP of the bridge is 10.0.30.2/24, because the .1 will be assigned to the OPNsense interface.|
+
+#### Proxmox Firewall
+
+In addition to the OPNsense which will operate as the central Firewall of the infrastructure, the firewall of Proxmox was also enabled, with the purpose of isolating the Infrastructure from being able to access the home router local network. Think of it as a "Defence in Depth" approach.
+
+Before explaining how firewalling works in Proxmox, let's briefly review how the VMs and nodes are structured in Proxmox:
+
+<img width="253" height="343" alt="image" src="https://github.com/user-attachments/assets/ffaf5587-0b5b-45f2-b509-ecace5c234fd" />
+
+In the above screenshot this structure is depicted. More specifically, there is:
+
+- Datacenter: This is the top level of abstraction. Under datacenter all the proxmox servers are listed. If a Proxmox cluster was created, there would be more than one, but since in the project only one physical server is used, there is only one entry.
+- Proxmox VE Nodes: The "kkproxmox" node is the physical server running the Proxmox VE.
+- VMs under each Proxmox VE Node: Under each Proxmox VE node, the different resources deployed are depicted. This includes VMs, VM templates, storage, network, etc.
+
+The way that the firewall works in Proxmox is the following: The firewall as a functionality can be enabled on any of the layers described above. For example, if the firewall is needed to be enabled on a VM, then the firewall needs to be enabled on the Datacenter, the Proxmox node hosting that VM, the VM itself, and on each virtual network interface of that VM.
+
+
+
+### Manual OPNsense Installation
+
+
+### Packer Configuration
+
+### Terraform Configuration
+
+### Ansible
+
 
 IaC PoC
 packer/terraform/ansible
