@@ -6,7 +6,7 @@ What is a Cyber Range?
 
 > A [Cyber Range](https://www.ibm.com/think/topics/cyber-range) is a virtual environment for cybersecurity training, testing, and research that simulates real-world networks and cyberattacks.
 
-I always wanted to build a security homelab, where I will have the freedom and the infrastructure to build, secure, attack, monitor, and defend an full-on infrastructure. At the same time, I want to build all of this "as code". I really believe is converting everything as code, because this approach solves many issues of manual work, like manual maintenance, configuration drift, complex change history, and no version control. It also facilitates the ability to rebuild the infrastructure as quickly as possible. I was thinking of naming this project "Security Playground" at first, but I thought "Cyber Range as Code" was more catchy and it grasped the two main concepts that I want to focus at for this project.
+I always wanted to build a security homelab, where I will have the freedom and the infrastructure to build, secure, attack, monitor, and defend an full-on infrastructure. At the same time, I want to build all of this "as code". I really believe is converting everything as code, because this approach solves many issues of manual work, like manual maintenance, configuration drift, complex change history, and no version control. It also facilitates the ability to rebuild the infrastructure as quickly as possible. I was thinking of naming this project "Security Playground" at first or something like that, but I thought "Cyber Range as Code" was more catchy and it grasped the two main concepts that I want to focus at for this project.
 
 The end goal of this project is to **build and maintain a real-world infrastructure** to:
 
@@ -175,7 +175,7 @@ In the screenshot above, the utilized objects are the following:
 
 #### Proxmox Firewall
 
-In addition to the OPNsense which will operate as the central Firewall of the infrastructure, the firewall of Proxmox was also enabled, with the purpose of isolating the Infrastructure from being able to access the home router local network. Think of it as a "Defence in Depth" approach.
+In addition to the OPNsense which will operate as the central Firewall of the infrastructure, the [firewall](https://pve.proxmox.com/pve-docs/pve-admin-guide.html#chapter_pve_firewall) of Proxmox was also enabled, with the purpose of isolating the Infrastructure from being able to access the home router local network. Think of it as a "Defence in Depth" approach.
 
 Before explaining how firewalling works in Proxmox, let's briefly review how the VMs and nodes are structured in Proxmox:
 
@@ -183,15 +183,48 @@ Before explaining how firewalling works in Proxmox, let's briefly review how the
 
 In the above screenshot this structure is depicted. More specifically, there is:
 
-- Datacenter: This is the top level of abstraction. Under datacenter all the proxmox servers are listed. If a Proxmox cluster was created, there would be more than one, but since in the project only one physical server is used, there is only one entry.
-- Proxmox VE Nodes: The "kkproxmox" node is the physical server running the Proxmox VE.
-- VMs under each Proxmox VE Node: Under each Proxmox VE node, the different resources deployed are depicted. This includes VMs, VM templates, storage, network, etc.
+- **Datacenter**: This is the top level of abstraction. Under datacenter all the proxmox servers are listed. If a Proxmox cluster was created, there would be more than one, but since in the project only one physical server is used, there is only one entry.
+- **Proxmox VE Nodes (Host)**: The "kkproxmox" node is the physical server running the Proxmox VE.
+- **VMs under each Proxmox VE Node**: Under each Proxmox VE node, the different resources deployed are listed. This includes VMs, VM templates, storage, network, etc.
 
-The way that the firewall works in Proxmox is the following: The firewall as a functionality can be enabled on any of the layers described above. For example, if the firewall is needed to be enabled on a VM, then the firewall needs to be enabled on the Datacenter, the Proxmox node hosting that VM, the VM itself, and on each virtual network interface of that VM.
+The Proxmox VE firewall groups the network into multiple **logical zones**. The firewall as a functionality can be enabled on any of the zones described above. For example, if the firewall is needed to be enabled on a VM, then the firewall needs to be enabled on the Datacenter, the Proxmox node hosting that VM, the VM itself, and on each virtual network interface of that VM. Also, when a firewall rule is create on one of the levels described above, it applies to all the levels under it. For example, if a rule is create on the Proxmox VE Node, then it applies to all the VMs under that Node.
 
+In Proxmox, firewall rules can be defined for different directions:
 
+- **In**: Traffic that is arriving in a zone
+- **Out**: Traffic that is leaving a zone
+- **Forward**: Traffic that is passing through a zone. In the host zone this can be routed traffic (when the host is acting as a gateway or performing NAT). At a VNet-level this affects all traffic that is passing by a VNet, including traffic from/to bridged network interfaces.
+
+There are default rules applied when enabling firewall. For `In` traffic the default rule is _Deny_ and for `Out` traffic, the default rule is _Allow_.
+
+For the project, the following configuration is applied:
+
+Firstly, on the Datacenter zone, Aliases were created for the private subnet IP ranges:
+
+<img alt="image" src="https://github.com/user-attachments/assets/888a88f4-2792-4810-8073-50c6801cc75d" />
+
+Two `Security Groups` were then created, which contain groups of firewall rules, which can be enforced on any zone afterwards, for easier application to multiple zones.
+
+The first `Security Group` is the following, and contains rules to allow access to the management IP of OPNsense (the creation of which is decribed on a later section), and to reject traffic to the local subnet of the home network. This is to isolate the infrastructure from being able to reach out to the local subnet directly. Access to the internet is still allowed. The rule No. 0 was created to allow access to the management IP of Proxmox, but it was found that the are [Default firewall rules](https://pve.proxmox.com/pve-docs/pve-admin-guide.html#pve_firewall_default_rules), one of which allows this specific traffic, so it the rule is now disabled.
+
+<img alt="image" src="https://github.com/user-attachments/assets/c20b282f-9d3d-4619-a04e-6b94ac85624d" />
+
+The second `Security Group` is the following, and contains a rule to allow traffic between the local subnets of the infrastructure. This traffic will be controlled further by the OPNsense.
+
+<img alt="image" src="https://github.com/user-attachments/assets/02d58251-9355-420a-b321-d4c5b6c0dda2" />
+
+After creating the two Security Groups, they were enforced on every zone:
+
+On the Proxmox host only the first one is needed, because traffic towards the infrastructure local subnets does not enter or leave the host directly:
+
+<img width="815" height="375" alt="image" src="https://github.com/user-attachments/assets/7d5ad664-c918-4ba1-b93f-d9f9111dc5a4" />
+
+On the OPNsense which will be shown in a later section, both rules were added.
+
+<img width="819" height="501" alt="image" src="https://github.com/user-attachments/assets/40c41f29-6796-42b0-acf5-d12e8bf56e3f" />
 
 ### Manual OPNsense Installation
+
 
 
 ### Packer Configuration
