@@ -125,6 +125,8 @@ The following technologies, for now, are strong contenders to be deployed. Since
 
 ## Architecture
 
+![NetworkDesign-FW Rules drawio](https://github.com/user-attachments/assets/f6528984-e477-4a61-9b26-40c389cea53c)
+
 explain the graph.
 it is not final, we add more as we go.
 
