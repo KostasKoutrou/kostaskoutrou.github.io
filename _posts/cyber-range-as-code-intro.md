@@ -99,7 +99,7 @@ The following technologies, for now, are strong contenders to be deployed. Since
     - Host visibiltiy with [Elastic agent](https://www.elastic.co/elastic-agent)
     - Centralized management with [Elastic Fleet](https://www.elastic.co/docs/reference/fleet)
 - [**ModSecurity**](https://modsecurity.org/) + [**OWASP Core Rule Set (CRS)**](https://coreruleset.org/): ModSecurity is an open source cross-platform **Web Application Firewall (WAF)**. Since its version 3 release, it now works as a standalone module which provies the capability to load/interpret rules written in the ModSecurity SecRules format and apply them to HTTP content provided by the web application via ModSecurity Connectors. This will prove useful, since in its previous module it worked as an Apache module only, while now it is more independent of the web server solution that it protects. ModSecurity on its own does not provide detection/protection rules. The OWASP CRS is a set of generic attack detection rules to be used with ModSecurity.
-- The Actual Infrastructure the will be secured and attacked:
+- The Actual **Infrastructure** that will be secured and attacked will include:
   - **Linux servers**:
     - [**DVWA**](https://github.com/digininja/DVWA): Damn Vulnerable Web Application (DVWA) is a PHP/MariaDB web application which **can be configured to be vulnerable against different types of web-based attacks**. This will be used for simulating attacks, as well as attempting to protect the application with different measures even though it is vulnerable.
     - [**OWASP Juice Shop**](https://owasp.org/www-project-juice-shop/): Similar to DVWA, it is another vulnerable web application.
@@ -125,7 +125,14 @@ The following technologies, for now, are strong contenders to be deployed. Since
 
 ## Architecture
 
+The initial infrastrcuture architecture is the following. It is important to note here that this is the initial architecture idea, and there may very well be changes during implementation.
+
 ![NetworkDesign-FW Rules drawio](https://github.com/user-attachments/assets/e2bc4414-052a-4be8-a214-d6cbd4dcc21e)
+
+As shown above, the architecture is a relatively simple and typical network infrastructure, with three separate zones:
+
+- **Demilitarized Zone (DMZ)**: The zone that exposes services which are to be served to the Internet. In the context of the project, these will be served to the local network, and, most importantly for the project, will be accessible by the "External Attacker", enabling for attack scenarios initiated from the "Internet".
+- **Internal Zone**: The zone where all there internal servers and services will reside. 
 
 explain the graph.
 it is not final, we add more as we go.
