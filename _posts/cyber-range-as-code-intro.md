@@ -320,13 +320,27 @@ Each interface was assigned its corresponding IP address:
 
 <img alt="image" src="https://github.com/user-attachments/assets/f9dca3e4-66eb-4122-9761-50a87c39dd5c" />
 
-
-
 #### OPNsense Firewall rules
+
+For firewall rules, since this is just a PoC, only 2 rules were created:
+
+A rule to allow access to the Web GUI at the management IP of OPNsense.
+
+<img alt="image" src="https://github.com/user-attachments/assets/2d9cf8b0-4864-48d2-97ca-decd084f5cae" />
+
+A rule to allow machine in the End User Zone to access anything.
+
+<img alt="image" src="https://github.com/user-attachments/assets/c16b0eb9-058e-43d4-bae4-6129eb3c430f" />
 
 #### OPNsense DHCP
 
+Additionally, DHCP was configured for the End User Zone:
+
+<img alt="image" src="https://github.com/user-attachments/assets/012f58c0-194b-4aba-bf85-b9b7acdd88ff" />
+
 ### Packer Configuration
+
+
 
 #### Packer pitfalls, solutions, and lessons learnt
 
