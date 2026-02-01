@@ -267,40 +267,60 @@ Network Settings: As mentioned before, the WAN interface of the OPNsense will be
 
 Installation with ZFS. After reading about ZFS vs UFS, it seems the ZFS handles unexpected power loss better while UFS may lead to data corruption, but it has a slight higher RAM usage.
 
-<img width="708" height="474" alt="image" src="https://github.com/user-attachments/assets/651a47cf-bf7e-42b6-9267-8418c56907e2" />
+<img alt="image" src="https://github.com/user-attachments/assets/651a47cf-bf7e-42b6-9267-8418c56907e2" />
 
 ZFS Configuration: We have only 1 disk for now, so stripe it is:
 
-<img width="1125" height="649" alt="image" src="https://github.com/user-attachments/assets/cf67261c-b823-48ee-b0fb-61770a7ebd58" />
+<img alt="image" src="https://github.com/user-attachments/assets/cf67261c-b823-48ee-b0fb-61770a7ebd58" />
 
 Select the virtual disk created in the VM creation steps:
 
-<img width="1125" height="339" alt="image" src="https://github.com/user-attachments/assets/dc3616c7-72c1-40b9-9229-20cc09be9df7" />
+<img alt="image" src="https://github.com/user-attachments/assets/dc3616c7-72c1-40b9-9229-20cc09be9df7" />
 
 Changed the root password and completed the install:
 
-<img width="1125" height="511" alt="image" src="https://github.com/user-attachments/assets/c178efdf-1d0f-4d36-bd2d-3d7cbf32457d" />
+<img alt="image" src="https://github.com/user-attachments/assets/c178efdf-1d0f-4d36-bd2d-3d7cbf32457d" />
 
 After installation, through the CLI, the interface and IP address assignments were completed:
 
 Select option 1
 
-<img width="1125" height="287" alt="image" src="https://github.com/user-attachments/assets/0ea1c108-6d9a-4595-9ba7-724fa4e55197" />
+<img alt="image" src="https://github.com/user-attachments/assets/0ea1c108-6d9a-4595-9ba7-724fa4e55197" />
 
 The interface is recommended to be assigned automatically as it is the only interface at the moment.
 
-<img width="1125" height="619" alt="image" src="https://github.com/user-attachments/assets/a1423bc1-4028-44bd-880c-50ee19c3401a" />
+<img alt="image" src="https://github.com/user-attachments/assets/a1423bc1-4028-44bd-880c-50ee19c3401a" />
 
 After the interface assignment is completed, the IP address assignment is next (select option 2).
 
-<img width="857" height="437" alt="image" src="https://github.com/user-attachments/assets/c9cca315-f284-453e-90ca-a499af903de0" />
+<img alt="image" src="https://github.com/user-attachments/assets/c9cca315-f284-453e-90ca-a499af903de0" />
 
 
-<img width="999" height="433" alt="image" src="https://github.com/user-attachments/assets/e80f61a4-681b-4327-adc5-a595977ce7d1" />
+<img alt="image" src="https://github.com/user-attachments/assets/e80f61a4-681b-4327-adc5-a595977ce7d1" />
 
+In order for Proxmox to be able to exchange information between the host and guest, and to execute commands in the guest, the [Qemu guest agent](https://pve.proxmox.com/wiki/Qemu-guest-agent) needs to be installed.
 
+<img alt="image" src="https://github.com/user-attachments/assets/77b766f5-c5ee-43e5-94cc-097b6ed2cc33" />
+
+Then the service needs to be enabled:
+
+<img alt="image" src="https://github.com/user-attachments/assets/2e205c47-d277-4ae7-8e52-22959f646553" />
 
 #### OPNsense network interfaces
+
+As shown in the network diagram, 3 more network interfaces were created on OPNsense, and connected to the corresponding Linux Bridges:
+
+<img alt="image" src="https://github.com/user-attachments/assets/79b3738f-da4e-4b51-a154-1e853a8a411c" />
+
+Then, each interface was assigned and enabled in OPNsense as well:
+
+<img alt="image" src="https://github.com/user-attachments/assets/2ad5f191-43f1-45a3-b8b3-4f0e73848451" />
+
+Each interface was assigned its corresponding IP address:
+
+<img alt="image" src="https://github.com/user-attachments/assets/f9dca3e4-66eb-4122-9761-50a87c39dd5c" />
+
+
 
 #### OPNsense Firewall rules
 
