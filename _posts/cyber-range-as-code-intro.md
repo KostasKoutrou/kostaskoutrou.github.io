@@ -411,7 +411,7 @@ When a VM boots, cloud-init runs and provides the necessary glue between launchi
 - Security: injects public SSH keys to log in without password
 - Growth: expands the disk partition to fill the size you gave it in proxmox.
 
-Cloud-init grabs the `user-data` file for instructions for the guest (the OS), and the `ubuntu.pkr.hcl` which is described next for instructions for proxmox.
+Cloud-init grabs the `ubuntu.pkr.hcl` which is described next for instructions for proxmox and the `user-data` file for instructions for the guest (the OS).
 
 But first, the `user-data` file is shown below:
 
@@ -439,6 +439,121 @@ autoinstall:
     layout:
       name: direct #use the entire virtual disk as one big partition.
 ```
+
+In the user-data file, the `autoinstall` directive is the set of instructions for the Ubuntu Subiquity installed. It provides all the information required during the initial installation of the ubuntu server. This includes:
+
+- The hostname
+- The admin user
+- Local
+- Timezone
+- Keyboard layout
+- SSH settings
+- Packages to be installed
+- Storage settings
+
+Let's look now at the `ubuntu.pkr.hcl` file
+
+```hcl
+packer {
+  required_plugins {
+    name = {
+      version = "~> 1"
+      source  = "github.com/hashicorp/proxmox"
+    }
+  }
+}
+
+# Declare variables, we will pull them later in the packer build command
+variable "proxmox_api_url" { type = string }
+variable "proxmox_api_token_id" { type = string }
+variable "proxmox_api_token_secret" {
+  type      = string
+  sensitive = true
+}
+variable "ubuntu_pw" {
+  type = string
+  sensitive = true
+}
+
+source "proxmox-iso" "ubuntu-server" { #Resource type and local name
+  proxmox_url = var.proxmox_api_url
+  username    = var.proxmox_api_token_id
+  token       = var.proxmox_api_token_secret
+
+  # Skip TLS Verification for self-signed certificates
+  insecure_skip_tls_verify = true
+  # qemu_agent = true # Default is true anyway
+
+  node    = "kkproxmox"
+  vm_id   = 1000
+  vm_name = "ubuntu-2404-template"
+
+  # iso_file = "local:iso/ubuntu-24.04.3-live-server-amd64.iso"
+
+  boot_iso {
+    # type = "scsi"
+    type = "ide"
+    iso_file = "local:iso/ubuntu-24.04.3-live-server-amd64.iso"
+    iso_checksum = "sha256:c3514bf0056180d09376462a7a1b4f213c1d6e8ea67fae5c25099c6fd3d8274b"
+    unmount = true
+  }
+
+  cores = 4
+  memory = 4096
+
+  network_adapters {
+    model  = "virtio"
+    bridge = "vmbr0" # Will probably change it in the Terraform script, this is only for packer.
+  }
+
+  disks {
+    disk_size    = "20G"
+    storage_pool = "local-lvm"
+    type         = "scsi"
+    ssd          = true
+  }
+
+  cloud_init = true # add an empty Cloud-Init CDROM driver after the VM has been converted to a template.
+  cloud_init_storage_pool = "local-lvm" # Name of the Proxmox storage pool to store the Cloud-Init CDROM on.
+
+  boot_command = [
+    "<esc><wait>", "e<wait>",
+    "<down><down><down><end>",
+    " autoinstall cloud-config-url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/user-data ds='nocloud-net;s=http://{{.HTTPIP}}:{{.HTTPPort}}/'",
+    "<f10>"
+  ]
+
+  http_directory = "http"
+  ssh_username   = "lab-admin"
+  ssh_password = "${var.ubuntu_pw}"
+  ssh_timeout    = "20m"
+}
+
+build {
+  sources = ["source.proxmox-iso.ubuntu-server"]
+
+  provisioner "shell" {
+    # execute_command = "echo ${var.ubuntu_pw}| sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
+    execute_command = "echo ${var.ubuntu_pw}| {{.Vars}} sudo -S -E sh -eux '{{.Path}}'"
+    inline = [
+      "echo 'Waiting for cloud-init to complete...'",
+      "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Still waiting...'; sleep 2; done",
+      "echo 'Cloud-init completed successfully'",
+      "echo 'Cleaning up...'",
+      "rm -rf /var/lib/apt/lists/*",
+      "rm -rf /tmp/*",
+      "rm -rf /var/tmp/*",
+      "cloud-init clean --logs --machine-id --seed --configs all"
+    ]
+  }
+}
+```
+
+This file is called the `Packer Template`, and include all the information for how to build the template. It includes:
+
+- The required packer plugins for this template. In this case, the Proxmox plugin is required only, to define the rest of the information and know how to communicate with the Proxmox API.
+- Variable declaration to be used in the packer build in the next lines of the file.
+- 
 
 #### Packer pitfalls, solutions, and lessons learnt
 
