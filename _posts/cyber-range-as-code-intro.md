@@ -440,7 +440,7 @@ autoinstall:
       name: direct #use the entire virtual disk as one big partition.
 ```
 
-In the user-data file, the `autoinstall` directive is the set of instructions for the Ubuntu Subiquity installed. It provides all the information required during the initial installation of the ubuntu server. This includes:
+In the user-data file, the `autoinstall` directive is the set of instructions for the Ubuntu Subiquity installer. It provides all the information required during the initial installation of the ubuntu server. This includes:
 
 - The hostname
 - The admin user
@@ -552,8 +552,17 @@ build {
 This file is called the `Packer Template`, and include all the information for how to build the template. It includes:
 
 - The required packer plugins for this template. In this case, the Proxmox plugin is required only, to define the rest of the information and know how to communicate with the Proxmox API.
-- Variable declaration to be used in the packer build in the next lines of the file.
-- 
+- Variable declaration to be used in the packer build in the next lines of the file. Note here that at this point only the declaration of the variables is done. The actual value of the variables will be provided via the `credentials.pkrvars.hcl` file during the packer build execution.
+- The `source` block is the core logic. It defines the different values that the VM should have, like CPU cores, memory size, ssh settings, the ISO file to use, the VM name, where to install the VM in proxmox, etc. The values that are not explicitly defined here have default values set provided by the proxmox plugin.
+  - `boot_command`: A very valuable part of the `source` block is the `boot_command`. In it, the actual keyboard presses for the installation are defined. With these boot commands, what is done is that the installation file is edited to pull the installation parameters from the `user-data` file described above. More specifically, it contains Linux Kernel Boot Parameters before the installation starts:
+    - `autoinstall`: This tells the Ubuntu installer (Subiquity) to run in automated mode, instead of going through the manual installation process of selecting language etc.
+    - The variables {{ .HTTPIP }} and {{ .HTTPPort }}: these are the IP of the PC and the port that temporarily serves the `user-data` file.
+    - `cloud-config-url`: This parameter tells the installer where the file of `user-data` is.
+    - `ds`: This stands for "Data Source" and Cloud-init uses its contents:
+      - `nocloud-net`: This tells Cloud-init that the data source is not Public cloud (Azure/AWS/GCP etc.) and to look at the local network for the file.
+      - `s=`: This stand for "seed from". It tells Cloud-init where to find the `user-data` and `meta-data` (another file not used for this PoC) files.
+
+
 
 #### Packer pitfalls, solutions, and lessons learnt
 
