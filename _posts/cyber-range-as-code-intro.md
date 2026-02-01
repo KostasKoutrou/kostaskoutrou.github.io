@@ -219,19 +219,42 @@ On the Proxmox host only the first one is needed, because traffic towards the in
 
 <img width="815" height="375" alt="image" src="https://github.com/user-attachments/assets/7d5ad664-c918-4ba1-b93f-d9f9111dc5a4" />
 
-On the OPNsense which will be shown in a later section, both rules were added.
+On the OPNsense, the configuration of which will be shown in a later section, both rules were added.
 
 <img width="819" height="501" alt="image" src="https://github.com/user-attachments/assets/40c41f29-6796-42b0-acf5-d12e8bf56e3f" />
 
 ### Manual OPNsense Installation
 
+Before moving to full IaC mode, as a PoC, OPNsense was installed manually on Proxmox. The first step is to download the ISO from the [download page](https://opnsense.org/download/).
 
+#### VM Creation
+
+When creating a VM in Proxmox, there are many options to select related to the OS, the system architecture, Disks architecture, etc. The configuration applied to OPNsense VM is shown in the following screenshots. Note that most selection were the default ones, because there is no significant difference to matter in the context of the project.
+
+<img alt="image" src="https://github.com/user-attachments/assets/cd0e382e-4f94-4795-9ca2-f3aa827ef87e" />
+
+
+
+
+#### VM Installation
+
+#### OPNsense network interfaces
+
+#### OPNsense Firewall rules
+
+#### OPNsense DHCP
 
 ### Packer Configuration
 
+#### Packer pitfalls, solutions, and lessons learnt
+
 ### Terraform Configuration
 
+#### Terraform pitfalls, solutions, and lessons learnt
+
 ### Ansible
+
+#### Ansible pitfalls, solutions, and lessons learnt
 
 
 IaC PoC
