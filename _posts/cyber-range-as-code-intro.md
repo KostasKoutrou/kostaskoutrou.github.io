@@ -340,7 +340,55 @@ Additionally, DHCP was configured for the End User Zone:
 
 ### Packer Configuration
 
+In order for Packer to work, the following was implemented:
 
+#### Prepare Proxmox for Packer
+
+**Create "Packer" Role and User on Proxmox:**
+
+For the Role:
+
+1. Go to Datacenter -> Permissions -> Roles.
+2. Click `Create`. Name it `PackerRole`.
+3. Add these privileges: VM.Allocate, VM.Config.HWType, VM.Config.CPU, VM.Config.Memory, VM.Config.Network, VM.Config.Disk, VM.Monitor, VM.Audit, VM.PowerMgmt, Datastore.AllocateSpace, Datastore.Audit, VM.Config.Options, SDN.Use VM.Backup+Clone+Console, VM.Config.CDROM, VM.Config.CloudInit, and VM.GuestAgent.Audit
+
+<img alt="image" src="https://github.com/user-attachments/assets/7353549f-d79e-4013-84b8-b7483de64cb5" />
+
+For the User:
+
+1. Go to Datacenter -> Permissions -> Users.
+2. Click `Add`. User name: `packer`, Realm: pve (more info at [Proxmox VE authentication](https://pve.proxmox.com/wiki/User_Management) - Authentication Realms).
+
+<img alt="image" src="https://github.com/user-attachments/assets/aad65f22-b8fa-4c5d-ab13-f9eeaafc5241" />
+
+Assign permissions to the User:
+
+1. Go to Datacenter -> Permissions.
+2. Click `Add` -> User Permission.
+3. Path: / (This gives permission for the whole datacenter).
+4. User: packer@pve.
+5. Role: PackerRole.
+
+<img alt="image" src="https://github.com/user-attachments/assets/54ed22d9-b447-4fc4-81f6-e0774f71a938" />
+
+**Generate API Token**
+
+This is the "Password" Packer will use to talk to the Proxmox API.
+1.	Go to Datacenter -> Permissions -> API Tokens.
+2.	Click `Add`.
+3.	Select User: packer@pve.
+4.	Token ID: packer-token.
+5.	Uncheck "Privilege Separation" (this ensures the token has the same rights as the user `packer`).
+6.	Click `Add`.
+CRITICAL: Proxmox will show you the Token Secret **only** at the time of its creation. If it is missed at that time, a new token must be created.
+
+<img alt="image" src="https://github.com/user-attachments/assets/8058d9e5-93be-4788-aa32-8612f96b8f12" />
+
+#### Preparing packer
+
+For the PoC, 2 Ubuntu VMs will be created. One will be under the `End user Zone` 
+
+Create Credentials
 
 #### Packer pitfalls, solutions, and lessons learnt
 
