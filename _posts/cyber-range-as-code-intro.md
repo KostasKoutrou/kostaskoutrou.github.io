@@ -225,18 +225,78 @@ On the OPNsense, the configuration of which will be shown in a later section, bo
 
 ### Manual OPNsense Installation
 
-Before moving to full IaC mode, as a PoC, OPNsense was installed manually on Proxmox. The first step is to download the ISO from the [download page](https://opnsense.org/download/).
+Before moving to full IaC mode, as a PoC, OPNsense was installed manually on Proxmox.
+
+The first step is to download the ISO from the [download page](https://opnsense.org/download/). Afterwards, the ISO is needed to be uploaded to Proxmox:
+
+<img width="1235" height="341" alt="image" src="https://github.com/user-attachments/assets/67ffe8d6-accb-4e93-b06d-3195513579db" />
 
 #### VM Creation
 
 When creating a VM in Proxmox, there are many options to select related to the OS, the system architecture, Disks architecture, etc. The configuration applied to OPNsense VM is shown in the following screenshots. Note that most selection were the default ones, because there is no significant difference to matter in the context of the project.
 
+General Settings
+
 <img alt="image" src="https://github.com/user-attachments/assets/cd0e382e-4f94-4795-9ca2-f3aa827ef87e" />
 
+OS Settings: This is where the OPNsense ISO is selected, and also the guest OS type.
 
+<img alt="image" src="https://github.com/user-attachments/assets/0b64421a-13e1-4701-9c52-d437e631da81" />
 
+System Settings
+
+<img alt="image" src="https://github.com/user-attachments/assets/2e577ee7-eac2-4616-8adf-2597fe1f3755" />
+
+Disks Settings
+
+<img alt="image" src="https://github.com/user-attachments/assets/aaa288a8-5220-4fff-a0bf-0f2faced53df" />
+
+CPU Settings
+
+<img alt="image" src="https://github.com/user-attachments/assets/ebd5a435-f05c-41af-a84b-478085422e48" />
+
+Memory Settings: A useful setting which will be experimented with when deploying more VMs is the "Ballooning Device" setting along with the Minimum memory. [Memory ballooning](https://pve.proxmox.com/wiki/Dynamic_Memory_Management#Ballooning) allows you to have your guest dynamically change its memory usage by evicting unused memory during run time. It reduces the impact your guest can have on memory usage of your host by giving up unused memory back to the host. The Proxmox VE host can loan ballooned memory to a busy VM. The VM decides which processes or cache pages to swap out to free up memory for the balloon. The VM (Windows or Linux) knows best which memory regions it can give up without impacting performance of the VM. The Minimum memory setting defines the minimum memory in MiB which will never be freed up for use by other VMs. For now the Minimum memory is set to the actual memory size, so essentially there is no memory ballooning for the VM.
+
+<img alt="image" src="https://github.com/user-attachments/assets/fc30cda5-8ba9-4a3c-ba16-42e678646265" />
+
+Network Settings: As mentioned before, the WAN interface of the OPNsense will be connected to the same Linux Bridge as the Proxmox host and the home router. After creating the VM, more network interfaces will be created.
+
+<img alt="image" src="https://github.com/user-attachments/assets/3fb8f750-6eeb-42c6-9655-2531f4a7a7e7" />
 
 #### VM Installation
+
+Installation with ZFS. After reading about ZFS vs UFS, it seems the ZFS handles unexpected power loss better while UFS may lead to data corruption, but it has a slight higher RAM usage.
+
+<img width="708" height="474" alt="image" src="https://github.com/user-attachments/assets/651a47cf-bf7e-42b6-9267-8418c56907e2" />
+
+ZFS Configuration: We have only 1 disk for now, so stripe it is:
+
+<img width="1125" height="649" alt="image" src="https://github.com/user-attachments/assets/cf67261c-b823-48ee-b0fb-61770a7ebd58" />
+
+Select the virtual disk created in the VM creation steps:
+
+<img width="1125" height="339" alt="image" src="https://github.com/user-attachments/assets/dc3616c7-72c1-40b9-9229-20cc09be9df7" />
+
+Changed the root password and completed the install:
+
+<img width="1125" height="511" alt="image" src="https://github.com/user-attachments/assets/c178efdf-1d0f-4d36-bd2d-3d7cbf32457d" />
+
+After installation, through the CLI, the interface and IP address assignments were completed:
+
+Select option 1
+
+<img width="1125" height="287" alt="image" src="https://github.com/user-attachments/assets/0ea1c108-6d9a-4595-9ba7-724fa4e55197" />
+
+The interface is recommended to be assigned automatically as it is the only interface at the moment.
+
+<img width="1125" height="619" alt="image" src="https://github.com/user-attachments/assets/a1423bc1-4028-44bd-880c-50ee19c3401a" />
+
+After the interface assignment is completed, the IP address assignment is next (select option 2).
+
+<img width="873" height="435" alt="image" src="https://github.com/user-attachments/assets/a32504fe-3b1e-4de3-a6c2-c0afff52bef2" />
+
+
+
 
 #### OPNsense network interfaces
 
