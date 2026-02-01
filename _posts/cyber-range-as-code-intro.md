@@ -451,7 +451,7 @@ In the user-data file, the `autoinstall` directive is the set of instructions fo
 - Packages to be installed
 - Storage settings
 
-Let's look now at the `ubuntu.pkr.hcl` file
+Let's look now at the `ubuntu.pkr.hcl` file:
 
 ```hcl
 packer {
@@ -561,10 +561,35 @@ This file is called the `Packer Template`, and include all the information for h
     - `ds`: This stands for "Data Source" and Cloud-init uses its contents:
       - `nocloud-net`: This tells Cloud-init that the data source is not Public cloud (Azure/AWS/GCP etc.) and to look at the local network for the file.
       - `s=`: This stand for "seed from". It tells Cloud-init where to find the `user-data` and `meta-data` (another file not used for this PoC) files.
-
-
+- The `build` block is the execution part of packer. The `source` block defines the VM, while the `build` block actually runs it. Here is where the [Provisioners](https://developer.hashicorp.com/packer/docs/provisioners) live, through which it is possible to execute actions on the machine image and configure it after booting. They can be used to install packages, patch the kernel, create users, donwload application code, etc. In the PoC, the `shell` provisioner is used to clean up the machine and reinitialize cloud-init so that it reruns during the Terraform provisioning of the VM (cloud-init runs only once on the machine unless its configuration is cleaned).
 
 #### Packer pitfalls, solutions, and lessons learnt
+
+Some tools that helped in troubleshooting Packer:
+1. Set the envar $env:PACKER_LOG=1 to make running packer verbose. This shows many hints as to what is going wrong.
+2. If the VM does not proceed with the autoinstaller, and reaches the manual installation flow, you can use Ctrl + Alt + F2 in the Proxmox console to jump to a root shell. This allows to
+  1. review logs of the subiquity and cloud-init. Two useful paths for checking are `/var/log/installer/subiquity-server-debug.log` and `/var/log/syslog`.
+  2. test network connections, to confirm, for example, that you can reach the temporary packer server on the PC running packer, or that the internet is reachable.
+3. Check the hardware resource usage of the VM being installed in Proxmox. Maybe there is overuse of the resource and may need to be increased.
+
+Some pitfalls and lessons learnt I met while setting up packer were the following:
+
+1. Proxmox 500 Error: After enabling verbose mode in packer (by setting $env:PACKER_LOG=1), a repeated message of 500 "Qemu must be running to read the IP address of the machine" kept popping up. I thought this meant that something was wrong, but actually this is expected and Packer is actually waiting for Qemu guest agent to be installed so that it can read the VM's IP Address from proxmox so it can SSH to it. If it never moves that point, then the QEMU guest agent was not installed, or, most probably, the autoinstaller did not start.
+2. The "Interactive Menu" problem:
+  - The pitfall: The VM kept reaching the manual language selection screen instead of starting the automated install.
+  - The cause: The installer could not find or parse the autoinstall instructions.
+  - The resolution: In the `boot_command`, an explicit definition of the autoinstall instructions needed to be defined using the `cloud-config-url` parameter.
+3. YAML formatting
+  - The pitfall: The installer found the user-data file but ignored the settings, falling back to manual installation.
+  - The cause: Ubuntu ignores the user-data file if it does not have the "#cloud-config" comment at the first line.
+  - The lesson: read the documentation of the requirements of different configuration files.
+
+4. Validation crashes (keyboard and identity):
+
+<img alt="image" src="https://github.com/user-attachments/assets/e1db920c-62d7-4366-95da-2dea2d3b3689" />
+
+ - The pitfall: The installer crashed with an "Unknown keyboard layout 'en'" error.
+ - 
 
 ### Terraform Configuration
 
