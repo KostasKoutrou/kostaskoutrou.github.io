@@ -295,6 +295,7 @@ After the interface assignment is completed, the IP address assignment is next (
 
 <img width="873" height="435" alt="image" src="https://github.com/user-attachments/assets/a32504fe-3b1e-4de3-a6c2-c0afff52bef2" />
 
+<img width="999" height="433" alt="image" src="https://github.com/user-attachments/assets/e80f61a4-681b-4327-adc5-a595977ce7d1" />
 
 
 
