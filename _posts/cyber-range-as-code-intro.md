@@ -386,9 +386,59 @@ CRITICAL: Proxmox will show you the Token Secret **only** at the time of its cre
 
 #### Preparing packer
 
-For the PoC, 2 Ubuntu VMs will be created. One will be under the `End user Zone` 
+To organize the Packer directory, a packer path was created, under which all the other files and directories were created.
 
-Create Credentials
+For the PoC, 2 Ubuntu VMs will be created. One will be under the `End user Zone` and the other under the `WAN Zone`. Because Packer creates ready-to-provision images, an image is to be created for every OS planned to be provisioned with Terraform. Therefore, under the `packer` path, a sub-path was created named `ubuntu-2404` for this purpose.
+
+All the created files are found under my repository [kostas-seclab](https://github.com/KostasKoutrou/kostas-seclab)
+
+**Create Credentials**
+
+The following `packer/credentials.pkrvars.hcl` file was created, which contains credentials to be used in Packer, and later on in Terraform as well.
+
+<img width="565" height="105" alt="image" src="https://github.com/user-attachments/assets/74f29d00-3b08-483e-b739-e6d59740de6d" />
+
+**Create `user-data` file**
+
+A YAML file `packer/ubuntu-2404/http/user-data` was created. When running Packer, the PC becomes a temporary web server, and the machine pulls the `user-data` file from the PC from the `http` path.
+
+To better understand how the `user-data` and the next files are involved during the image building using Packer, this is a great point where the tool called [**Cloud-init**](https://cloudinit.readthedocs.io/en/latest/) should be briefly described. Cloud-init is the industry standard multi-distribution method for cross-platform cloud instance initialization. It is supported across all major public cloud providers, provisioning systems for private cloud infrastructure, and bare-metal installations.
+
+When a VM boots, cloud-init runs and provides the necessary glue between launching a cloud instance and connecting to it so that it works as expected. It looks for metadata provided by proxmox or terraform and performs different initialization tasks automatically, including:
+
+- Network: Sets static IP or DHCP config
+- Identity: changes the hostname from ubuntu-template to what is defined
+- Security: injects public SSH keys to log in without password
+- Growth: expands the disk partition to fill the size you gave it in proxmox.
+
+Cloud-init grabs the `user-data` file for instructions for the guest (the OS), and the `ubuntu.pkr.hcl` which is described next for instructions for proxmox.
+
+But first, the `user-data` file is shown below:
+
+```yaml
+#cloud-config
+autoinstall:
+  version: 1
+  identity:
+    hostname: ubuntu-template
+    username: lab-admin
+    password: "$6$wFmQrqy8bMHGTQ.O$1WWGjLd3buuOov83OY7zJbdw5Z9Gx4C3ueH04GZGHzqz6h7Jy0TelUUOisEt/1GJwQifYKYKVfj17vkd0mk0f0"
+  user-data:
+    disable_root: false
+  locale: en_US.UTF-8
+  timezone: UTC
+  keyboard:
+    layout: us
+  ssh:
+    install-server: true #install openssh
+    allow-pw: true #allow password authentication in ssh
+  packages:
+    - qemu-guest-agent #qemu guest agent so that proxmox retrieves info like IP address.
+    - cloud-init #needed so the VM is configurable via Terraform.
+  storage:
+    layout:
+      name: direct #use the entire virtual disk as one big partition.
+```
 
 #### Packer pitfalls, solutions, and lessons learnt
 
