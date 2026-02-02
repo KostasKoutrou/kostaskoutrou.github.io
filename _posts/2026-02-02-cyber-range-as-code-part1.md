@@ -622,17 +622,12 @@ Some **pitfalls and lessons** learnt I met while setting up packer were the foll
 4. **Validation crashes**:
  - The issue: The installer crashed with an "Unknown keyboard layout 'en'" error (1st screenshot), and crashed while attempting to run timedatectl list-timezones (2nd screenshot).
  - The cause and resolution: Some parameters in the `user-data` file are mandatory and do not have default values when not explicitly defined. These include the timezone and keyboard layout parameters, which were not initally defined. Once added to the `user-data` file, the crashes were fixed.
-
   <img alt="image" src="https://github.com/user-attachments/assets/e1db920c-62d7-4366-95da-2dea2d3b3689" />
-
-
   <img alt="image" src="https://github.com/user-attachments/assets/f58cd53a-93ec-4de2-8d53-074a1fc7733b" />
-
 5. **Hardware resource constraints**
   - The issue: The installation appeared to hang or move extremely slowly without showing errors.
   - The cause: Initially the default memory and CPU values were left in the packer template file, which means 1 CPU core and 512MB memory. Especially for the memory size, this is a very low value for an installation of Ubuntu server.
   - The solution and lesson: Modern installers require more thant the default minimal resources to complete. Increase the values for 4 CPU cores and 4096MB memory resolved the issue.
-
 6. **SSH Handshake and authentication**
  - The issue: The OS installed successfully, but Packer failed to connect with the following repeating error:
 ```
