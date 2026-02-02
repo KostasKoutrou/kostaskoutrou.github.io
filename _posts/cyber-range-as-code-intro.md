@@ -939,7 +939,7 @@ For Ansible, the following files were created:
 192.168.0.104 ansible_user=ubuntu
 ```
 
-`ansible/install_nginx.yml`: This file contains the state for this PoC of the configuration to be applied to the machines of inventory.ini.
+`ansible/install_nginx.yml`: This file contains the state for this PoC of the configuration to be applied to the machines of inventory.ini. For the purposes of the PoC, only an Nginx server is installed on one of the two Linux Servers.
 
 ```yaml
 ---
@@ -981,10 +981,39 @@ The ansible.cfg file had to be set by setting the environment variable (because 
 
 To run Ansible with the configuration defined above, the following command was run: `ansible-playbook install_nginx.yml`
 
+<img alt="image" src="https://github.com/user-attachments/assets/4a414b9c-6f01-4da1-9984-69ad5cf00a17" />
 
+Due to Ansible's idempotency, running the command again will show that everything is ok and no changes were applied:
+
+<img width="815" height="353" alt="image" src="https://github.com/user-attachments/assets/2fe0b7d3-f372-434c-94ec-3f3ab3f059d1" />
+
+After running Ansible, the Nginx can be reached from the browser
+
+<img width="765" height="265" alt="image" src="https://github.com/user-attachments/assets/ae5c13d6-23e0-4c80-ae2f-b095bf0873f4" />
 
 ## Next Steps
 
-Make proxmox and opnsense into IaC.
+So now the flow is complete. A VM template was created using Packer, VMs were provisioned with Terraform, and further configurations were applied using Ansible. This was a PoC to verify the flow can be used for the rest of the project.
+
+The next steps will be to reach a fully recoverable and fully IaC state from start up to the point which has been reached now manually.
+
+This means:
+
+1. Configure all the Proxmox settings described in this post using either Ansible or any other automation tool (even a script).
+2. Configure OPNsense using Packer, Terraform and Ansible. A Packer template will be built using OPNsense's ISO, Terraform will be used to provision the OPNsense with the settings which were applied manually, and Ansible will be used to apply any configuration to it, including Firewall rules, DHCP, installing Packages, etc.
 
 ## Conclusion
+
+Building a Cyber Range as Code is going to be a complex project to pull of fully as Code. It will require several testing and iterations in order for it work properly.
+
+However, this project will be a great lesson towards:
+
+1. Learning IaC (Packer, Terraform, Ansible).
+2. Applying security hardening and security standards to multiple machines using IaC Practices.
+3. Developing methodoligies for security testing and reviewing the results.
+
+This post was the plan for the project. It included different ideas for potential technologies to be used, as well as the architecture to be built. In the next posts the implementation will start.
+
+Hopefully you picked something of interest and will following the progress of this project.
+
+See you in the next one.
