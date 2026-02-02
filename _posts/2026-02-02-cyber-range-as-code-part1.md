@@ -140,6 +140,7 @@ As shown above, the architecture is a relatively simple and typical network infr
   4. **WAN Zone**: This is where the "Internet", in the context of the Infrastructure, lives. This is where:
       - The PC from which the Proxmox management will be done, running the Packer, Terraform, and Ansible.
       - The External Attacks will occur from.
+- There will also be Internal Attack Simulations, executed from within the different zones, bypassing the firewall ("assume breach").
 
 ## Initial Configuration / PoC
 
