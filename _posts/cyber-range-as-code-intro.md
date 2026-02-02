@@ -426,7 +426,7 @@ To organize the Packer directory, a packer path was created, under which all the
 
 For the PoC, 2 Ubuntu VMs will be created. One will be under the `End user Zone` and the other under the `WAN Zone`. Because Packer creates ready-to-provision images, an image is to be created for every OS planned to be provisioned with Terraform. Therefore, under the `packer` path, a sub-path was created named `ubuntu-2404` for this purpose.
 
-All the created files are found under my repository [kostas-seclab](https://github.com/KostasKoutrou/kostas-seclab)
+All the created files are found under the project's repository [kostas-seclab](https://github.com/KostasKoutrou/kostas-seclab)
 
 **Create Credentials**
 
@@ -670,7 +670,7 @@ While the VM is being installed, in the Console window it is possible to review 
 
 After successfully running Packer, the result is a Proxmox template, ready to be cloned. This template is used by Terraform, as shown in the next section.
 
-<img width="1041" height="337" alt="image" src="https://github.com/user-attachments/assets/490da478-ba97-4db7-970e-880d41570714" />
+<img alt="image" src="https://github.com/user-attachments/assets/862f0292-2481-4aa2-8862-6ba033da0d88" />
 
 ### Terraform Configuration
 
@@ -678,7 +678,7 @@ In order for Terraform to work, the following was implemented:
 
 #### Prepare Proxmox for Terraform
 
-**Update "Packer" Role in Proxmox**
+**Update "Packer" Role in Proxmox for Terraform**
 
 For simplicity, the same user used in Packer is used for Terraform. Therefore, the permissions required for Terraform were provided to the previously created `PackerRole` role. The permissions required are described [here](https://registry.terraform.io/providers/Telmate/proxmox/latest/docs), and are the following:
 
@@ -705,11 +705,62 @@ For simplicity, the same user used in Packer is used for Terraform. Therefore, t
 - VM.PowerMgmt
 - SDN.Use
 
+To organize the Terraform directory, a terraform path was created, under which all the other files and directories were created.
+
+For the PoC, 2 Ubuntu VMs will be created. One will be under the `End user Zone` and the other under the `WAN Zone`.
+
+All the created files are found under the project's repository [kostas-seclab](https://github.com/KostasKoutrou/kostas-seclab)
+
+For terraform, the following files were created:
+
+The `terraform/variables.tf` file contains variables to be used by terraform:
+
+```terraform
+variable "proxmox_api_url" {
+    type = string
+    description = "The URL for the Proxmox API (e.g., https://192.168.0.50:8006/api2/json)"
+}
+
+variable "proxmox_api_token_id" {
+    type = string
+    sensitive = true
+    description = "The API Token ID (e.g., root@pam!terraform)"
+}
+
+variable "proxmox_api_token_secret" {
+    type = string
+    sensitive = true
+    description = "The API Token Secret (UUID)"
+}
+```
+
+The `terraform/provider.tf` files contains information regarding what provider terraform will connect to (AWS, Azure Google Cloud, Proxmox, etc. - In our case it is proxmox), as well as the configuration to connect to the provider. The variables for the provider are pulled from the `terraform/variables.tf` definitions. The execution of `terraform apply` is where the source and the actual values of the varaibles will be defined.
+
+```terraform
+terraform {
+  required_providers {
+    proxmox = {
+        source = "Telmate/proxmox"
+        version = "3.0.2-rc07"
+    }
+  }
+}
+
+provider "proxmox" {
+    pm_api_url = var.proxmox_api_url
+    pm_api_token_id = var.proxmox_api_token_id
+    pm_api_token_secret = var.proxmox_api_token_secret
+
+    pm_tls_insecure = true
+}
+```
 
 
 #### Terraform pitfalls, solutions, and lessons learnt
 
-#### Terraform result
+
+
+#### Terraform apply and PoCresult
 
 ### Ansible
 
