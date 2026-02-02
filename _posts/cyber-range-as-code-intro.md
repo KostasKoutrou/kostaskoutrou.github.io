@@ -414,6 +414,14 @@ sudo apt install packer
 sudo apt install terraform
 ```
 
+However, because I am currently running bash via Windows Sybsystem for Linux (WSL), it is difficult to grab the IP address of the physical PC, which makes packer fail when opening the temporary web server to give the `user-data` file. Therefore, for this iteration we are running Packer on Windows, and for the next phase we will probably add the `user-data` file to Proxmox directly for more seamless implementation.
+
+To install Packer for windows, you just download it from [here](https://developer.hashicorp.com/packer/install), unzip it, and add the path of the exe to the Path environment variable of the PC:
+
+<img width="630" height="720" alt="image" src="https://github.com/user-attachments/assets/38936949-0060-46ef-bbf5-1b4eea0b5021" />
+
+<img alt="image" src="https://github.com/user-attachments/assets/016dc5ee-a194-465e-b68e-22f942dc74f3" />
+
 To organize the Packer directory, a packer path was created, under which all the other files and directories were created.
 
 For the PoC, 2 Ubuntu VMs will be created. One will be under the `End user Zone` and the other under the `WAN Zone`. Because Packer creates ready-to-provision images, an image is to be created for every OS planned to be provisioned with Terraform. Therefore, under the `packer` path, a sub-path was created named `ubuntu-2404` for this purpose.
@@ -637,13 +645,65 @@ TCP connection for SSH
 ```
   - The cause and resolution: the `ssh_password` value in the packer template is used for this connection, and was not initially defined. Upon its definition, the issue was resolved.
 
-#### Packer PoC result
+#### Packer build and PoC result
+
+To run packer, the following commands are used, executed at the path of `packer/ubuntu-2404/`:
+
+```bash
+packer init .
+packer validate -var-file="../credentials.pkrvars.hcl" . # To Validate the packer configuration before building
+packer build -var-file="../credentials.pkrvars.hcl" . # To Build the template
+```
+
+Running the packer validate command results in the following:
+
+<img width="697" height="55" alt="image" src="https://github.com/user-attachments/assets/209c4b78-27e1-49e1-b411-b01bb6e044e8" />
+
+
+Running the packer build command results in the following:
+
+<img alt="image" src="https://github.com/user-attachments/assets/acf0f158-9ece-4ab3-b59d-a71c2c222fcd" />
+
+While the VM is being installed, in the Console window it is possible to review what is being run:
+
+<img alt="image" src="https://github.com/user-attachments/assets/3d421b7d-5c40-4d06-8eb4-f5d63302e1c9" />
 
 After successfully running Packer, the result is a Proxmox template, ready to be cloned. This template is used by Terraform, as shown in the next section.
 
 <img width="1041" height="337" alt="image" src="https://github.com/user-attachments/assets/490da478-ba97-4db7-970e-880d41570714" />
 
 ### Terraform Configuration
+
+In order for Terraform to work, the following was implemented:
+
+#### Prepare Proxmox for Terraform
+
+**Update "Packer" Role in Proxmox**
+
+For simplicity, the same user used in Packer is used for Terraform. Therefore, the permissions required for Terraform were provided to the previously created `PackerRole` role. The permissions required are described [here](https://registry.terraform.io/providers/Telmate/proxmox/latest/docs), and are the following:
+
+- Datastore.AllocateSpace
+- Datastore.AllocateTemplate
+- Datastore.Audit
+- Pool.Allocate
+- Pool.Audit
+- Sys.Audit
+- Sys.Console
+- Sys.Modify
+- VM.Allocate
+- VM.Audit
+- VM.Clone
+- VM.Config.CDROM
+- VM.Config.Cloudinit
+- VM.Config.CPU
+- VM.Config.Disk
+- VM.Config.HWType
+- VM.Config.Memory
+- VM.Config.Network
+- VM.Config.Options
+- VM.Migrate
+- VM.PowerMgmt
+- SDN.Use
 
 
 
