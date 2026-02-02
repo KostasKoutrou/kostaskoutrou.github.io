@@ -145,6 +145,8 @@ As shown above, the architecture is a relatively simple and typical network infr
 
 In this section, **an initial configuration of the infrastructure is described, with only the bare minimum of components**, as well as a **PoC of the infrastructure** working as described in the previous sections, i.e., with IaC practices.
 
+All the code used in this PoC can be found under the project's repository [kostas-seclab](https://github.com/KostasKoutrou/kostas-seclab).
+
 ### Proxmox Configuration
 
 The installation of Proxmox is a typical installation of any OS. Because the physical machine is connected to the home router, the following network configuration was added:
