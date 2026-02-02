@@ -6,7 +6,7 @@ What is a Cyber Range?
 
 > A [Cyber Range](https://www.ibm.com/think/topics/cyber-range) is a virtual environment for cybersecurity training, testing, and research that simulates real-world networks and cyberattacks.
 
-I always wanted to build a security homelab, where I will have the freedom and the infrastructure to build, secure, attack, monitor, and defend a full-on infrastructure. At the same time, I want to build all of this "as code". I really believe in converting everything as code, because this approach solves many issues of manual work, like manual maintenance, configuration drift, complex change history, and no version control. It also facilitates the ability to rebuild the infrastructure as quickly as possible. I was thinking of naming this project "Security Playground" at first or something like that, but I thought "Cyber Range as Code" was more catchy and it grasped the two main concepts that I want to focus on for this project.
+I always wanted to build a security homelab, where I will have the freedom and the infrastructure to build, secure, attack, monitor, and defend a full-on infrastructure. At the same time, I want to build all of this "as code". I really believe in converting everything to "as code", because this approach solves many issues of manual work, like manual maintenance, configuration drift, complex change history, and no version control. It also facilitates the ability to rebuild the infrastructure as quickly as possible. I was thinking of naming this project "Security Playground" at first or something like that, but I thought "Cyber Range as Code" was more catchy and it grasped the two main concepts that I want to focus on for this project.
 
 The end goal of this project is to **build and maintain a real-world infrastructure** to:
 
@@ -15,7 +15,7 @@ The end goal of this project is to **build and maintain a real-world infrastruct
   - Review the generated logs to understand what happened on the backend, what could be detected and created as a detection rule
 - Implement **security standards** like ISO27001, NIS2, NIST, and CIS
 - **Architect a secure infrastructure**: This will be a never ending goal, as, even in a relatively simple infrastructure like the one which will be built under this project, there always is something to improve in terms of security architecture.
-- **Recover seamlessly**: **All the infrastructure must be deployed automatically**. The end goal is seamless recovery: If it is ever needed to redeploy the infrastructure on a new server, it can be done with the minimum number of manual effort. This is where **the project leans heavily into IaC**, as it will be explained more in the next sections.
+- **Recover seamlessly**: **All the infrastructure must be deployed automatically**. The end goal is seamless recovery: If it is ever needed to redeploy the infrastructure on a new server, it can be done with minimal manual effort. This is where **the project leans heavily into IaC**, as it will be explained more in the next sections.
 
 This project covers a lot of concepts about IaC, security hardening, security standards, blue teaming, and red teaming. Hopefully the end result will allow other security professionals to deploy this infrastructure and easily get to security testing.
 
@@ -265,7 +265,7 @@ Network Settings: As mentioned before, the WAN interface of the OPNsense will be
 
 #### VM Installation
 
-Installation with ZFS. After reading about ZFS vs UFS, it seems the ZFS handles unexpected power loss better while UFS may lead to data corruption, but it has a slight higher RAM usage.
+Installation with ZFS. After reading about ZFS vs UFS, it seems the ZFS handles unexpected power loss better while UFS may lead to data corruption, but it has a slightly higher RAM usage.
 
 <img alt="image" src="https://github.com/user-attachments/assets/651a47cf-bf7e-42b6-9267-8418c56907e2" />
 
@@ -555,7 +555,7 @@ source "proxmox-iso" "ubuntu-server" { #Resource type and local name
   boot_command = [
     "<esc><wait>", "e<wait>",
     "<down><down><down><end>",
-    " autoinstall cloud-config-url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/user-data ds='nocloud-net;s=http://{{.HTTPIP}}:{{.HTTPPort}}/'",
+    " autoinstall cloud-config-url=http://{% raw %}{{ .HTTPIP }}{% endraw %}:{% raw %}{{ .HTTPPort }}{% endraw %}/user-data ds='nocloud-net;s=http://{% raw %}{{.HTTPIP}}{% endraw %}:{% raw %}{{.HTTPPort}}{% endraw %}/'",
     "<f10>"
   ]
 
@@ -569,8 +569,8 @@ build {
   sources = ["source.proxmox-iso.ubuntu-server"]
 
   provisioner "shell" {
-    # execute_command = "echo ${var.ubuntu_pw}| sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
-    execute_command = "echo ${var.ubuntu_pw}| {{.Vars}} sudo -S -E sh -eux '{{.Path}}'"
+    # execute_command = "echo ${var.ubuntu_pw}| sudo -S sh -c '{% raw %}{{ .Vars }}{% endraw %} {% raw %}{{ .Path }}{% endraw %}'"
+    execute_command = "echo ${var.ubuntu_pw}| {% raw %}{{.Vars}}{% endraw %} sudo -S -E sh -eux '{% raw %}{{.Path}}{% endraw %}'"
     inline = [
       "echo 'Waiting for cloud-init to complete...'",
       "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Still waiting...'; sleep 2; done",
@@ -592,7 +592,7 @@ This file is called the `Packer Template`, and include all the information for h
 - The `source` block is the core logic. It defines the different values that the VM should have, like CPU cores, memory size, ssh settings, the ISO file to use, the VM name, where to install the VM in proxmox, etc. The values that are not explicitly defined here have default values set provided by the proxmox plugin.
   - `boot_command`: A very valuable part of the `source` block is the `boot_command`. In it, the actual keyboard presses for the installation are defined. With these boot commands, what is done is that the installation file is edited to pull the installation parameters from the `user-data` file described above. More specifically, it contains Linux Kernel Boot Parameters before the installation starts:
     - `autoinstall`: This tells the Ubuntu installer (Subiquity) to run in automated mode, instead of going through the manual installation process of selecting language etc.
-    - The variables {{ .HTTPIP }} and {{ .HTTPPort }}: these are the IP of the PC and the port that temporarily serves the `user-data` file.
+    - The variables {% raw %}{{ .HTTPIP }}{% endraw %} and {% raw %}{{ .HTTPPort }}{% endraw %}: these are the IP of the PC and the port that temporarily serves the `user-data` file.
     - `cloud-config-url`: This parameter tells the installer where the file of `user-data` is.
     - `ds`: This stands for "Data Source" and Cloud-init uses its contents:
       - `nocloud-net`: This tells Cloud-init that the data source is not Public cloud (Azure/AWS/GCP etc.) and to look at the local network for the file.
@@ -642,7 +642,7 @@ TCP connection for SSH
 7. **sudo asking password on shell provisioner in packer**
   - The issue: When running the "shell" provisioner in Packer build, it asked for a manual input of the user password to execute the sudo commands.
   - The cause: the "shell" provisioner has a variable called `execute_command`. What shell provisioner does essential is that it converts all the commands provided to a script file, and then executes that script with a predetermined `execute_command`. This can be edited to satisfy any need.
-  - The solution: The `execute_command` value was changed to `"echo ${var.ubuntu_pw}| {{.Vars}} sudo -S -E sh -eux '{{.Path}}'"`, which pulls the password and inputs it for when sudo asks for it.
+  - The solution: The `execute_command` value was changed to `"echo ${var.ubuntu_pw}| {% raw %}{{.Vars}}{% endraw %} sudo -S -E sh -eux '{% raw %}{{.Path}}{% endraw %}'"`, which pulls the password and inputs it for when sudo asks for it.
 8. **Cloud-init status --wait not working in shell provisioner**
   - The issue: In the shell provisioner, when trying to clean up the cloud-init state, at first it was tried to run the "cloud-init status --wait" command, to wait for cloud-init to complete before reinitializing. This command would return status code 2 which means that the cloud-init process has not finished, while shell provisioner only accepts status code 0 as a "non-error" status code, so Packer would crash and mention this as an error.
   - The Solution: The /var/lib/cloud/instance/boot-finished file is now being checked instead to verify that cloud-init finished running.
