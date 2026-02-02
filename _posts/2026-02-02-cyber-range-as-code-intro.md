@@ -143,15 +143,15 @@ As shown above, the architecture is a relatively simple and typical network infr
 
 ## Initial Configuration / PoC
 
-In this section, an initial configuration of the infrastructure is described, with only the bare minimum of components, as well as a PoC of the infrastructure working as described in the previous sections, i.e., with IaC practictes.
+In this section, **an initial configuration of the infrastructure is described, with only the bare minimum of components**, as well as a **PoC of the infrastructure** working as described in the previous sections, i.e., with IaC practictes.
 
 ### Proxmox Configuration
 
 The installation of Proxmox is a typical installation of any OS. Because the physical machine is connected to the home router, the following network configuration was added:
 
-- IP Address: Static 192.168.0.50/24 - Outside of the DHCP range of the home router, but in the same subnet.
-- Gateway: 192.168.0.1 - The IP Address of the home router.
-- DNS: 1.1.1.1 - Used Cloudflare's general use DNS IP address.
+- **IP Address**: Static 192.168.0.50/24 - Outside of the DHCP range of the home router, but in the same subnet.
+- **Gateway**: 192.168.0.1 - The IP Address of the home router.
+- **DNS**: 1.1.1.1 - Used Cloudflare's general use DNS IP address.
 
 <img alt="image" src="https://github.com/user-attachments/assets/d4e74abb-2a23-48a6-8d1a-d5d63a1840a8" />
 
@@ -161,21 +161,21 @@ Proxmox VE is using the [Linux network stack](https://pve.proxmox.com/wiki/Netwo
 
 The network configuration for the project utilized Linux Bridges to create the defined zones.
 
-<img width="1569" height="393" alt="image" src="https://github.com/user-attachments/assets/8121de5d-694b-4668-a7d9-fabdb06bc79b" />
+<img alt="image" src="https://github.com/user-attachments/assets/8121de5d-694b-4668-a7d9-fabdb06bc79b" />
 
 In the screenshot above, the utilized objects are the following:
 
 |Name|Type|Description|
 |-|-|
-|nic1|Network Device|This is the physical interface which physically connects from the Proxmox VE server to the home router, enabling connectivity to the home PC and to the internet.|
-|vmbr0|Linux Bridge|It is through this Linux Bridge that the Proxmox VE server actually connects to the home router, as depicted in the `Ports/Slaves` column, where the `nic1` is defined. The default gateway for the Proxmox server is also defined through this bridge.|
-|vmbrDMZ20|Linux Bridge|The Linux Bridge for the DMZ. The "20" in the name is there for convenience of knowing which subnet the zone has (10.0.20.0/24). The IP of the bridge is 10.0.20.2/24, because the .1 will be assigned to the OPNsense interface.|
-|vmbrEUZ40|Linux Bridge|The Linux Bridge for the End Users zone. The "40" in the name is there for convenience of knowing which subnet the zone has (10.0.40.0/24). The IP of the bridge is 10.0.40.2/24, because the .1 will be assigned to the OPNsense interface.|
-|vmbrIZ30|Linux Bridge|The Linux Bridge for the Internal Zone. The "30" in the name is there for convenience of knowing which subnet the zone has (10.0.30.0/24). The IP of the bridge is 10.0.30.2/24, because the .1 will be assigned to the OPNsense interface.|
+|nic1|Network Device|This is the **physical interface** which physically connects from the Proxmox VE server to the home router, enabling connectivity to the home PC and to the internet.|
+|vmbr0|Linux Bridge|It is through this Linux Bridge that the Proxmox VE server actually **connects to the home router**, as depicted in the `Ports/Slaves` column, where the `nic1` is defined. The default gateway for the Proxmox server is also defined through this bridge.|
+|vmbrDMZ20|Linux Bridge|**The Linux Bridge for the DMZ**. The "20" in the name is there for convenience of knowing which subnet the zone has (10.0.20.0/24). The IP of the bridge is 10.0.20.2/24, because the .1 will be assigned to the OPNsense interface.|
+|vmbrEUZ40|Linux Bridge|**The Linux Bridge for the End Users zone**. The "40" in the name is there for convenience of knowing which subnet the zone has (10.0.40.0/24). The IP of the bridge is 10.0.40.2/24, because the .1 will be assigned to the OPNsense interface.|
+|vmbrIZ30|Linux Bridge|**The Linux Bridge for the Internal Zone**. The "30" in the name is there for convenience of knowing which subnet the zone has (10.0.30.0/24). The IP of the bridge is 10.0.30.2/24, because the .1 will be assigned to the OPNsense interface.|
 
 #### Proxmox Firewall
 
-In addition to the OPNsense which will operate as the central Firewall of the infrastructure, the [firewall](https://pve.proxmox.com/pve-docs/pve-admin-guide.html#chapter_pve_firewall) of Proxmox was also enabled, with the purpose of isolating the Infrastructure from being able to access the home router local network. Think of it as a "Defence in Depth" approach.
+In addition to the OPNsense which will operate as the central Firewall of the infrastructure, **the [firewall](https://pve.proxmox.com/pve-docs/pve-admin-guide.html#chapter_pve_firewall) of Proxmox was also enabled**, with the purpose of isolating the Infrastructure from being able to access the home router local network. Think of it as a "Defence in Depth" approach.
 
 Before explaining how firewalling works in Proxmox, let's briefly review how the VMs and nodes are structured in Proxmox:
 
@@ -187,7 +187,7 @@ In the above screenshot this structure is depicted. More specifically, there is:
 - **Proxmox VE Nodes (Host)**: The "kkproxmox" node is the physical server running the Proxmox VE.
 - **VMs under each Proxmox VE Node**: Under each Proxmox VE node, the different resources deployed are listed. This includes VMs, VM templates, storage, network, etc.
 
-The Proxmox VE firewall groups the network into multiple **logical zones**. The firewall as a functionality can be enabled on any of the zones described above. For example, if the firewall is needed to be enabled on a VM, then the firewall needs to be enabled on the Datacenter, the Proxmox node hosting that VM, the VM itself, and on each virtual network interface of that VM. Also, when a firewall rule is create on one of the levels described above, it applies to all the levels under it. For example, if a rule is create on the Proxmox VE Node, then it applies to all the VMs under that Node.
+The Proxmox VE firewall groups the network into the above **logical zones** (there is also a zone relatedto SDN which is out of scope for this PoC). The firewall as a functionality can be enabled on any of the zones described above. For example, if the firewall is needed to be enabled on a VM, then the firewall needs to be enabled on the Datacenter, the Proxmox node hosting that VM, the VM itself, and on each virtual network interface of that VM. Also, when a firewall rule is create on one of the levels described above, it applies to all the levels under it. For example, if a rule is create on the Proxmox VE Node, then it applies to all the VMs under that Node.
 
 In Proxmox, firewall rules can be defined for different directions:
 
@@ -199,7 +199,7 @@ There are default rules applied when enabling firewall. For `In` traffic the def
 
 For the project, the following configuration is applied:
 
-Firstly, on the Datacenter zone, Aliases were created for the private subnet IP ranges:
+Firstly, on the **Datacenter** zone, Aliases were created for the private subnet IP ranges:
 
 <img alt="image" src="https://github.com/user-attachments/assets/888a88f4-2792-4810-8073-50c6801cc75d" />
 
@@ -215,13 +215,13 @@ The second `Security Group` is the following, and contains a rule to allow traff
 
 After creating the two Security Groups, they were enforced on every zone:
 
-On the Proxmox host only the first one is needed, because traffic towards the infrastructure local subnets does not enter or leave the host directly:
+On the **Proxmox** host only the first one is needed, because traffic towards the infrastructure local subnets does not enter or leave the host directly:
 
-<img width="815" height="375" alt="image" src="https://github.com/user-attachments/assets/7d5ad664-c918-4ba1-b93f-d9f9111dc5a4" />
+<img alt="image" src="https://github.com/user-attachments/assets/7d5ad664-c918-4ba1-b93f-d9f9111dc5a4" />
 
-On the OPNsense, the configuration of which will be shown in a later section, both rules were added.
+On the **OPNsense**, the configuration of which will be shown in a later section, both rules were added.
 
-<img width="819" height="501" alt="image" src="https://github.com/user-attachments/assets/40c41f29-6796-42b0-acf5-d12e8bf56e3f" />
+<img alt="image" src="https://github.com/user-attachments/assets/40c41f29-6796-42b0-acf5-d12e8bf56e3f" />
 
 ### Manual OPNsense Installation
 
@@ -229,7 +229,7 @@ Before moving to full IaC mode, as a PoC, OPNsense was installed manually on Pro
 
 The first step is to download the ISO from the [download page](https://opnsense.org/download/). Afterwards, the ISO is needed to be uploaded to Proxmox:
 
-<img width="1235" height="341" alt="image" src="https://github.com/user-attachments/assets/67ffe8d6-accb-4e93-b06d-3195513579db" />
+<img alt="image" src="https://github.com/user-attachments/assets/67ffe8d6-accb-4e93-b06d-3195513579db" />
 
 #### VM Creation
 
@@ -255,7 +255,7 @@ CPU Settings
 
 <img alt="image" src="https://github.com/user-attachments/assets/ebd5a435-f05c-41af-a84b-478085422e48" />
 
-Memory Settings: A useful setting which will be experimented with when deploying more VMs is the "Ballooning Device" setting along with the Minimum memory. [Memory ballooning](https://pve.proxmox.com/wiki/Dynamic_Memory_Management#Ballooning) allows you to have your guest dynamically change its memory usage by evicting unused memory during run time. It reduces the impact your guest can have on memory usage of your host by giving up unused memory back to the host. The Proxmox VE host can loan ballooned memory to a busy VM. The VM decides which processes or cache pages to swap out to free up memory for the balloon. The VM (Windows or Linux) knows best which memory regions it can give up without impacting performance of the VM. The Minimum memory setting defines the minimum memory in MiB which will never be freed up for use by other VMs. For now the Minimum memory is set to the actual memory size, so essentially there is no memory ballooning for the VM.
+Memory Settings: A useful setting which will be experimented with when deploying more VMs is the "**Ballooning Device**" setting along with the Minimum memory. [Memory ballooning](https://pve.proxmox.com/wiki/Dynamic_Memory_Management#Ballooning) allows you to have your guest **dynamically change its memory usage** by evicting unused memory during run time. It reduces the impact your guest can have on memory usage of your host by giving up unused memory back to the host. The Proxmox VE host can loan ballooned memory to a busy VM. The VM decides which processes or cache pages to swap out to free up memory for the balloon. The VM (Windows or Linux) knows best which memory regions it can give up without impacting performance of the VM. The Minimum memory setting defines the minimum memory in MiB which will never be freed up for use by other VMs. For now the Minimum memory is set to the actual memory size, so essentially there is no memory ballooning for the VM.
 
 <img alt="image" src="https://github.com/user-attachments/assets/fc30cda5-8ba9-4a3c-ba16-42e678646265" />
 
@@ -386,7 +386,7 @@ CRITICAL: Proxmox will show you the Token Secret **only** at the time of its cre
 
 #### Preparing packer
 
-To install Packer, the [official method](https://developer.hashicorp.com/packer/tutorials/docker-get-started/get-started-install-cli) resulted in some errors, and the method describe in this [stackoverflow post](https://stackoverflow.com/questions/75254685/gpg-error-https-apt-releases-hashicorp-com-bionic-inrelease-the-following-si) worked properly, which includes running the following commands and will also be used to install Terraform.
+To install Packer, the [official method](https://developer.hashicorp.com/packer/tutorials/docker-get-started/get-started-install-cli) resulted in some errors, and the method describe in this [stackoverflow post](https://stackoverflow.com/questions/75254685/gpg-error-https-apt-releases-hashicorp-com-bionic-inrelease-the-following-si) worked properly, which includes running the following commands and will be used to install Terraform, too.
 
 ```bash
 # Source - https://stackoverflow.com/a
@@ -422,7 +422,7 @@ To install Packer for windows, you just download it from [here](https://develope
 
 <img alt="image" src="https://github.com/user-attachments/assets/016dc5ee-a194-465e-b68e-22f942dc74f3" />
 
-To organize the Packer directory, a packer path was created, under which all the other files and directories were created.
+To organize the Packer directory, a `packer` path was created, under which all the other files and directories were created.
 
 For the PoC, 2 Ubuntu VMs will be created. One will be under the `End user Zone` and the other under the `WAN Zone`. Because Packer creates ready-to-provision images, an image is to be created for every OS planned to be provisioned with Terraform. Therefore, under the `packer` path, a sub-path was created named `ubuntu-2404` for this purpose.
 
@@ -438,7 +438,7 @@ The following `packer/credentials.pkrvars.hcl` file was created, which contains 
 
 A YAML file `packer/ubuntu-2404/http/user-data` was created. When running Packer, the PC becomes a temporary web server, and the machine pulls the `user-data` file from the PC from the `http` path.
 
-To better understand how the `user-data` and the next files are involved during the image building using Packer, this is a great point where the tool called [**Cloud-init**](https://cloudinit.readthedocs.io/en/latest/) should be briefly described. Cloud-init is the industry standard multi-distribution method for cross-platform cloud instance initialization. It is supported across all major public cloud providers, provisioning systems for private cloud infrastructure, and bare-metal installations.
+To better understand how the `user-data` and the next files are involved during the image building using Packer, this is a great point where the tool called [**Cloud-init**](https://cloudinit.readthedocs.io/en/latest/) should be briefly described. **Cloud-init is the industry standard multi-distribution method for cross-platform cloud instance initialization**. It is supported across all major public cloud providers, provisioning systems for private cloud infrastructure, and bare-metal installations.
 
 When a VM boots, cloud-init runs and provides the necessary glue between launching a cloud instance and connecting to it so that it works as expected. It looks for metadata provided by proxmox or terraform and performs different initialization tasks automatically, including:
 
@@ -476,7 +476,7 @@ autoinstall:
       name: direct #use the entire virtual disk as one big partition.
 ```
 
-In the user-data file, the `autoinstall` directive is the set of instructions for the Ubuntu Subiquity installer. It provides all the information required during the initial installation of the ubuntu server. This includes:
+In the `user-data` file, the `autoinstall` directive is the set of instructions for the Ubuntu Subiquity installer. It provides all the information required during the initial installation of the ubuntu server, including:
 
 - The hostname
 - The admin user
@@ -587,8 +587,8 @@ build {
 
 This file is called the `Packer Template`, and include all the information for how to build the template. It includes:
 
-- The required packer plugins for this template. In this case, the Proxmox plugin is required only, to define the rest of the information and know how to communicate with the Proxmox API.
-- Variable declaration to be used in the packer build in the next lines of the file. Note here that at this point only the declaration of the variables is done. The actual value of the variables will be provided via the `credentials.pkrvars.hcl` file during the packer build execution.
+- The **required packer plugins** for this template. In this case, the Proxmox plugin is required only, to define the rest of the information and know how to communicate with the Proxmox API.
+- **Variable declaration to be used in the packer build** in the next lines of the file. Note here that at this point only the declaration of the variables is done. The actual value of the variables will be provided via the `credentials.pkrvars.hcl` file during the packer build execution.
 - The `source` block is the core logic. It defines the different values that the VM should have, like CPU cores, memory size, ssh settings, the ISO file to use, the VM name, where to install the VM in proxmox, etc. The values that are not explicitly defined here have default values set provided by the proxmox plugin.
   - `boot_command`: A very valuable part of the `source` block is the `boot_command`. In it, the actual keyboard presses for the installation are defined. With these boot commands, what is done is that the installation file is edited to pull the installation parameters from the `user-data` file described above. More specifically, it contains Linux Kernel Boot Parameters before the installation starts:
     - `autoinstall`: This tells the Ubuntu installer (Subiquity) to run in automated mode, instead of going through the manual installation process of selecting language etc.
@@ -597,44 +597,44 @@ This file is called the `Packer Template`, and include all the information for h
     - `ds`: This stands for "Data Source" and Cloud-init uses its contents:
       - `nocloud-net`: This tells Cloud-init that the data source is not Public cloud (Azure/AWS/GCP etc.) and to look at the local network for the file.
       - `s=`: This stand for "seed from". It tells Cloud-init where to find the `user-data` and `meta-data` (another file not used for this PoC) files.
-- The `build` block is the execution part of packer. The `source` block defines the VM, while the `build` block actually runs it. Here is where the [Provisioners](https://developer.hashicorp.com/packer/docs/provisioners) live, through which it is possible to execute actions on the machine image and configure it after booting. They can be used to install packages, patch the kernel, create users, donwload application code, etc. In the PoC, the `shell` provisioner is used to clean up the machine and reinitialize cloud-init so that it reruns during the Terraform provisioning of the VM (cloud-init runs only once on the machine unless its configuration is cleaned).
+- The `build` block is the execution part of packer. The `source` block defines the VM, while the `build` block actually runs it. Here is where the [**Provisioners**](https://developer.hashicorp.com/packer/docs/provisioners) live, through which it is possible to execute actions on the machine image and configure it after booting. They can be used to install packages, patch the kernel, create users, donwload application code, etc. In the PoC, the `shell` provisioner is used to clean up the machine and reinitialize cloud-init so that it reruns during the Terraform provisioning of the VM (cloud-init runs only once on the machine unless its configuration is cleaned).
 
 #### Packer pitfalls, solutions, and lessons learnt
 
 Some tools that helped in troubleshooting Packer:
-1. Set the envar $env:PACKER_LOG=1 to make running packer verbose. This shows many hints as to what is going wrong.
-2. If the VM does not proceed with the autoinstaller, and reaches the manual installation flow, you can use Ctrl + Alt + F2 in the Proxmox console to jump to a root shell. This allows to
-  1. review logs of the subiquity and cloud-init. Two useful paths for checking are `/var/log/installer/subiquity-server-debug.log` and `/var/log/syslog`.
-  2. test network connections, to confirm, for example, that you can reach the temporary packer server on the PC running packer, or that the internet is reachable.
-3. Check the hardware resource usage of the VM being installed in Proxmox. Maybe there is overuse of the resource and may need to be increased.
+1. Set the envar `$env:PACKER_LOG=1` to make running packer verbose. This shows many hints as to what is going wrong.
+2. If the VM does not proceed with the autoinstaller, and reaches the manual installation flow, you can use `Ctrl + Alt + F2` in the Proxmox console to **jump to a root shell**. This allows to
+  1. **review logs of the subiquity and cloud-init**. Two useful paths for checking are `/var/log/installer/subiquity-server-debug.log` and `/var/log/syslog`.
+  2. **test network connections**, to confirm, for example, that you can reach the temporary packer server on the PC running packer, or that the internet is reachable.
+3. **Check the hardware resource usage of the VM** being installed in Proxmox. Maybe there is overuse of the resource and may need to be increased.
 
-Some pitfalls and lessons learnt I met while setting up packer were the following:
+Some **pitfalls and lessons** learnt I met while setting up packer were the following:
 
-1. Proxmox 500 Error: After enabling verbose mode in packer (by setting $env:PACKER_LOG=1), a repeated message of 500 "Qemu must be running to read the IP address of the machine" kept popping up. I thought this meant that something was wrong, but actually this is expected and Packer is actually waiting for Qemu guest agent to be installed so that it can read the VM's IP Address from proxmox so it can SSH to it. If it never moves that point, then the QEMU guest agent was not installed, or, most probably, the autoinstaller did not start.
-2. The "Interactive Menu" problem:
-  - The pitfall: The VM kept reaching the manual language selection screen instead of starting the automated install.
+1. **Proxmox 500 Error**: After enabling verbose mode in packer (by setting `$env:PACKER_LOG=1`), a repeated message of 500 "Qemu must be running to read the IP address of the machine" kept popping up. I thought this meant that something was wrong, but actually this is expected and Packer is actually waiting for Qemu guest agent to be installed so that it can read the VM's IP Address from proxmox so it can SSH to it. If it never moves that point, then the QEMU guest agent was not installed, or, most probably, the autoinstaller did not start.
+2. **The "Interactive Menu" problem**:
+  - The issue: The VM kept reaching the manual language selection screen instead of starting the automated install.
   - The cause: The installer could not find or parse the autoinstall instructions.
   - The resolution: In the `boot_command`, an explicit definition of the autoinstall instructions needed to be defined using the `cloud-config-url` parameter.
-3. YAML formatting
-  - The pitfall: The installer found the user-data file but ignored the settings, falling back to manual installation.
+3. **YAML formatting**
+  - The issue: The installer found the user-data file but ignored the settings, falling back to manual installation.
   - The cause: Ubuntu ignores the user-data file if it does not have the "#cloud-config" comment at the first line.
   - The lesson: read the documentation of the requirements of different configuration files.
-4. Validation crashes (keyboard and identity):
- - The pitfall: The installer crashed with an "Unknown keyboard layout 'en'" error (1st screenshot), and crashed while attempting to run timedatectl list-timezones (2nd screenshot).
+4. **Validation crashes**:
+ - The issue: The installer crashed with an "Unknown keyboard layout 'en'" error (1st screenshot), and crashed while attempting to run timedatectl list-timezones (2nd screenshot).
  - The cause and resolution: Some parameters in the `user-data` file are mandatory and do not have default values when not explicitly defined. These include the timezone and keyboard layout parameters, which were not initally defined. Once added to the `user-data` file, the crashes were fixed.
 
-<img alt="image" src="https://github.com/user-attachments/assets/e1db920c-62d7-4366-95da-2dea2d3b3689" />
+  <img alt="image" src="https://github.com/user-attachments/assets/e1db920c-62d7-4366-95da-2dea2d3b3689" />
 
 
-<img width="1125" height="521" alt="image" src="https://github.com/user-attachments/assets/f58cd53a-93ec-4de2-8d53-074a1fc7733b" />
+  <img alt="image" src="https://github.com/user-attachments/assets/f58cd53a-93ec-4de2-8d53-074a1fc7733b" />
 
-5. Hardware resource constraints
-  - The pitfall: The installation appeared to hang or move extremely slowly without showing errors.
+5. **Hardware resource constraints**
+  - The issue: The installation appeared to hang or move extremely slowly without showing errors.
   - The cause: Initially the default memory and CPU values were left in the packer template file, which means 1 CPU core and 512MB memory. Especially for the memory size, this is a very low value for an installation of Ubuntu server.
   - The solution and lesson: Modern installers require more thant the defualt minimal resources to complete. Increase the values for 4 CPU cores and 4096MB memory resolved the issue.
 
-6. SSH Handshake and authentication
- - The pitfall: The OS installed successfully, but Packer failed to connect with the following repeating error:
+6. **SSH Handshake and authentication**
+ - The issue: The OS installed successfully, but Packer failed to connect with the following repeating error:
 ```
 2026/01/26 10:59:47 packer-plugin-proxmox_v1.2.3_x5.0_windows_amd64.exe plugin: 2026/01/26 10:59:47 [INFO] Attempting SSH connection to 192.168.0.110:22...
 2026/01/26 10:59:47 packer-plugin-proxmox_v1.2.3_x5.0_windows_amd64.exe plugin: 2026/01/26 10:59:47 [DEBUG] reconnecting to 
@@ -644,12 +644,12 @@ TCP connection for SSH
 2026/01/26 10:59:47 packer-plugin-proxmox_v1.2.3_x5.0_windows_amd64.exe plugin: 2026/01/26 10:59:47 [DEBUG] Detected authentication error. Increasing handshake attempts.
 ```
   - The cause and resolution: the `ssh_password` value in the packer template is used for this connection, and was not initially defined. Upon its definition, the issue was resolved.
-7. sudo asking password on shell provisioner in packer.
-  - The pitfall: When running the "shell" provisioner in Packer build, it asked for a manual input of the user password to execute the sudo commands.
+7. **sudo asking password on shell provisioner in packer**
+  - The issue: When running the "shell" provisioner in Packer build, it asked for a manual input of the user password to execute the sudo commands.
   - The cause: the "shell" provisioner has a variable called `execute_command`. What shell provisioner does essential is that it converts all the commands provided to a script file, and then executes that script with a predetermined `execute_command`. This can be edited to satisfy any need.
   - The solution: The `execute_command` value was changed to `"echo ${var.ubuntu_pw}| {{.Vars}} sudo -S -E sh -eux '{{.Path}}'"`, which pulls the password and inputs it for when sudo asks for it.
-8. Cloud-init status --wait not working in shell provisioner
-  - The Pitfall: In the shell provisioner, when trying to clean up the cloud-init state, at first it was tried to run the "cloud-init status --wait" command, to wait for cloud-init to complete before reinitializing. This command would return status code 2 which means that the cloud-init process has not finished, while shell provisioner only accepts status code 0 as a "non-error" status code, so Packer would crash and mention this as an error.
+8. **Cloud-init status --wait not working in shell provisioner**
+  - The issue: In the shell provisioner, when trying to clean up the cloud-init state, at first it was tried to run the "cloud-init status --wait" command, to wait for cloud-init to complete before reinitializing. This command would return status code 2 which means that the cloud-init process has not finished, while shell provisioner only accepts status code 0 as a "non-error" status code, so Packer would crash and mention this as an error.
   - The Solution: The /var/lib/cloud/instance/boot-finished file is now being checked instead to verify that cloud-init finished running.
 
 #### Packer build and PoC result
@@ -712,17 +712,17 @@ For simplicity, the same user used in Packer is used for Terraform. Therefore, t
 - VM.PowerMgmt
 - SDN.Use
 
-To organize the Terraform directory, a terraform path was created, under which all the other files and directories were created.
+To organize the Terraform directory, a `terraform` path was created, under which all the other files and directories were created.
 
-For the PoC, 2 Ubuntu VMs will be created. One will be under the `End user Zone` and the other under the `WAN Zone`.
+**For the PoC, 2 Ubuntu VMs will be created**. One will be under the `End user Zone` and the other under the `WAN Zone`.
 
 All the created files are found under the project's repository [kostas-seclab](https://github.com/KostasKoutrou/kostas-seclab)
 
 For terraform, the following files were created:
 
-The `terraform/variables.tf` file contains variables to be used by terraform:
+The `terraform/variables.tf` file contains **variables to be used by terraform**:
 
-```terraform
+```hcl
 variable "proxmox_api_url" {
     type = string
     description = "The URL for the Proxmox API (e.g., https://192.168.0.50:8006/api2/json)"
@@ -741,9 +741,9 @@ variable "proxmox_api_token_secret" {
 }
 ```
 
-The `terraform/provider.tf` file contains information regarding what provider terraform will connect to (AWS, Azure Google Cloud, Proxmox, etc. - In our case it is proxmox, using the [Telmate/proxmox](https://registry.terraform.io/providers/Telmate/proxmox/latest/docs) provider), as well as the configuration to connect to the provider. The variables for the provider are pulled from the `terraform/variables.tf` definitions. The execution of `terraform apply` is where the source and the actual values of the varaibles will be defined.
+The `terraform/provider.tf` file contains information regarding **what provider terraform will connect to** (AWS, Azure Google Cloud, Proxmox, etc. - In our case it is proxmox, using the [Telmate/proxmox](https://registry.terraform.io/providers/Telmate/proxmox/latest/docs) provider), as well as **the configuration to connect to the provider**. The variables for the provider are pulled from the `terraform/variables.tf` definitions. The execution of `terraform apply` is where the source and the actual values of the varaibles will be defined.
 
-```terraform
+```hcl
 terraform {
   required_providers {
     proxmox = {
@@ -762,9 +762,9 @@ provider "proxmox" {
 }
 ```
 
-The `terraform/main.tf` file contains the blocks of what exactly to build. In our case of building 2 test Ubuntu servers using the tempalte built by Packer, the main.tf looks like this:
+The `terraform/main.tf` file contains **the blocks of what exactly to build**. In our case of building 2 test Ubuntu servers using the tempalte built by Packer, the main.tf looks like this:
 
-```terraform
+```hcl
 resource "proxmox_vm_qemu" "test_server" { # Resource type and resource name
     name = "terraform-vm-01" # Name of the VM
     target_node = "kkproxmox" # Proxmox node to build the VM on
@@ -869,20 +869,20 @@ resource "proxmox_vm_qemu" "test_server1" { # the 2nd VM
 
 Some pitfalls and lessons learnt I met while setting up Terraform were the following:
 
-1.	Stale Cloud-Init State
- - The Symptom: After deploying a VM with Terraform, Proxmox showed the correct name (e.g., terraform-vm-01), but the internal OS console still showed the template's original name (ubuntu-server). The VM ignored the new configuration.
- - The Cause: cloud-init is designed to run only once. During the Packer build process, cloud-init ran to set up the initial template and left a "marker file" indicating it was finished. When the template was cloned via Terraform, the new VM saw the marker and immediately went back to sleep, ignoring the new instructions from Terraform.
- - The Fix: A "cleanup" shell provisioner was added at the end of the Packer configuration (ubuntu.pkr.hcl), which runs the command `cloud-init clean --logs --machine-id --seed --configs all` to fully reinitialized the cloud-init status.
- - The Lesson: Templates must be stateless. If the state is not reset before saving a template, every clone will wake up thinking it has already been configured.
-2. Duplicate Machine IDs
- - The Symptom (Potential): While fixing the previous issue, a risk was identified where multiple VMs might end up with the same IP address from the DHCP server.
- - The Cause: Linux generates a unique /etc/machine-id upon installation. If this isn't reset during the Packer build, every clone shares the same ID, causing network conflicts.
- - The Fix: In the `cloud-init clean` command in Packer, the flag `--machine-id` was added to reset the machine id as well.
- - The Lesson: Simply changing a hostname isn't enough. Unique system identifiers (GUIDs, Machine IDs) must be regenerated for every new instance to avoid collisions on the network level.
-4.	No Cloud-Init Drive
- - The Symptom: Terraform was successfully creating the VM resource, but the OS configuration (hostname, user data) was never applied. When manually mounting a Cloud-Init drive fixed this issue.
- - The Cause: The Packer template was missing the `cloud_init = true` instruction. Consequently, the template was created without a Cloud-Init drive. Without this drive, Terraform had no physical medium to insert the configuration data for the OS to read. Additionally, in the Terraform main.tf file, the "cloudinit" was also needed to be explicitly defined.
- - The Fix: We updated the source "proxmox-iso" block in Packer to explicitly include the cloud-init parameter, and Terraform to include the "cloudinit" disk.
+1.	**Stale Cloud-Init State**
+ - The issue: After deploying a VM with Terraform, Proxmox showed the correct name (e.g., terraform-vm-01), but **the internal OS console still showed the template's original name (ubuntu-server)**. The VM ignored the new configuration.
+ - The Cause: **cloud-init is designed to run only once**. During the Packer build process, cloud-init ran to set up the initial template and left a "marker file" indicating it was finished. When the template was cloned via Terraform, the new VM saw the marker and immediately went back to sleep, ignoring the new instructions from Terraform.
+ - The Fix: **A "cleanup" shell provisioner was added** at the end of the Packer configuration (ubuntu.pkr.hcl), which runs the command `cloud-init clean --logs --machine-id --seed --configs all` to fully reinitialized the cloud-init status.
+ - The Lesson: **Templates must be stateless**. If the state is not reset before saving a template, every clone will wake up thinking it has already been configured.
+2. **Duplicate Machine IDs**
+ - The issue (Potential): While fixing the previous issue, a risk was identified where **multiple VMs might end up with the same IP address from the DHCP server**.
+ - The Cause: **Linux generates a unique /etc/machine-id upon installation**. If this isn't reset during the Packer build, every clone shares the same ID, causing network conflicts.
+ - The Fix: In the `cloud-init clean` command in Packer, **the flag `--machine-id` was added to reset the machine id as well**.
+ - The Lesson: Simply changing a hostname isn't enough. **Unique system identifiers (GUIDs, Machine IDs) must be regenerated for every new instance** to avoid collisions on the network level.
+3.	**No Cloud-Init Drive**
+ - The issue: Terraform was successfully creating the VM resource, but **the OS configuration (hostname, user data) was never applied**. When manually mounting a Cloud-Init drive fixed this issue.
+ - The Cause: **The Packer template was missing the `cloud_init = true` instruction**. Consequently, the template was created without a Cloud-Init drive. Without this drive, Terraform had no physical medium to insert the configuration data for the OS to read. Additionally, in the Terraform main.tf file, the "cloudinit" was also needed to be explicitly defined.
+ - The Fix: The source "proxmox-iso" block in Packer was updated to explicitly **include the `cloud-init` parameter,** and Terraform to include the "cloudinit" disk.
 
 #### Terraform apply and PoC result
 
@@ -902,9 +902,9 @@ Running `terraform init` results in the following:
 
 <img width="565" height="275" alt="image" src="https://github.com/user-attachments/assets/a0dcbe99-67c6-485c-b3db-5b8faaf158d8" />
 
-Running `terraform plan -var-file="../packer/credentials.pkrvars.hcl"` results many lines which show the configuration to be applied. Below is a screenshot of part of the output:
+Running `terraform plan -var-file="../packer/credentials.pkrvars.hcl"` outputs many lines which show the configuration to be applied. Below is a screenshot of part of the output:
 
-<img width="975" height="601" alt="image" src="https://github.com/user-attachments/assets/7a5b9108-aeb8-46e5-b9ca-1a66b3a9fee5" />
+<img alt="image" src="https://github.com/user-attachments/assets/7a5b9108-aeb8-46e5-b9ca-1a66b3a9fee5" />
 
 Running the `terraform apply -var-file="../packer/credentials.pkrvars.hcl"` shows the same information as the `terraform plan`, which is the configuration to be applied, and asks for confirmation in the end. After typing "yes", the VMs are being provisioned, and the final output is the following:
 
@@ -934,7 +934,7 @@ For Ansible, the following files were created:
 
 `ansible/inventory.ini`: This file contains the list of machines with their IP addresses for Ansible to connect to them.
 
-```
+```ini
 [webservers]
 192.168.0.104 ansible_user=ubuntu
 ```
@@ -967,15 +967,15 @@ For Ansible, the following files were created:
 
 `ansible/ansible.cfg`: This file override the global Ansible settings:
 
-```
+```ini
 [defaults]
 inventory = ./inventory.ini
 host_key_checking = False
 ```
 
-The ansible.cfg file had to be set by setting the environment variable (because we are running with WSL): `export ANSIBLE_CONFIG=./ansible.cfg`. To confirm, run `ansible --version`, which should show the `config file`:
+The ansible.cfg file had to be set by setting the environment variable (because we are running with WSL): `export ANSIBLE_CONFIG=./ansible.cfg`. To confirm, run `ansible --version`, which should show the `config file` value:
 
-<img width="787" height="171" alt="image" src="https://github.com/user-attachments/assets/7ac8a653-ee6a-4c07-82fa-f6b17f0a801e" />
+<img alt="image" src="https://github.com/user-attachments/assets/7ac8a653-ee6a-4c07-82fa-f6b17f0a801e" />
 
 #### Running Ansible
 
@@ -985,7 +985,7 @@ To run Ansible with the configuration defined above, the following command was r
 
 Due to Ansible's idempotency, running the command again will show that everything is ok and no changes were applied:
 
-<img width="815" height="353" alt="image" src="https://github.com/user-attachments/assets/2fe0b7d3-f372-434c-94ec-3f3ab3f059d1" />
+<img alt="image" src="https://github.com/user-attachments/assets/2fe0b7d3-f372-434c-94ec-3f3ab3f059d1" />
 
 After running Ansible, the Nginx can be reached from the browser
 
@@ -995,12 +995,12 @@ After running Ansible, the Nginx can be reached from the browser
 
 So now the flow is complete. A VM template was created using Packer, VMs were provisioned with Terraform, and further configurations were applied using Ansible. This was a PoC to verify the flow can be used for the rest of the project.
 
-The next steps will be to reach a fully recoverable and fully IaC state from start up to the point which has been reached now manually.
+**The next steps** will be to reach a fully recoverable and fully IaC state from start up to the point which has been reached now manually.
 
 This means:
 
-1. Configure all the Proxmox settings described in this post using either Ansible or any other automation tool (even a script).
-2. Configure OPNsense using Packer, Terraform and Ansible. A Packer template will be built using OPNsense's ISO, Terraform will be used to provision the OPNsense with the settings which were applied manually, and Ansible will be used to apply any configuration to it, including Firewall rules, DHCP, installing Packages, etc.
+1. Configure all the **Proxmox settings** described in this post using either Ansible or any other automation tool (even a script).
+2. Configure **OPNsense** using Packer, Terraform and Ansible. A Packer template will be built using OPNsense's ISO, Terraform will be used to provision the OPNsense with the settings which were applied manually, and Ansible will be used to apply any configuration to it, including Firewall rules, DHCP, installing Packages, etc.
 
 ## Conclusion
 
@@ -1009,11 +1009,11 @@ Building a Cyber Range as Code is going to be a complex project to pull of fully
 However, this project will be a great lesson towards:
 
 1. Learning IaC (Packer, Terraform, Ansible).
-2. Applying security hardening and security standards to multiple machines using IaC Practices.
-3. Developing methodoligies for security testing and reviewing the results.
+2. Applying security hardening and security standards to multiple machines using IaC practices.
+3. Developing methodologies for security testing and reviewing the results.
 
-This post was the plan for the project. It included different ideas for potential technologies to be used, as well as the architecture to be built. In the next posts the implementation will start.
+This post included the plan for the project. It included different ideas for potential technologies to be used, as well as the architecture to be built. In the next posts the implementation will start.
 
-Hopefully you picked something of interest and will following the progress of this project.
+Hopefully you picked something of interest and will follow along the progress of this project.
 
 See you in the next one.
