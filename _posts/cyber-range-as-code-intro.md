@@ -611,17 +611,45 @@ Some pitfalls and lessons learnt I met while setting up packer were the followin
   - The pitfall: The installer found the user-data file but ignored the settings, falling back to manual installation.
   - The cause: Ubuntu ignores the user-data file if it does not have the "#cloud-config" comment at the first line.
   - The lesson: read the documentation of the requirements of different configuration files.
-
 4. Validation crashes (keyboard and identity):
+ - The pitfall: The installer crashed with an "Unknown keyboard layout 'en'" error (1st screenshot), and crashed while attempting to run timedatectl list-timezones (2nd screenshot).
+ - The cause and resolution: Some parameters in the `user-data` file are mandatory and do not have default values when not explicitly defined. These include the timezone and keyboard layout parameters, which were not initally defined. Once added to the `user-data` file, the crashes were fixed.
 
 <img alt="image" src="https://github.com/user-attachments/assets/e1db920c-62d7-4366-95da-2dea2d3b3689" />
 
- - The pitfall: The installer crashed with an "Unknown keyboard layout 'en'" error.
- - 
+
+<img width="1125" height="521" alt="image" src="https://github.com/user-attachments/assets/f58cd53a-93ec-4de2-8d53-074a1fc7733b" />
+
+5. Hardware resource constraints
+  - The pitfall: The installation appeared to hang or move extremely slowly without showing errors.
+  - The cause: Initially the default memory and CPU values were left in the packer template file, which means 1 CPU core and 512MB memory. Especially for the memory size, this is a very low value for an installation of Ubuntu server.
+  - The solution and lesson: Modern installers require more thant the defualt minimal resources to complete. Increase the values for 4 CPU cores and 4096MB memory resolved the issue.
+
+6. SSH Handshake and authentication
+ - The pitfall: The OS installed successfully, but Packer failed to connect with the following repeating error:
+```
+2026/01/26 10:59:47 packer-plugin-proxmox_v1.2.3_x5.0_windows_amd64.exe plugin: 2026/01/26 10:59:47 [INFO] Attempting SSH connection to 192.168.0.110:22...
+2026/01/26 10:59:47 packer-plugin-proxmox_v1.2.3_x5.0_windows_amd64.exe plugin: 2026/01/26 10:59:47 [DEBUG] reconnecting to 
+TCP connection for SSH
+2026/01/26 10:59:47 packer-plugin-proxmox_v1.2.3_x5.0_windows_amd64.exe plugin: 2026/01/26 10:59:47 [DEBUG] handshaking with SSH
+2026/01/26 10:59:47 packer-plugin-proxmox_v1.2.3_x5.0_windows_amd64.exe plugin: 2026/01/26 10:59:47 [DEBUG] SSH handshake err: ssh: handshake failed: ssh: unable to authenticate, attempted methods [none], no supported methods remain
+2026/01/26 10:59:47 packer-plugin-proxmox_v1.2.3_x5.0_windows_amd64.exe plugin: 2026/01/26 10:59:47 [DEBUG] Detected authentication error. Increasing handshake attempts.
+```
+  - The cause and resolution: the `ssh_password` value in the packer template is used for this connection, and was not initially defined. Upon its definition, the issue was resolved.
+
+#### Packer PoC result
+
+After successfully running Packer, the result is a Proxmox template, ready to be cloned. This template is used by Terraform, as shown in the next section.
+
+<img width="1041" height="337" alt="image" src="https://github.com/user-attachments/assets/490da478-ba97-4db7-970e-880d41570714" />
 
 ### Terraform Configuration
 
+
+
 #### Terraform pitfalls, solutions, and lessons learnt
+
+#### Terraform result
 
 ### Ansible
 
