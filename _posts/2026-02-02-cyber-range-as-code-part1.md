@@ -620,22 +620,22 @@ Some **pitfalls and lessons** learnt I met while setting up packer were the foll
 {% raw %}
 1. **Proxmox 500 Error**: After enabling verbose mode in packer (by setting `$env:PACKER_LOG=1`), a repeated message of 500 "Qemu must be running to read the IP address of the machine" kept popping up. I thought this meant that something was wrong, but actually this is expected and Packer is actually waiting for Qemu guest agent to be installed so that it can read the VM's IP Address from proxmox so it can SSH to it. If it never moves that point, then the QEMU guest agent was not installed, or, most probably, the autoinstaller did not start.
 2. **The "Interactive Menu" problem**:
-  - The issue: The VM kept reaching the manual language selection screen instead of starting the automated install.
-  - The cause: The installer could not find or parse the autoinstall instructions.
-  - The resolution: In the `boot_command`, an explicit definition of the autoinstall instructions needed to be defined using the `cloud-config-url` parameter.
+  - **The issue**: The VM kept reaching the manual language selection screen instead of starting the automated install.
+  - **The cause**: The installer could not find or parse the autoinstall instructions.
+  - **The resolution**: In the `boot_command`, an explicit definition of the autoinstall instructions needed to be defined using the `cloud-config-url` parameter.
 3. **YAML formatting**
-  - The issue: The installer found the user-data file but ignored the settings, falling back to manual installation.
-  - The cause: Ubuntu ignores the user-data file if it does not have the "#cloud-config" comment at the first line.
-  - The lesson: read the documentation of the requirements of different configuration files.
+  - **The issue**: The installer found the user-data file but ignored the settings, falling back to manual installation.
+  - **The cause**: Ubuntu ignores the user-data file if it does not have the "#cloud-config" comment at the first line.
+  - **The lesson**: read the documentation of the requirements of different configuration files.
 4. **Validation crashes**:
- - The issue: The installer crashed with an "Unknown keyboard layout 'en'" error (1st screenshot), and crashed while attempting to run timedatectl list-timezones (2nd screenshot).
- - The cause and resolution: Some parameters in the `user-data` file are mandatory and do not have default values when not explicitly defined. These include the timezone and keyboard layout parameters, which were not initally defined. Once added to the `user-data` file, the crashes were fixed.
+ - **The issue**: The installer crashed with an "Unknown keyboard layout 'en'" error (1st screenshot), and crashed while attempting to run timedatectl list-timezones (2nd screenshot).
+ - **The cause and resolution**: Some parameters in the `user-data` file are mandatory and do not have default values when not explicitly defined. These include the timezone and keyboard layout parameters, which were not initally defined. Once added to the `user-data` file, the crashes were fixed.
   <img alt="image" src="https://github.com/user-attachments/assets/e1db920c-62d7-4366-95da-2dea2d3b3689" />
   <img alt="image" src="https://github.com/user-attachments/assets/f58cd53a-93ec-4de2-8d53-074a1fc7733b" />
 5. **Hardware resource constraints**
-  - The issue: The installation appeared to hang or move extremely slowly without showing errors.
-  - The cause: Initially the default memory and CPU values were left in the packer template file, which means 1 CPU core and 512MB memory. Especially for the memory size, this is a very low value for an installation of Ubuntu server.
-  - The solution and lesson: Modern installers require more thant the default minimal resources to complete. Increase the values for 4 CPU cores and 4096MB memory resolved the issue.
+  - **The issue**: The installation appeared to hang or move extremely slowly without showing errors.
+  - **The cause**: Initially the default memory and CPU values were left in the packer template file, which means 1 CPU core and 512MB memory. Especially for the memory size, this is a very low value for an installation of Ubuntu server.
+  - **The solution and lesson**: Modern installers require more thant the default minimal resources to complete. Increase the values for 4 CPU cores and 4096MB memory resolved the issue.
 6. **SSH Handshake and authentication**
  - The issue: The OS installed successfully, but Packer failed to connect with the following repeating error:
 ```plaintext
@@ -646,14 +646,14 @@ TCP connection for SSH
 2026/01/26 10:59:47 packer-plugin-proxmox_v1.2.3_x5.0_windows_amd64.exe plugin: 2026/01/26 10:59:47 [DEBUG] SSH handshake err: ssh: handshake failed: ssh: unable to authenticate, attempted methods [none], no supported methods remain
 2026/01/26 10:59:47 packer-plugin-proxmox_v1.2.3_x5.0_windows_amd64.exe plugin: 2026/01/26 10:59:47 [DEBUG] Detected authentication error. Increasing handshake attempts.
 ```
-  - The cause and resolution: the `ssh_password` value in the packer template is used for this connection, and was not initially defined. Upon its definition, the issue was resolved.
+  - **The cause and resolution**: the `ssh_password` value in the packer template is used for this connection, and was not initially defined. Upon its definition, the issue was resolved.
 7. **sudo asking password on shell provisioner in packer**
-  - The issue: When running the "shell" provisioner in Packer build, it asked for a manual input of the user password to execute the sudo commands.
-  - The cause: the "shell" provisioner has a variable called `execute_command`. What shell provisioner does essential is that it converts all the commands provided to a script file, and then executes that script with a predetermined `execute_command`. This can be edited to satisfy any need.
-  - The solution: The `execute_command` value was changed to `"echo ${var.ubuntu_pw}| {{.Vars}} sudo -S -E sh -eux '{{.Path}}'"`, which pulls the password and inputs it for when sudo asks for it.
+  - **The issue**: When running the "shell" provisioner in Packer build, it asked for a manual input of the user password to execute the sudo commands.
+  - **The cause**: the "shell" provisioner has a variable called `execute_command`. What shell provisioner does essential is that it converts all the commands provided to a script file, and then executes that script with a predetermined `execute_command`. This can be edited to satisfy any need.
+  - **The solution**: The `execute_command` value was changed to `"echo ${var.ubuntu_pw}| {{.Vars}} sudo -S -E sh -eux '{{.Path}}'"`, which pulls the password and inputs it for when sudo asks for it.
 8. **Cloud-init status --wait not working in shell provisioner**
-  - The issue: In the shell provisioner, when trying to clean up the cloud-init state, at first it was tried to run the "cloud-init status --wait" command, to wait for cloud-init to complete before reinitializing. This command would return status code 2 which means that the cloud-init process has not finished, while shell provisioner only accepts status code 0 as a "non-error" status code, so Packer would crash and mention this as an error.
-  - The Solution: The /var/lib/cloud/instance/boot-finished file is now being checked instead to verify that cloud-init finished running.
+  - **The issue**: In the shell provisioner, when trying to clean up the cloud-init state, at first it was tried to run the "cloud-init status --wait" command, to wait for cloud-init to complete before reinitializing. This command would return status code 2 which means that the cloud-init process has not finished, while shell provisioner only accepts status code 0 as a "non-error" status code, so Packer would crash and mention this as an error.
+  - **The Solution**: The /var/lib/cloud/instance/boot-finished file is now being checked instead to verify that cloud-init finished running.
 {% endraw %}
 
 #### Packer build and PoC result
@@ -876,19 +876,19 @@ resource "proxmox_vm_qemu" "test_server1" { # the 2nd VM
 Some pitfalls and lessons learnt I met while setting up Terraform were the following:
 
 1.	**Stale Cloud-Init State**
- - The issue: After deploying a VM with Terraform, Proxmox showed the correct name (e.g., terraform-vm-01), but **the internal OS console still showed the template's original name (ubuntu-server)**. The VM ignored the new configuration.
- - The Cause: **cloud-init is designed to run only once**. During the Packer build process, cloud-init ran to set up the initial template and left a "marker file" indicating it was finished. When the template was cloned via Terraform, the new VM saw the marker and immediately went back to sleep, ignoring the new instructions from Terraform.
- - The Fix: **A "cleanup" shell provisioner was added** at the end of the Packer configuration (ubuntu.pkr.hcl), which runs the command `cloud-init clean --logs --machine-id --seed --configs all` to fully reinitialized the cloud-init status.
- - The Lesson: **Templates must be stateless**. If the state is not reset before saving a template, every clone will wake up thinking it has already been configured.
+ - **The issue**: After deploying a VM with Terraform, Proxmox showed the correct name (e.g., terraform-vm-01), but **the internal OS console still showed the template's original name (ubuntu-server)**. The VM ignored the new configuration.
+ - **The Cause**: **cloud-init is designed to run only once**. During the Packer build process, cloud-init ran to set up the initial template and left a "marker file" indicating it was finished. When the template was cloned via Terraform, the new VM saw the marker and immediately went back to sleep, ignoring the new instructions from Terraform.
+ - **The Fix**: **A "cleanup" shell provisioner was added** at the end of the Packer configuration (ubuntu.pkr.hcl), which runs the command `cloud-init clean --logs --machine-id --seed --configs all` to fully reinitialized the cloud-init status.
+ - **The Lesson**: **Templates must be stateless**. If the state is not reset before saving a template, every clone will wake up thinking it has already been configured.
 2. **Duplicate Machine IDs**
- - The issue (Potential): While fixing the previous issue, a risk was identified where **multiple VMs might end up with the same IP address from the DHCP server**.
- - The Cause: **Linux generates a unique /etc/machine-id upon installation**. If this isn't reset during the Packer build, every clone shares the same ID, causing network conflicts.
- - The Fix: In the `cloud-init clean` command in Packer, **the flag `--machine-id` was added to reset the machine id as well**.
- - The Lesson: Simply changing a hostname isn't enough. **Unique system identifiers (GUIDs, Machine IDs) must be regenerated for every new instance** to avoid collisions on the network level.
+ - **The issue (Potential)**: While fixing the previous issue, a risk was identified where **multiple VMs might end up with the same IP address from the DHCP server**.
+ - **The Cause**: **Linux generates a unique /etc/machine-id upon installation**. If this isn't reset during the Packer build, every clone shares the same ID, causing network conflicts.
+ - **The Fix**: In the `cloud-init clean` command in Packer, **the flag `--machine-id` was added to reset the machine id as well**.
+ - **The Lesson**: Simply changing a hostname isn't enough. **Unique system identifiers (GUIDs, Machine IDs) must be regenerated for every new instance** to avoid collisions on the network level.
 3.	**No Cloud-Init Drive**
- - The issue: Terraform was successfully creating the VM resource, but **the OS configuration (hostname, user data) was never applied**. When manually mounting a Cloud-Init drive fixed this issue.
- - The Cause: **The Packer template was missing the `cloud_init = true` instruction**. Consequently, the template was created without a Cloud-Init drive. Without this drive, Terraform had no physical medium to insert the configuration data for the OS to read. Additionally, in the Terraform main.tf file, the "cloudinit" was also needed to be explicitly defined.
- - The Fix: The source "proxmox-iso" block in Packer was updated to explicitly **include the `cloud-init` parameter,** and Terraform to include the "cloudinit" disk.
+ - **The issue**: Terraform was successfully creating the VM resource, but **the OS configuration (hostname, user data) was never applied**. When manually mounting a Cloud-Init drive fixed this issue.
+ - **The Cause**: **The Packer template was missing the `cloud_init = true` instruction**. Consequently, the template was created without a Cloud-Init drive. Without this drive, Terraform had no physical medium to insert the configuration data for the OS to read. Additionally, in the Terraform main.tf file, the "cloudinit" was also needed to be explicitly defined.
+ - **The Fix**: The source "proxmox-iso" block in Packer was updated to explicitly **include the `cloud-init` parameter,** and Terraform to include the "cloudinit" disk.
 
 #### Terraform apply and PoC result
 
@@ -1005,8 +1005,8 @@ So now the flow is complete. A VM template was created using Packer, VMs were pr
 
 This means:
 
-1. Configure all the **Proxmox settings** described in this post using either Ansible or any other automation tool (even a script).
-2. Configure **OPNsense** using Packer, Terraform and Ansible. A Packer template will be built using OPNsense's ISO, Terraform will be used to provision the OPNsense with the settings which were applied manually, and Ansible will be used to apply any configuration to it, including Firewall rules, DHCP, installing Packages, etc.
+1. Configuring all the **Proxmox settings** described in this post using either Ansible or any other automation tool (even a script).
+2. Configuring **OPNsense** using Packer, Terraform and Ansible. A Packer template will be built using OPNsense's ISO, Terraform will be used to provision the OPNsense with the settings which were applied manually, and Ansible will be used to apply any configuration to it, including Firewall rules, DHCP, installing Packages, etc.
 
 ## Conclusion
 
