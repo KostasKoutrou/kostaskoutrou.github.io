@@ -388,7 +388,7 @@ CRITICAL: Proxmox will show you the Token Secret **only** at the time of its cre
 
 To install Packer, the [official method](https://developer.hashicorp.com/packer/tutorials/docker-get-started/get-started-install-cli) resulted in some errors, and the method describe in this [stackoverflow post](https://stackoverflow.com/questions/75254685/gpg-error-https-apt-releases-hashicorp-com-bionic-inrelease-the-following-si) worked properly, which includes running the following commands and will be used to install Terraform, too.
 
-```
+```bash
 # Source - https://stackoverflow.com/a
 # Posted by Thilina Ashen Gamage
 # Retrieved 2026-01-28, License - CC BY-SA 4.0
@@ -451,7 +451,7 @@ Cloud-init grabs the `ubuntu.pkr.hcl` which is described next for instructions f
 
 But first, the `user-data` file is shown below:
 
-```
+```yaml
 #cloud-config
 autoinstall:
   version: 1
@@ -656,7 +656,7 @@ TCP connection for SSH
 
 To run packer, the following commands are used, executed at the path of `packer/ubuntu-2404/`:
 
-```
+```powershell
 packer init .
 packer validate -var-file="../credentials.pkrvars.hcl" . # To Validate the packer configuration before building
 packer build -var-file="../credentials.pkrvars.hcl" . # To Build the template
@@ -890,7 +890,7 @@ Some pitfalls and lessons learnt I met while setting up Terraform were the follo
 
 To run terraform, the following commands were used:
 
-```
+```bash
 terraform init # To initialize terraform
 terraform plan -var-file=../packer/credentials.pkrvars.hcl # To validate that the terraform config is ready to be applied.
 terraform apply -var-file=../packer/credentials.pkrvars.hcl # To apply the Terraform config and build the defined VMs.
@@ -936,14 +936,14 @@ For Ansible, the following files were created:
 
 `ansible/inventory.ini`: This file contains the list of machines with their IP addresses for Ansible to connect to them.
 
-```
+```ini
 [webservers]
 192.168.0.104 ansible_user=ubuntu
 ```
 
 `ansible/install_nginx.yml`: This file contains the state for this PoC of the configuration to be applied to the machines of inventory.ini. For the purposes of the PoC, only an Nginx server is installed on one of the two Linux Servers.
 
-```
+```yaml
 ---
 - name: Configure Webservers
   hosts: all
@@ -969,7 +969,7 @@ For Ansible, the following files were created:
 
 `ansible/ansible.cfg`: This file override the global Ansible settings:
 
-```
+```ini
 [defaults]
 inventory = ./inventory.ini
 host_key_checking = False
