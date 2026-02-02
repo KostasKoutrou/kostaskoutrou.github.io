@@ -489,6 +489,7 @@ In the `user-data` file, the `autoinstall` directive is the set of instructions 
 
 Let's look now at the `ubuntu.pkr.hcl` file:
 
+{% raw %}
 ```terraform
 packer {
   required_plugins {
@@ -555,7 +556,7 @@ source "proxmox-iso" "ubuntu-server" { #Resource type and local name
   boot_command = [
     "<esc><wait>", "e<wait>",
     "<down><down><down><end>",
-    " autoinstall cloud-config-url=http://{% raw %}{{ .HTTPIP }}{% endraw %}:{% raw %}{{ .HTTPPort }}{% endraw %}/user-data ds='nocloud-net;s=http://{% raw %}{{.HTTPIP}}{% endraw %}:{% raw %}{{.HTTPPort}}{% endraw %}/'",
+    " autoinstall cloud-config-url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/user-data ds='nocloud-net;s=http://{{.HTTPIP}}:{{.HTTPPort}}/'",
     "<f10>"
   ]
 
@@ -569,8 +570,8 @@ build {
   sources = ["source.proxmox-iso.ubuntu-server"]
 
   provisioner "shell" {
-    # execute_command = "echo ${var.ubuntu_pw}| sudo -S sh -c '{% raw %}{{ .Vars }}{% endraw %} {% raw %}{{ .Path }}{% endraw %}'"
-    execute_command = "echo ${var.ubuntu_pw}| {% raw %}{{.Vars}}{% endraw %} sudo -S -E sh -eux '{% raw %}{{.Path}}{% endraw %}'"
+    # execute_command = "echo ${var.ubuntu_pw}| sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
+    execute_command = "echo ${var.ubuntu_pw}| {{.Vars}} sudo -S -E sh -eux '{{.Path}}'"
     inline = [
       "echo 'Waiting for cloud-init to complete...'",
       "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Still waiting...'; sleep 2; done",
@@ -584,20 +585,23 @@ build {
   }
 }
 ```
+{% endraw %}
 
 This file is called the `Packer Template`, and include all the information for how to build the template. It includes:
 
+{% raw %}
 - The **required packer plugins** for this template. In this case, the Proxmox plugin is required only, to define the rest of the information and know how to communicate with the Proxmox API.
 - **Variable declaration to be used in the packer build** in the next lines of the file. Note here that at this point only the declaration of the variables is done. The actual value of the variables will be provided via the `credentials.pkrvars.hcl` file during the packer build execution.
 - The `source` block is the core logic. It defines the different values that the VM should have, like CPU cores, memory size, ssh settings, the ISO file to use, the VM name, where to install the VM in proxmox, etc. The values that are not explicitly defined here have default values set provided by the proxmox plugin.
   - `boot_command`: A very valuable part of the `source` block is the `boot_command`. In it, the actual keyboard presses for the installation are defined. With these boot commands, what is done is that the installation file is edited to pull the installation parameters from the `user-data` file described above. More specifically, it contains Linux Kernel Boot Parameters before the installation starts:
     - `autoinstall`: This tells the Ubuntu installer (Subiquity) to run in automated mode, instead of going through the manual installation process of selecting language etc.
-    - The variables {% raw %}{{ .HTTPIP }}{% endraw %} and {% raw %}{{ .HTTPPort }}{% endraw %}: these are the IP of the PC and the port that temporarily serves the `user-data` file.
+    - The variables {{ .HTTPIP }} and {{ .HTTPPort }}: these are the IP of the PC and the port that temporarily serves the `user-data` file.
     - `cloud-config-url`: This parameter tells the installer where the file of `user-data` is.
     - `ds`: This stands for "Data Source" and Cloud-init uses its contents:
       - `nocloud-net`: This tells Cloud-init that the data source is not Public cloud (Azure/AWS/GCP etc.) and to look at the local network for the file.
       - `s=`: This stand for "seed from". It tells Cloud-init where to find the `user-data` and `meta-data` (another file not used for this PoC) files.
 - The `build` block is the execution part of packer. The `source` block defines the VM, while the `build` block actually runs it. Here is where the [**Provisioners**](https://developer.hashicorp.com/packer/docs/provisioners) live, through which it is possible to execute actions on the machine image and configure it after booting. They can be used to install packages, patch the kernel, create users, download application code, etc. In the PoC, the `shell` provisioner is used to clean up the machine and reinitialize cloud-init so that it reruns during the Terraform provisioning of the VM (cloud-init runs only once on the machine unless its configuration is cleaned).
+{% endraw %}
 
 #### Packer pitfalls, solutions, and lessons learnt
 
@@ -610,6 +614,7 @@ Some tools that helped in troubleshooting Packer:
 
 Some **pitfalls and lessons** learnt I met while setting up packer were the following:
 
+{% raw %}
 1. **Proxmox 500 Error**: After enabling verbose mode in packer (by setting `$env:PACKER_LOG=1`), a repeated message of 500 "Qemu must be running to read the IP address of the machine" kept popping up. I thought this meant that something was wrong, but actually this is expected and Packer is actually waiting for Qemu guest agent to be installed so that it can read the VM's IP Address from proxmox so it can SSH to it. If it never moves that point, then the QEMU guest agent was not installed, or, most probably, the autoinstaller did not start.
 2. **The "Interactive Menu" problem**:
   - The issue: The VM kept reaching the manual language selection screen instead of starting the automated install.
@@ -642,10 +647,11 @@ TCP connection for SSH
 7. **sudo asking password on shell provisioner in packer**
   - The issue: When running the "shell" provisioner in Packer build, it asked for a manual input of the user password to execute the sudo commands.
   - The cause: the "shell" provisioner has a variable called `execute_command`. What shell provisioner does essential is that it converts all the commands provided to a script file, and then executes that script with a predetermined `execute_command`. This can be edited to satisfy any need.
-  - The solution: The `execute_command` value was changed to `"echo ${var.ubuntu_pw}| {% raw %}{{.Vars}}{% endraw %} sudo -S -E sh -eux '{% raw %}{{.Path}}{% endraw %}'"`, which pulls the password and inputs it for when sudo asks for it.
+  - The solution: The `execute_command` value was changed to `"echo ${var.ubuntu_pw}| {{.Vars}} sudo -S -E sh -eux '{{.Path}}'"`, which pulls the password and inputs it for when sudo asks for it.
 8. **Cloud-init status --wait not working in shell provisioner**
   - The issue: In the shell provisioner, when trying to clean up the cloud-init state, at first it was tried to run the "cloud-init status --wait" command, to wait for cloud-init to complete before reinitializing. This command would return status code 2 which means that the cloud-init process has not finished, while shell provisioner only accepts status code 0 as a "non-error" status code, so Packer would crash and mention this as an error.
   - The Solution: The /var/lib/cloud/instance/boot-finished file is now being checked instead to verify that cloud-init finished running.
+{% endraw %}
 
 #### Packer build and PoC result
 
