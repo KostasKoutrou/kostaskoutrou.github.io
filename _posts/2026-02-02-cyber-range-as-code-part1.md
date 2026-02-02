@@ -630,7 +630,7 @@ Some **pitfalls and lessons** learnt I met while setting up packer were the foll
   - The solution and lesson: Modern installers require more thant the default minimal resources to complete. Increase the values for 4 CPU cores and 4096MB memory resolved the issue.
 6. **SSH Handshake and authentication**
  - The issue: The OS installed successfully, but Packer failed to connect with the following repeating error:
-```
+```plaintext
 2026/01/26 10:59:47 packer-plugin-proxmox_v1.2.3_x5.0_windows_amd64.exe plugin: 2026/01/26 10:59:47 [INFO] Attempting SSH connection to 192.168.0.110:22...
 2026/01/26 10:59:47 packer-plugin-proxmox_v1.2.3_x5.0_windows_amd64.exe plugin: 2026/01/26 10:59:47 [DEBUG] reconnecting to 
 TCP connection for SSH
