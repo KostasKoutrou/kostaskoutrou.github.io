@@ -386,6 +386,34 @@ CRITICAL: Proxmox will show you the Token Secret **only** at the time of its cre
 
 #### Preparing packer
 
+To install Packer, the [official method](https://developer.hashicorp.com/packer/tutorials/docker-get-started/get-started-install-cli) resulted in some errors, and the method describe in this [stackoverflow post](https://stackoverflow.com/questions/75254685/gpg-error-https-apt-releases-hashicorp-com-bionic-inrelease-the-following-si) worked properly, which includes running the following commands and will also be used to install Terraform.
+
+```bash
+# Source - https://stackoverflow.com/a
+# Posted by Thilina Ashen Gamage
+# Retrieved 2026-01-28, License - CC BY-SA 4.0
+
+# GPG is required for the package signing key
+sudo apt install gpg
+
+# Download the signing key to a new keyring
+wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+# Verify the key's fingerprint
+gpg --no-default-keyring --keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg --fingerprint
+
+# The fingerprint must match 798A EC65 4E5C 1542 8C8E 42EE AA16 FCBC A621 E701, which can also be verified at https://www.hashicorp.com/security under "Linux Package Checksum Verification".
+
+# Add the HashiCorp repo
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+# apt update successfully
+sudo apt update
+
+sudo apt install packer
+sudo apt install terraform
+```
+
 To organize the Packer directory, a packer path was created, under which all the other files and directories were created.
 
 For the PoC, 2 Ubuntu VMs will be created. One will be under the `End user Zone` and the other under the `WAN Zone`. Because Packer creates ready-to-provision images, an image is to be created for every OS planned to be provisioned with Terraform. Therefore, under the `packer` path, a sub-path was created named `ubuntu-2404` for this purpose.
