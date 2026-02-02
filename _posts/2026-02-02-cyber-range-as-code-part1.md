@@ -489,7 +489,7 @@ In the `user-data` file, the `autoinstall` directive is the set of instructions 
 
 Let's look now at the `ubuntu.pkr.hcl` file:
 
-```
+```terraform
 packer {
   required_plugins {
     name = {
@@ -724,7 +724,7 @@ For terraform, the following files were created:
 
 The `terraform/variables.tf` file contains **variables to be used by terraform**:
 
-```
+```terraform
 variable "proxmox_api_url" {
     type = string
     description = "The URL for the Proxmox API (e.g., https://192.168.0.50:8006/api2/json)"
@@ -745,7 +745,7 @@ variable "proxmox_api_token_secret" {
 
 The `terraform/provider.tf` file contains information regarding **what provider terraform will connect to** (AWS, Azure Google Cloud, Proxmox, etc. - In our case it is proxmox, using the [Telmate/proxmox](https://registry.terraform.io/providers/Telmate/proxmox/latest/docs) provider), as well as **the configuration to connect to the provider**. The variables for the provider are pulled from the `terraform/variables.tf` definitions. The execution of `terraform apply` is where the source and the actual values of the varaibles will be defined.
 
-```
+```terraform
 terraform {
   required_providers {
     proxmox = {
@@ -764,7 +764,7 @@ provider "proxmox" {
 }
 ```
 
-The `terraform/main.tf` file contains **the blocks of what exactly to build**. In our case of building 2 test Ubuntu servers using the tempalte built by Packer, the main.tf looks like this:
+The `terraform/main.tf` file contains **the blocks of what exactly to build**. In our case of building 2 test Ubuntu servers using the template built by Packer, the main.tf looks like this:
 
 ```terraform
 resource "proxmox_vm_qemu" "test_server" { # Resource type and resource name
