@@ -932,14 +932,54 @@ Then, in the Terraform main.tf file, the public key was added to one of the mach
 
 For Ansible, the following files were created:
 
-`ansible/inventory.ini`
+`ansible/inventory.ini`: This file contains the list of machines with their IP addresses for Ansible to connect to them.
 
 ```
 [webservers]
 192.168.0.104 ansible_user=ubuntu
 ```
 
+`ansible/install_nginx.yml`: This file contains the state for this PoC of the configuration to be applied to the machines of inventory.ini.
+
+```yaml
+---
+- name: Configure Webservers
+  hosts: all
+  become: true #sudo
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+
+    - name: Start Nginx service
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+```
+
+`ansible/ansible.cfg`: This file override the global Ansible settings:
+
+```
+[defaults]
+inventory = ./inventory.ini
+host_key_checking = False
+```
+
+The ansible.cfg file had to be set by setting the environment variable (because we are running with WSL): `export ANSIBLE_CONFIG=./ansible.cfg`. To confirm, run `ansible --version`, which should show the `config file`:
+
+<img width="787" height="171" alt="image" src="https://github.com/user-attachments/assets/7ac8a653-ee6a-4c07-82fa-f6b17f0a801e" />
+
 #### Running Ansible
+
+To run Ansible with the configuration defined above, the following command was run: `ansible-playbook install_nginx.yml`
 
 
 
