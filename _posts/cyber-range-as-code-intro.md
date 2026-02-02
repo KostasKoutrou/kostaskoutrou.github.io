@@ -644,6 +644,13 @@ TCP connection for SSH
 2026/01/26 10:59:47 packer-plugin-proxmox_v1.2.3_x5.0_windows_amd64.exe plugin: 2026/01/26 10:59:47 [DEBUG] Detected authentication error. Increasing handshake attempts.
 ```
   - The cause and resolution: the `ssh_password` value in the packer template is used for this connection, and was not initially defined. Upon its definition, the issue was resolved.
+7. sudo asking password on shell provisioner in packer.
+  - The pitfall: When running the "shell" provisioner in Packer build, it asked for a manual input of the user password to execute the sudo commands.
+  - The cause: the "shell" provisioner has a variable called `execute_command`. What shell provisioner does essential is that it converts all the commands provided to a script file, and then executes that script with a predetermined `execute_command`. This can be edited to satisfy any need.
+  - The solution: The `execute_command` value was changed to `"echo ${var.ubuntu_pw}| {{.Vars}} sudo -S -E sh -eux '{{.Path}}'"`, which pulls the password and inputs it for when sudo asks for it.
+8. Cloud-init status --wait not working in shell provisioner
+  - The Pitfall: In the shell provisioner, when trying to clean up the cloud-init state, at first it was tried to run the "cloud-init status --wait" command, to wait for cloud-init to complete before reinitializing. This command would return status code 2 which means that the cloud-init process has not finished, while shell provisioner only accepts status code 0 as a "non-error" status code, so Packer would crash and mention this as an error.
+  - The Solution: The /var/lib/cloud/instance/boot-finished file is now being checked instead to verify that cloud-init finished running.
 
 #### Packer build and PoC result
 
@@ -734,7 +741,7 @@ variable "proxmox_api_token_secret" {
 }
 ```
 
-The `terraform/provider.tf` files contains information regarding what provider terraform will connect to (AWS, Azure Google Cloud, Proxmox, etc. - In our case it is proxmox), as well as the configuration to connect to the provider. The variables for the provider are pulled from the `terraform/variables.tf` definitions. The execution of `terraform apply` is where the source and the actual values of the varaibles will be defined.
+The `terraform/provider.tf` file contains information regarding what provider terraform will connect to (AWS, Azure Google Cloud, Proxmox, etc. - In our case it is proxmox, using the [Telmate/proxmox](https://registry.terraform.io/providers/Telmate/proxmox/latest/docs) provider), as well as the configuration to connect to the provider. The variables for the provider are pulled from the `terraform/variables.tf` definitions. The execution of `terraform apply` is where the source and the actual values of the varaibles will be defined.
 
 ```terraform
 terraform {
@@ -755,21 +762,186 @@ provider "proxmox" {
 }
 ```
 
+The `terraform/main.tf` file contains the blocks of what exactly to build. In our case of building 2 test Ubuntu servers using the tempalte built by Packer, the main.tf looks like this:
+
+```terraform
+resource "proxmox_vm_qemu" "test_server" { # Resource type and resource name
+    name = "terraform-vm-01" # Name of the VM
+    target_node = "kkproxmox" # Proxmox node to build the VM on
+
+    clone = "ubuntu-2404-template" # Clone the ubuntu template built by Packer
+
+    agent = 1 #enable QEMU guest agent
+    
+    cpu {
+        cores = 2
+        sockets = 1
+        type = "host"
+    }
+    memory = 2048
+    scsihw = "virtio-scsi-pci"
+    # bootdisk = "scsi0"
+
+    # This is addeded to the default ciuser "ubuntu". "ssh-keygen -t rsa" was used to generate the key pair. This is needed for Ansible to SSH with.
+    sshkeys = "${file("~/.ssh/id_rsa.pub")}"
+
+    disk { # The cloudinit disk needs to be defined explicitly for it to be mounted temporarily for cloud-init to run.
+        slot    = "ide0"
+        type    = "cloudinit"
+        storage = "local-lvm"
+    }
+
+    disk {
+        slot = "scsi0"
+        size = "20G"
+        type = "disk"
+        storage = "local-lvm"
+        format = "raw"
+    }
+
+    startup_shutdown { # These were defined because these are the values that Proxmox puts on the VMs by default while Terraform tried to put different values, so every time that "terraform apply" would run, it would try to change them, for Proxmox to change them back right after.
+        order = -1
+        shutdown_timeout = -1
+        startup_delay = -1
+    }
+
+    network { # This VM connects to the WAN Zone Linux Bridge
+        id = 0
+        model = "virtio"
+        bridge = "vmbr0"
+    }
+
+    os_type = "cloud-init" # This is used together with the "cloudinit" disk to apply the cloud-init related configuration (the following commands).
+    ipconfig0 = "ip=dhcp" # get IP from the DHCP
+    skip_ipv6 = true # do not get IPv6
+}
+
+resource "proxmox_vm_qemu" "test_server1" { # the 2nd VM
+    name = "terraform-vm-02" # Name of the VM
+    target_node = "kkproxmox" # Proxmox node to build the VM on
+
+    clone = "ubuntu-2404-template" # Clone the ubuntu template built by Packer
+
+    agent = 1 #enable QEMU guest agent
+    
+    cpu {
+        cores = 2
+        sockets = 1
+        type = "host"
+    }
+    memory = 2048
+    scsihw = "virtio-scsi-pci"
+    # bootdisk = "scsi0"
+
+    disk { # The cloudinit disk needs to be defined explicitly for it to be mounted temporarily for cloud-init to run.
+        slot    = "ide0"
+        type    = "cloudinit"
+        storage = "local-lvm"
+    }
+
+    disk {
+        slot = "scsi0"
+        size = "20G"
+        type = "disk"
+        storage = "local-lvm"
+        format = "raw"
+    }
+
+    startup_shutdown { # These were defined because these are the values that Proxmox puts on the VMs by default while Terraform tried to put different values, so every time that "terraform apply" would run, it would try to change them, for Proxmox to change them back right after.
+        order = -1
+        shutdown_timeout = -1
+        startup_delay = -1
+    }
+
+    network { # This VM connects to the End User Zone Linux Bridge
+        id = 0
+        model = "virtio"
+        bridge = "vmbrEUZ40"
+    }
+
+    os_type = "cloud-init" # This is used together with the "cloudinit" disk to apply the cloud-init related configuration (the following commands).
+    ipconfig0 = "ip=dhcp" # get IP from the DHCP
+    skip_ipv6 = true # do not get IPv6
+}
+```
 
 #### Terraform pitfalls, solutions, and lessons learnt
 
+Some pitfalls and lessons learnt I met while setting up Terraform were the following:
 
+1.	Stale Cloud-Init State
+ - The Symptom: After deploying a VM with Terraform, Proxmox showed the correct name (e.g., terraform-vm-01), but the internal OS console still showed the template's original name (ubuntu-server). The VM ignored the new configuration.
+ - The Cause: cloud-init is designed to run only once. During the Packer build process, cloud-init ran to set up the initial template and left a "marker file" indicating it was finished. When the template was cloned via Terraform, the new VM saw the marker and immediately went back to sleep, ignoring the new instructions from Terraform.
+ - The Fix: A "cleanup" shell provisioner was added at the end of the Packer configuration (ubuntu.pkr.hcl), which runs the command `cloud-init clean --logs --machine-id --seed --configs all` to fully reinitialized the cloud-init status.
+ - The Lesson: Templates must be stateless. If the state is not reset before saving a template, every clone will wake up thinking it has already been configured.
+2. Duplicate Machine IDs
+ - The Symptom (Potential): While fixing the previous issue, a risk was identified where multiple VMs might end up with the same IP address from the DHCP server.
+ - The Cause: Linux generates a unique /etc/machine-id upon installation. If this isn't reset during the Packer build, every clone shares the same ID, causing network conflicts.
+ - The Fix: In the `cloud-init clean` command in Packer, the flag `--machine-id` was added to reset the machine id as well.
+ - The Lesson: Simply changing a hostname isn't enough. Unique system identifiers (GUIDs, Machine IDs) must be regenerated for every new instance to avoid collisions on the network level.
+4.	No Cloud-Init Drive
+ - The Symptom: Terraform was successfully creating the VM resource, but the OS configuration (hostname, user data) was never applied. When manually mounting a Cloud-Init drive fixed this issue.
+ - The Cause: The Packer template was missing the `cloud_init = true` instruction. Consequently, the template was created without a Cloud-Init drive. Without this drive, Terraform had no physical medium to insert the configuration data for the OS to read. Additionally, in the Terraform main.tf file, the "cloudinit" was also needed to be explicitly defined.
+ - The Fix: We updated the source "proxmox-iso" block in Packer to explicitly include the cloud-init parameter, and Terraform to include the "cloudinit" disk.
 
-#### Terraform apply and PoCresult
+#### Terraform apply and PoC result
+
+To run terraform, the following commands were used:
+
+```bash
+terraform init # To initialize terraform
+terraform plan -var-file=../packer/credentials.pkrvars.hcl # To validate that the terraform config is ready to be applied.
+terraform apply -var-file=../packer/credentials.pkrvars.hcl # To apply the Terraform config and build the defined VMs.
+```
+
+The `credentials.pkrvars.hcl` file was used as the var-file, because it contains the same info required for Terraform to run.
+
+Unlike Packer, Terraform was run in WSL, because the ssh key defined in the Terraform `main.tf` file will be used by Ansible in the next step, and Ansible cannot be run in Windows, only in Linux.
+
+Running `terraform init` results in the following:
+
+<img width="565" height="275" alt="image" src="https://github.com/user-attachments/assets/a0dcbe99-67c6-485c-b3db-5b8faaf158d8" />
+
+Running `terraform plan -var-file="../packer/credentials.pkrvars.hcl"` results many lines which show the configuration to be applied. Below is a screenshot of part of the output:
+
+<img width="975" height="601" alt="image" src="https://github.com/user-attachments/assets/7a5b9108-aeb8-46e5-b9ca-1a66b3a9fee5" />
+
+Running the `terraform apply -var-file="../packer/credentials.pkrvars.hcl"` shows the same information as the `terraform plan`, which is the configuration to be applied, and asks for confirmation in the end. After typing "yes", the VMs are being provisioned, and the final output is the following:
+
+<img width="593" height="523" alt="image" src="https://github.com/user-attachments/assets/f34fb350-5e3e-4e79-ad68-2372d76f4987" />
+
+After 2 minutes, in Proxmox we can see the provisioned VMs up and runnning:
+
+<img alt="image" src="https://github.com/user-attachments/assets/dc1a165b-e520-4022-ab24-bec391d18158" />
+
+Now that the VMs are provisioned, the next step is to apply further configurations using Ansible.
 
 ### Ansible
 
-#### Ansible pitfalls, solutions, and lessons learnt
+Ansible cannot be run in Windows PowerShell, so WSL was used.
+
+To install Ansible, use `sudo apt install ansible`
+
+Ansible uses ssh keys to SSH to machine and apply configurations. To generated the ssh key pair, run `ssh-keygen -t rsa`:
+
+<img width="808" height="605" alt="image" src="https://github.com/user-attachments/assets/ed8b1b3b-7b85-4118-a156-09add815c186" />
+
+Then, in the Terraform main.tf file, the public key was added to one of the machines:
+
+`sshkeys = "${file("~/.ssh/id_rsa.pub")}"`
+
+For Ansible, the following files were created:
+
+`ansible/inventory.ini`
+
+```
+[webservers]
+192.168.0.104 ansible_user=ubuntu
+```
+
+#### Running Ansible
 
 
-IaC PoC
-packer/terraform/ansible
-with pitfalls.
 
 ## Next Steps
 
