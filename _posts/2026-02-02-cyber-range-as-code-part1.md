@@ -388,7 +388,7 @@ CRITICAL: Proxmox will show you the Token Secret **only** at the time of its cre
 
 To install Packer, the [official method](https://developer.hashicorp.com/packer/tutorials/docker-get-started/get-started-install-cli) resulted in some errors, and the method describe in this [stackoverflow post](https://stackoverflow.com/questions/75254685/gpg-error-https-apt-releases-hashicorp-com-bionic-inrelease-the-following-si) worked properly, which includes running the following commands and will be used to install Terraform, too.
 
-```bash
+```
 # Source - https://stackoverflow.com/a
 # Posted by Thilina Ashen Gamage
 # Retrieved 2026-01-28, License - CC BY-SA 4.0
@@ -451,7 +451,7 @@ Cloud-init grabs the `ubuntu.pkr.hcl` which is described next for instructions f
 
 But first, the `user-data` file is shown below:
 
-```yaml
+```
 #cloud-config
 autoinstall:
   version: 1
@@ -489,7 +489,7 @@ In the `user-data` file, the `autoinstall` directive is the set of instructions 
 
 Let's look now at the `ubuntu.pkr.hcl` file:
 
-```hcl
+```
 packer {
   required_plugins {
     name = {
@@ -745,7 +745,7 @@ variable "proxmox_api_token_secret" {
 
 The `terraform/provider.tf` file contains information regarding **what provider terraform will connect to** (AWS, Azure Google Cloud, Proxmox, etc. - In our case it is proxmox, using the [Telmate/proxmox](https://registry.terraform.io/providers/Telmate/proxmox/latest/docs) provider), as well as **the configuration to connect to the provider**. The variables for the provider are pulled from the `terraform/variables.tf` definitions. The execution of `terraform apply` is where the source and the actual values of the varaibles will be defined.
 
-```hcl
+```
 terraform {
   required_providers {
     proxmox = {
@@ -766,7 +766,7 @@ provider "proxmox" {
 
 The `terraform/main.tf` file contains **the blocks of what exactly to build**. In our case of building 2 test Ubuntu servers using the tempalte built by Packer, the main.tf looks like this:
 
-```hcl
+```
 resource "proxmox_vm_qemu" "test_server" { # Resource type and resource name
     name = "terraform-vm-01" # Name of the VM
     target_node = "kkproxmox" # Proxmox node to build the VM on
@@ -890,7 +890,7 @@ Some pitfalls and lessons learnt I met while setting up Terraform were the follo
 
 To run terraform, the following commands were used:
 
-```bash
+```
 terraform init # To initialize terraform
 terraform plan -var-file=../packer/credentials.pkrvars.hcl # To validate that the terraform config is ready to be applied.
 terraform apply -var-file=../packer/credentials.pkrvars.hcl # To apply the Terraform config and build the defined VMs.
@@ -936,14 +936,14 @@ For Ansible, the following files were created:
 
 `ansible/inventory.ini`: This file contains the list of machines with their IP addresses for Ansible to connect to them.
 
-```ini
+```
 [webservers]
 192.168.0.104 ansible_user=ubuntu
 ```
 
 `ansible/install_nginx.yml`: This file contains the state for this PoC of the configuration to be applied to the machines of inventory.ini. For the purposes of the PoC, only an Nginx server is installed on one of the two Linux Servers.
 
-```yaml
+```
 ---
 - name: Configure Webservers
   hosts: all
@@ -969,7 +969,7 @@ For Ansible, the following files were created:
 
 `ansible/ansible.cfg`: This file override the global Ansible settings:
 
-```ini
+```
 [defaults]
 inventory = ./inventory.ini
 host_key_checking = False
