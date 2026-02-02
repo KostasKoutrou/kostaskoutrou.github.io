@@ -712,6 +712,8 @@ For simplicity, the same user used in Packer is used for Terraform. Therefore, t
 - VM.PowerMgmt
 - SDN.Use
 
+#### Preparing Terraform
+
 To organize the Terraform directory, a `terraform` path was created, under which all the other files and directories were created.
 
 **For the PoC, 2 Ubuntu VMs will be created**. One will be under the `End user Zone` and the other under the `WAN Zone`.
