@@ -6,7 +6,7 @@ What is a Cyber Range?
 
 > A [Cyber Range](https://www.ibm.com/think/topics/cyber-range) is a virtual environment for cybersecurity training, testing, and research that simulates real-world networks and cyberattacks.
 
-I always wanted to build a security homelab, where I will have the freedom and the infrastructure to build, secure, attack, monitor, and defend an full-on infrastructure. At the same time, I want to build all of this "as code". I really believe is converting everything as code, because this approach solves many issues of manual work, like manual maintenance, configuration drift, complex change history, and no version control. It also facilitates the ability to rebuild the infrastructure as quickly as possible. I was thinking of naming this project "Security Playground" at first or something like that, but I thought "Cyber Range as Code" was more catchy and it grasped the two main concepts that I want to focus at for this project.
+I always wanted to build a security homelab, where I will have the freedom and the infrastructure to build, secure, attack, monitor, and defend a full-on infrastructure. At the same time, I want to build all of this "as code". I really believe in converting everything as code, because this approach solves many issues of manual work, like manual maintenance, configuration drift, complex change history, and no version control. It also facilitates the ability to rebuild the infrastructure as quickly as possible. I was thinking of naming this project "Security Playground" at first or something like that, but I thought "Cyber Range as Code" was more catchy and it grasped the two main concepts that I want to focus on for this project.
 
 The end goal of this project is to **build and maintain a real-world infrastructure** to:
 
@@ -15,9 +15,9 @@ The end goal of this project is to **build and maintain a real-world infrastruct
   - Review the generated logs to understand what happened on the backend, what could be detected and created as a detection rule
 - Implement **security standards** like ISO27001, NIS2, NIST, and CIS
 - **Architect a secure infrastructure**: This will be a never ending goal, as, even in a relatively simple infrastructure like the one which will be built under this project, there always is something to improve in terms of security architecture.
-- **Recover seamlessly**: **All the infrastructure must be deployed automatically**. The end goal is if it is ever wanted to deploy the infrastructure on a new server, the deployment will be done with the minimum number of manual work. This is where **the project leans heavily into IaC**, as it will be explained more in the next sections.
+- **Recover seamlessly**: **All the infrastructure must be deployed automatically**. The end goal is seamless recovery: If it is ever needed to redeploy the infrastructure on a new server, it can be done with the minimum number of manual effort. This is where **the project leans heavily into IaC**, as it will be explained more in the next sections.
 
-This project covers a lot of concepts about IaC, security hardening, security standards, blue teaming, and red teaming. Hopefully the end result will allow other security professionals deploy this infrastructure and easily get to security testing.
+This project covers a lot of concepts about IaC, security hardening, security standards, blue teaming, and red teaming. Hopefully the end result will allow other security professionals to deploy this infrastructure and easily get to security testing.
 
 In this first post, a **high level design** of the end result is described, of the **tech stack** that is planned to be used, as well as **an early PoC** regarding the infrastructure and its deployment using IaC.
 
@@ -51,7 +51,7 @@ As mentioned above, one core aspect of this project is to be able to **have the 
       - Terraform must not use the default OS users to perform actions.
       - Specific fields in Terraform must not be left empty.
       - Every VM must have a description field explaining its purpose.
-  PaC will something that will be implemented at a later phase of the project, after the IaC phase is at a mature state.
+  PaC is something that will be implemented at a later phase of the project, after the IaC phase is at a mature state.
 - **Detection as Code (DaC)**: [DaC](https://www.legitsecurity.com/aspm-knowledge-base/detection-as-code) enables the writing, maintenance, and automation of the threat detection logic as if it were software code, making security a built-in part of the development pipeline. Similar to PaC, DaC will start being implemented at a later phase of the project.
 
 ## Tech stack
@@ -62,13 +62,13 @@ The following technologies, for now, are strong contenders to be deployed. Since
 
 - [**Proxmox**](https://www.proxmox.com/en/): The whole infrastructure will be deployed on a physical server running Proxmox Virtual Environment (PVE) as a Type-1 Hypervisor. The infrastructure will be built with VMs and Containers.
 - For the **IaC** aspect, the following 3 tools will be used:
-  - [**Packer**](https://developer.hashicorp.com/packer): Packer is a community tool for **creating identical machine images** for multiple platforms from a single source configuration. What Packer essentially does is
-  1. it takes an ISO file of an OS
-  2. installs it on a temporary VM
-  3. applies any defined action during the installation (language, locale, hard disk to install the OS, etc.)
-  4. applies any configuration defined (e.g., IP address)
-  5. installs any package defined and
-  6. converts that VM to a template.
+  - [**Packer**](https://developer.hashicorp.com/packer): Packer is a community tool for **creating identical machine images** for multiple platforms from a single source configuration. Essential, Packer:
+  1. Takes an ISO file of an OS
+  2. Installs it on a temporary VM
+  3. Applies any defined action during the installation (language, locale, hard disk to install the OS, etc.)
+  4. Applies any configuration defined (e.g., IP address)
+  5. Installs any package defined and
+  6. Converts that VM to a template.
     That template is made for the platform on which the temporary VM was created on. In the case of this project, since the VM is created in Proxmox, the template will be a Proxmox VM template. **This template is then used by Terraform to provision VMs which will have that configuration ready immediately**. Packer provides the freedom of utilizing any ISO and converting it to a template exactly for the needs of the task at hand.
   - [**Terraform**](https://developer.hashicorp.com/terraform): HashiCorp Terraform is an **infrastructure as code tool** that enables the definition of both cloud and on-prem resources in human-readable configuration files that can be versioned, reused, and shared. Terraform can manage low-level components like compute, storage, and networking resources, as well as high-level components like DNS entries and SaaS features. **In the context of the project, the templates created by Packer will used by Terraform to provision all the infrastructure defined**. Note here that many of the configurations of the template defined by Packer can be changed during the provisioning by Terraform (e.g., RAM, CPU cores, installed packages, etc.), which provides more freedom during provisioning. But with Packer the benefit with the resulting template is that there is no need to install the packages already installed and execute any time consuming action every time a new VM is provisioned, because it was already done during the Packer VM template creation.
   - [**Ansible**](https://docs.ansible.com/): Ansible is an automation language which allows for automating essentially any IT task. **For the project, Ansible is used for further configuring all the VMs provisioned by Terraform**, like installing additional packages, starting services, connections, etc. Ansible uses SSH or WinRM to execute remote commands on machines. One of the benefits of Ansible is what is called **Idempotency**. This means that Ansible only makes changes if necessary, preventing unintended side effects. An Ansible playbook is written in YAML, and in a playbook the final desired state of the target machine is described. Then it is up to Ansible to make any changes or no changes depending on whether the target machine already has the final desired state.
@@ -96,9 +96,9 @@ The following technologies, for now, are strong contenders to be deployed. Since
     - File extraction with [Zeek](https://zeek.org/) or Suricata
     - Full packet capture with [Stenographer](https://docs.securityonion.net/en/2.4/stenographer.html)
     - File analysis with [Strelka](https://github.com/target/strelka)
-    - Host visibiltiy with [Elastic agent](https://www.elastic.co/elastic-agent)
+    - Host visibility with [Elastic agent](https://www.elastic.co/elastic-agent)
     - Centralized management with [Elastic Fleet](https://www.elastic.co/docs/reference/fleet)
-- [**ModSecurity**](https://modsecurity.org/) + [**OWASP Core Rule Set (CRS)**](https://coreruleset.org/): ModSecurity is an open source cross-platform **Web Application Firewall (WAF)**. Since its version 3 release, it now works as a standalone module which provies the capability to load/interpret rules written in the ModSecurity SecRules format and apply them to HTTP content provided by the web application via ModSecurity Connectors. This will prove useful, since in its previous module it worked as an Apache module only, while now it is more independent of the web server solution that it protects. ModSecurity on its own does not provide detection/protection rules. The OWASP CRS is a set of generic attack detection rules to be used with ModSecurity.
+- [**ModSecurity**](https://modsecurity.org/) + [**OWASP Core Rule Set (CRS)**](https://coreruleset.org/): ModSecurity is an open source cross-platform **Web Application Firewall (WAF)**. Since its version 3 release, it now works as a standalone module which provides the capability to load/interpret rules written in the ModSecurity SecRules format and apply them to HTTP content provided by the web application via ModSecurity Connectors. This will prove useful, since in its previous module it worked as an Apache module only, while now it is more independent of the web server solution that it protects. ModSecurity on its own does not provide detection/protection rules. The OWASP CRS is a set of generic attack detection rules to be used with ModSecurity.
 - The Actual **Infrastructure** that will be secured and attacked will include:
   - **Linux servers**:
     - [**DVWA**](https://github.com/digininja/DVWA): Damn Vulnerable Web Application (DVWA) is a PHP/MariaDB web application which **can be configured to be vulnerable against different types of web-based attacks**. This will be used for simulating attacks, as well as attempting to protect the application with different measures even though it is vulnerable.
@@ -125,7 +125,7 @@ The following technologies, for now, are strong contenders to be deployed. Since
 
 ## Architecture
 
-The initial infrastrcuture architecture is the following. It is important to note here that this is the initial architecture idea, it is not final, and there may very well be changes during implementation.
+The initial infrastructure architecture is the following. It is important to note here that this is the initial architecture idea, it is not final, and there may very well be changes during implementation.
 
 ![NetworkDesign-FW Rules drawio](https://github.com/user-attachments/assets/daeb1cd9-9816-49d0-874e-2836c15d9d86)
 
@@ -137,13 +137,13 @@ As shown above, the architecture is a relatively simple and typical network infr
       - Any internal servers, e.g., SQL Servers and AD DC, hosting and serving information which is destined to be consumed by internal resources only.
       - Security Tools, including the SIEM/XDR/Monitoring tools.
   3. **End Users**: The last zone will be for the End Users, where typical workstation VMs will reside, and have defined access to specific servers/services and to the internet.
-  4. **WAN Zone**: This is there the "Internet", in the context of the Infrastructure, lives. This is where:
+  4. **WAN Zone**: This is where the "Internet", in the context of the Infrastructure, lives. This is where:
       - The PC from which the Proxmox management will be done, running the Packer, Terraform, and Ansible.
       - The External Attacks will occur from.
 
 ## Initial Configuration / PoC
 
-In this section, **an initial configuration of the infrastructure is described, with only the bare minimum of components**, as well as a **PoC of the infrastructure** working as described in the previous sections, i.e., with IaC practictes.
+In this section, **an initial configuration of the infrastructure is described, with only the bare minimum of components**, as well as a **PoC of the infrastructure** working as described in the previous sections, i.e., with IaC practices.
 
 ### Proxmox Configuration
 
@@ -187,7 +187,7 @@ In the above screenshot this structure is depicted. More specifically, there is:
 - **Proxmox VE Nodes (Host)**: The "kkproxmox" node is the physical server running the Proxmox VE.
 - **VMs under each Proxmox VE Node**: Under each Proxmox VE node, the different resources deployed are listed. This includes VMs, VM templates, storage, network, etc.
 
-The Proxmox VE firewall groups the network into the above **logical zones** (there is also a zone relatedto SDN which is out of scope for this PoC). The firewall as a functionality can be enabled on any of the zones described above. For example, if the firewall is needed to be enabled on a VM, then the firewall needs to be enabled on the Datacenter, the Proxmox node hosting that VM, the VM itself, and on each virtual network interface of that VM. Also, when a firewall rule is create on one of the levels described above, it applies to all the levels under it. For example, if a rule is create on the Proxmox VE Node, then it applies to all the VMs under that Node.
+The Proxmox VE firewall groups the network into the above **logical zones** (there is also a zone related to SDN which is out of scope for this PoC). The firewall as a functionality can be enabled on any of the zones described above. For example, if the firewall is needed to be enabled on a VM, then the firewall needs to be enabled on the Datacenter, the Proxmox node hosting that VM, the VM itself, and on each virtual network interface of that VM. Also, when a firewall rule is created on one of the levels described above, it applies to all the levels under it. For example, if a rule is create on the Proxmox VE Node, then it applies to all the VMs under that Node.
 
 In Proxmox, firewall rules can be defined for different directions:
 
@@ -205,7 +205,7 @@ Firstly, on the **Datacenter** zone, Aliases were created for the private subnet
 
 Two `Security Groups` were then created, which contain groups of firewall rules, which can be enforced on any zone afterwards, for easier application to multiple zones.
 
-The first `Security Group` is the following, and contains rules to allow access to the management IP of OPNsense (the creation of which is decribed on a later section), and to reject traffic to the local subnet of the home network. This is to isolate the infrastructure from being able to reach out to the local subnet directly. Access to the internet is still allowed. The rule No. 0 was created to allow access to the management IP of Proxmox, but it was found that the are [Default firewall rules](https://pve.proxmox.com/pve-docs/pve-admin-guide.html#pve_firewall_default_rules), one of which allows this specific traffic, so it the rule is now disabled.
+The first `Security Group` is the following, and contains rules to allow access to the management IP of OPNsense (the creation of which is decribed on a later section), and to reject traffic to the local subnet of the home network. This is to isolate the infrastructure from being able to reach out to the local subnet directly. Access to the internet is still allowed. Rule No. 0 was initially created to allow access to the Proxmox management IP, but it was later found that Proxmox includes [Default firewall rules](https://pve.proxmox.com/pve-docs/pve-admin-guide.html#pve_firewall_default_rules) that already permit this traffic, so the rule is now disabled.
 
 <img alt="image" src="https://github.com/user-attachments/assets/c20b282f-9d3d-4619-a04e-6b94ac85624d" />
 
@@ -414,7 +414,7 @@ sudo apt install packer
 sudo apt install terraform
 ```
 
-However, because I am currently running bash via Windows Sybsystem for Linux (WSL), it is difficult to grab the IP address of the physical PC, which makes packer fail when opening the temporary web server to give the `user-data` file. Therefore, for this iteration we are running Packer on Windows, and for the next phase we will probably add the `user-data` file to Proxmox directly for more seamless implementation.
+However, because I am currently running bash via Windows Subsystem for Linux (WSL), it is difficult to grab the IP address of the physical PC, which makes packer fail when opening the temporary web server to give the `user-data` file. Therefore, for this iteration we are running Packer on Windows, and for the next phase we will probably add the `user-data` file to Proxmox directly for more seamless implementation.
 
 To install Packer for windows, you just download it from [here](https://developer.hashicorp.com/packer/install), unzip it, and add the path of the exe to the Path environment variable of the PC:
 
@@ -597,7 +597,7 @@ This file is called the `Packer Template`, and include all the information for h
     - `ds`: This stands for "Data Source" and Cloud-init uses its contents:
       - `nocloud-net`: This tells Cloud-init that the data source is not Public cloud (Azure/AWS/GCP etc.) and to look at the local network for the file.
       - `s=`: This stand for "seed from". It tells Cloud-init where to find the `user-data` and `meta-data` (another file not used for this PoC) files.
-- The `build` block is the execution part of packer. The `source` block defines the VM, while the `build` block actually runs it. Here is where the [**Provisioners**](https://developer.hashicorp.com/packer/docs/provisioners) live, through which it is possible to execute actions on the machine image and configure it after booting. They can be used to install packages, patch the kernel, create users, donwload application code, etc. In the PoC, the `shell` provisioner is used to clean up the machine and reinitialize cloud-init so that it reruns during the Terraform provisioning of the VM (cloud-init runs only once on the machine unless its configuration is cleaned).
+- The `build` block is the execution part of packer. The `source` block defines the VM, while the `build` block actually runs it. Here is where the [**Provisioners**](https://developer.hashicorp.com/packer/docs/provisioners) live, through which it is possible to execute actions on the machine image and configure it after booting. They can be used to install packages, patch the kernel, create users, download application code, etc. In the PoC, the `shell` provisioner is used to clean up the machine and reinitialize cloud-init so that it reruns during the Terraform provisioning of the VM (cloud-init runs only once on the machine unless its configuration is cleaned).
 
 #### Packer pitfalls, solutions, and lessons learnt
 
@@ -631,7 +631,7 @@ Some **pitfalls and lessons** learnt I met while setting up packer were the foll
 5. **Hardware resource constraints**
   - The issue: The installation appeared to hang or move extremely slowly without showing errors.
   - The cause: Initially the default memory and CPU values were left in the packer template file, which means 1 CPU core and 512MB memory. Especially for the memory size, this is a very low value for an installation of Ubuntu server.
-  - The solution and lesson: Modern installers require more thant the defualt minimal resources to complete. Increase the values for 4 CPU cores and 4096MB memory resolved the issue.
+  - The solution and lesson: Modern installers require more thant the default minimal resources to complete. Increase the values for 4 CPU cores and 4096MB memory resolved the issue.
 
 6. **SSH Handshake and authentication**
  - The issue: The OS installed successfully, but Packer failed to connect with the following repeating error:
@@ -656,7 +656,7 @@ TCP connection for SSH
 
 To run packer, the following commands are used, executed at the path of `packer/ubuntu-2404/`:
 
-```bash
+```
 packer init .
 packer validate -var-file="../credentials.pkrvars.hcl" . # To Validate the packer configuration before building
 packer build -var-file="../credentials.pkrvars.hcl" . # To Build the template
@@ -724,7 +724,7 @@ For terraform, the following files were created:
 
 The `terraform/variables.tf` file contains **variables to be used by terraform**:
 
-```hcl
+```
 variable "proxmox_api_url" {
     type = string
     description = "The URL for the Proxmox API (e.g., https://192.168.0.50:8006/api2/json)"
@@ -784,7 +784,7 @@ resource "proxmox_vm_qemu" "test_server" { # Resource type and resource name
     scsihw = "virtio-scsi-pci"
     # bootdisk = "scsi0"
 
-    # This is addeded to the default ciuser "ubuntu". "ssh-keygen -t rsa" was used to generate the key pair. This is needed for Ansible to SSH with.
+    # This is added to the default ciuser "ubuntu". "ssh-keygen -t rsa" was used to generate the key pair. This is needed for Ansible to SSH with.
     sshkeys = "${file("~/.ssh/id_rsa.pub")}"
 
     disk { # The cloudinit disk needs to be defined explicitly for it to be mounted temporarily for cloud-init to run.
@@ -1006,7 +1006,7 @@ This means:
 
 ## Conclusion
 
-Building a Cyber Range as Code is going to be a complex project to pull of fully as Code. It will require several testing and iterations in order for it work properly.
+Building a Cyber Range as Code is going to be a complex project to pull off fully as Code. It will require several testing and iterations in order for it work properly.
 
 However, this project will be a great lesson towards:
 
