@@ -766,7 +766,7 @@ provider "proxmox" {
 
 The `terraform/main.tf` file contains **the blocks of what exactly to build**. In our case of building 2 test Ubuntu servers using the tempalte built by Packer, the main.tf looks like this:
 
-```
+```terraform
 resource "proxmox_vm_qemu" "test_server" { # Resource type and resource name
     name = "terraform-vm-01" # Name of the VM
     target_node = "kkproxmox" # Proxmox node to build the VM on
