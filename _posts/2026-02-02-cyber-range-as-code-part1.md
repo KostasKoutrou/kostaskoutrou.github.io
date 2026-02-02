@@ -1007,7 +1007,7 @@ This means:
 
 ## Conclusion
 
-Building a Cyber Range as Code is going to be a complex project to pull off fully as Code. It will require several testing and iterations in order for it work properly.
+Building a Cyber Range as Code is going to be a complex project to pull off fully "as Code". It will require testing and several iterations in order for it work properly.
 
 However, this project will be a great lesson towards:
 
