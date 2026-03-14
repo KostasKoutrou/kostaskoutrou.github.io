@@ -295,11 +295,13 @@ To fix this, in VS Code, the new line character needs to be changed on the botto
 
 <img alt="image" src="https://github.com/user-attachments/assets/350a5d79-058d-419c-965f-f55f6dbe0adc" />
 
+## Automate OPNSense
 
+### OPNSense Packer
 
-Automate OPNSense
+As described on my first post of the series, the idea of this lab is to build VMs automatically in 3 steps:
 
-OPNSense Packer
+1. Using Packer, build a template to be used 
 
 method used config.xml, config one OPNSense manually and export and config.xml to be used by packer.
 
