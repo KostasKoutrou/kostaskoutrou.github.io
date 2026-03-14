@@ -40,6 +40,21 @@ To install the collection the following command was executed:
 
 <img alt="image" src="https://github.com/user-attachments/assets/c604ab1e-eb4b-4887-8687-82597fafe540" />
 
+Additionally, the community.proxmox ansible collection requires the Python libraries `proxmoxer` and `requests` to talk to the Proxmox API. To install them, run one of the following:
+
+```bash
+# If you are on Ubuntu/Debian in WSL
+sudo apt update
+sudo apt install python3-proxmoxer python3-requests
+
+# OR if you prefer pip:
+pip3 install proxmoxer requests
+```
+
+Without these libraries, the following error is shown when trying to run the Ansible playbook:
+
+<img alt="image" src="https://github.com/user-attachments/assets/fb69ef22-ac75-41a8-bc5f-1d0bc0032e24" />
+
 Since Ansible executes SSH using certificate-based authentication, the public key of the Ansible Control Node is needed to be added on Proxmox's trusted keys. Since the public key is the one that exists on the physical PC currently running all the commands, the easiest way to do this task is with the following command:
 
 `ssh-copy-id -i ~/.ssh/id_rsa.pub root@192.168.0.50`
@@ -75,9 +90,7 @@ export PROXMOX_TOKEN_ID="packer-token"
 export PROXMOX_TOKEN_SECRET="<token_secret>"
 ```
 
-Describe yml
-
-After setting up Ansible, the next step is to write and execute the Ansible Playbooks to apply the configurations to Proxmox, which were initially applied manually and escribed on my [previous post](https://kostaskoutrou.github.io/2026/02/02/cyber-range-as-code-part1.html) and part 1 of this series. The Ansible playbook can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/ansible/proxmox_config.yml), and is also depicted below, with more details in comments and afterwards:
+After setting up Ansible, the next step is to write and execute the Ansible Playbooks to apply the configurations to Proxmox, which were initially applied manually and escribed on my [previous post](https://kostaskoutrou.github.io/2026/02/02/cyber-range-as-code-part1.html) and part 1 of this series. The Ansible playbook can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/ansible/proxmox_config.yml), and is also depicted below, with more details in the comments and afterwards:
 
 ```yaml
 ---
@@ -267,7 +280,21 @@ Running the playbook outputs the following:
 
 As shown in the screenshot, the configuration is already applied, and all tasks output status `ok`. The two tasks that output `skipped` are the ones executed via SSH. Because they manually set values on Proxmox, the `when` keyword is used to skip the execution if the value is already set. Otherwise, the task would always output status `changed`, making the total output of the playbook confusing to read.
 
-Describe issues in word
+#### Issues met and resolutions
+
+**CRLF vs LF in VS Code**
+
+In my current setup, I am runnig VS Code on Windows (my host machine) and running all the code using Windows Subsystem for Linux (WSL). There is a discrepancy was to how the new line character is saved in Windows and expected to be read in Linux. More specifically:
+
+1. Windows saves a new line as CRLF (\\r\\n).
+2. Linux expects a new line to be LF (\\n).
+
+When Ansible (running in Linux) reads the `inventory.ini` file, it sees the carriage return as part of the text. It reads the group name as `[proxmox\r]`. The playbook, on the other hand asks for `proxmox`. Since `proxmox` does not equal `proxmox\r`, Ansible skips it.
+
+To fix this, in VS Code, the new line character needs to be changed on the bottom right of the window for CRLF to LF:
+
+<img alt="image" src="https://github.com/user-attachments/assets/350a5d79-058d-419c-965f-f55f6dbe0adc" />
+
 
 
 Automate OPNSense
