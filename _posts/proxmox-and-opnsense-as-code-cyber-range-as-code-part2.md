@@ -1,4 +1,5 @@
 
+The code of the project can be find in my [GitHub Repository](https://github.com/KostasKoutrou/kostas-seclab)
 
 ## Automate Proxmox
 
@@ -65,9 +66,28 @@ Because the Community Proxmox Ansible Collection requires a few specific [parame
 |api_token_secretstring|Specify the token secret.<br>Uses the PROXMOX_TOKEN_SECRET environment variable if not specified.|
 |api_userstring / required|Specify the user to authenticate with.<br>Uses the PROXMOX_USER environment variable if not specified.|
 
-Describe issues in word
+Therefore, the following Envars are set before running Proxmox Ansible playbooks:
+
+```bash
+export PROXMOX_HOST="192.168.0.50"
+export PROXMOX_USER="packer@pve"
+export PROXMOX_TOKEN_ID="packer-token"
+export PROXMOX_TOKEN_SECRET="<token_secret>"
+```
 
 Describe yml
+
+After setting up Ansible, the next step is to write and execute the Ansible Playbooks to apply the configurations to Proxmox, which were initially applied manually and escribed on my [previous post](https://kostaskoutrou.github.io/2026/02/02/cyber-range-as-code-part1.html) and part 1 of this series. The Ansible playbook can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/ansible/proxmox_config.yml), and is also depicted below:
+
+```yaml
+
+```
+
+How to run
+Screenshots of it running
+
+Describe issues in word
+
 
 Automate OPNSense
 
