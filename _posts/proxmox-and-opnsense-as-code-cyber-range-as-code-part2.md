@@ -80,7 +80,176 @@ Describe yml
 After setting up Ansible, the next step is to write and execute the Ansible Playbooks to apply the configurations to Proxmox, which were initially applied manually and escribed on my [previous post](https://kostaskoutrou.github.io/2026/02/02/cyber-range-as-code-part1.html) and part 1 of this series. The Ansible playbook can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/ansible/proxmox_config.yml), and is also depicted below:
 
 ```yaml
+---
+#before running, run the following:
+# export PROXMOX_HOST="192.168.0.50"
+# export PROXMOX_USER="packer@pve"
+# export PROXMOX_TOKEN_ID="packer-token"
+# export PROXMOX_TOKEN_SECRET="<token_secret>"
 
+- name: Configure Proxmox via API
+  hosts: proxmox
+  connection: local # because this play configures Proxmox via API, with this keyword the playbook is executed at the ansible control node instead of SSH'ing and running it locally on the managed node.
+  gather_facts: false
+
+  tasks:
+    - name: Set DNS # Task to configure the central DNS settings of Proxmox
+      community.proxmox.proxmox_node:
+        node_name: kkproxmox
+        dns:
+          dns1: 1.1.1.1
+          dns2: 8.8.8.8
+          search: kostas.local
+      # delegate_to: localhost # this is not needed if the "connection: local" is at the start of the playbook
+
+    - name: Set Network # Task to create the Virtual Network Bridges in Proxmox
+      community.proxmox.proxmox_node_network:
+        node: kkproxmox
+        autostart: true
+        iface_type: bridge
+        iface: "{{ item.iface }}"
+        cidr: "{{ item.cidr }}"
+        comments: "{{ item.comments }}"
+        bridge_ports: "{{ item.bridge_ports }}"
+        gateway: "{{ item.gateway }}"
+      loop:
+        - { iface: "vmbrWAN10", cidr: "10.0.10.2/24", comments: "WAN" , bridge_ports: "" , gateway: "" }
+        - { iface: "vmbrDMZ20", cidr: "10.0.20.2/24", comments: "DMZ" , bridge_ports: "" , gateway: "" }
+        - { iface: "vmbrIZ30", cidr: "10.0.30.2/24", comments: "Internal Zone" , bridge_ports: "" , gateway: "" }
+        - { iface: "vmbrEUZ40", cidr: "10.0.40.2/24", comments: "End User Zone" , bridge_ports: "" , gateway: "" }
+        - { iface: "vmbr0", cidr: "192.168.0.50/24", comments: "Bridge to home router" , bridge_ports: "nic1" , gateway: "192.168.0.1" }
+      
+    - name: Set Network interfaces # Task to connect the physical interface to the physical network
+      community.proxmox.proxmox_node_network:
+        node: kkproxmox
+        iface_type: eth
+        iface: nic1
+        comments: "Physical Interface of Proxmox to home router"
+
+    - name: Apply Network # Apply the above network configurations
+      community.proxmox.proxmox_node_network:
+        node: kkproxmox
+        state: "apply"
+
+    - name: Set Firewall Aliases # Set firewall aliases to be used for the firewall rules below
+      community.proxmox.proxmox_firewall:
+        level: cluster
+        aliases:
+          - name: subnet10
+            cidr: "10.0.0.0/8"
+          - name: subnet172
+            cidr: "172.16.0.0/12"
+          - name: subnet192
+            cidr: "192.168.0.0/16"
+    
+    - name: Create Firewall Security Groups # security groups to be applied on the different Proxmox levels
+      community.proxmox.proxmox_firewall:
+        level: cluster
+        group_conf: true # Whether security group should be created or deleted
+        state: present # create the group
+        group: "{{ item.group }}"
+      loop:
+        - { group: "allowguesttraffic" }
+        - { group: "blockhomenwtraffic" }
+    
+    - name: Set Firewall Security Groups rules # configure rules of the above security groups
+      community.proxmox.proxmox_firewall:
+        level: group
+        state: present # Create/update/delete firewall rules or security group.
+        update: true # If state=present and if one or more rule/alias/ipset already exists it will update them.
+        group: "{{ item.group }}"
+        rules: "{{ item.rules }}"
+      loop: 
+        - group: allowguesttraffic # allow/not control traffic from the lab's subnets.
+          rules:
+            - type: in
+              action: ACCEPT
+              source: dc/subnet10
+              pos: 0
+              log: nolog
+              enable: true
+        - group: blockhomenwtraffic # block traffic to the home physical network.
+          rules:
+            - type: in
+              action: ACCEPT
+              source: dc/subnet192
+              pos: 0
+              log: nolog
+              enable: false # disabled but kept just in case, because proxmox has this rule by default
+              comment: "Allow ProxMox Management"
+              dest: 192.168.0.50
+              dport: 8006
+              proto: tcp
+            - type: in
+              action: ACCEPT
+              source: dc/subnet192
+              pos: 1
+              log: nolog
+              enable: true
+              comment: "Allow OPNSense Management"
+              dest: 192.168.0.51
+              dport: 443
+              proto: tcp
+            - type: out
+              action: REJECT
+              pos: 2
+              log: nolog
+              enable: true
+              comment: "Block Local Traffic"
+              dest: dc/subnet192
+
+    - name: Apply Security Groups # apply security groups for both cluster and node levels
+      community.proxmox.proxmox_firewall:
+        level: "{{ item.level }}"
+        node: "{{ item.node }}"
+        update: true
+        state: present
+        rules:
+          - action: blockhomenwtraffic # same rule for both cluster and node levels
+            pos: 0
+            type: group
+            enable: true
+      loop:
+        - { level: cluster, node: "" }
+        - { level: node, node: kkproxmox }
+
+    # - name: Configure Update Repositories - left for future update
+
+    #The below 2 tasks are useful if it is needed to print the current configuration
+    # - name: Get Firewall Config
+    #   community.proxmox.proxmox_node_info:
+    #     # level: node
+    #     # node: kkproxmox
+    #   register: debug_data
+
+    # - name: Show debug data
+    #   debug:
+    #     var: debug_data
+
+- name: Configure Proxmox via SSH
+  hosts: proxmox
+  gather_facts: false
+
+  tasks:
+    - name: Check current Cluster Firewall status
+      ansible.builtin.command: pvesh get /cluster/firewall/options --output-format json
+      register: cluster_fw_status
+      changed_when: false
+
+    - name: Enable Firewall on Cluster
+      ansible.builtin.command: pvesh set /cluster/firewall/options -enable 1
+      # Only run this command IF the 'enable' value is not 1 (or if it doesn't exist yet)
+      when: (cluster_fw_status.stdout | from_json).enable | default(0) | int != 1
+
+    - name: Check current Node Firewall status
+      ansible.builtin.command: pvesh get /nodes/kkproxmox/firewall/options --output-format json
+      register: node_fw_status
+      changed_when: false
+
+    - name: Enable Firewall on Node
+      ansible.builtin.command: pvesh set /nodes/kkproxmox/firewall/options -enable 1
+      # Only run this command IF the 'enable' value is not 1 (or if it doesn't exist yet)
+      when: (node_fw_status.stdout | from_json).enable | default(0) | int != 1
 ```
 
 How to run
