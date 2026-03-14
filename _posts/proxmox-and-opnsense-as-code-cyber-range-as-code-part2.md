@@ -77,7 +77,7 @@ export PROXMOX_TOKEN_SECRET="<token_secret>"
 
 Describe yml
 
-After setting up Ansible, the next step is to write and execute the Ansible Playbooks to apply the configurations to Proxmox, which were initially applied manually and escribed on my [previous post](https://kostaskoutrou.github.io/2026/02/02/cyber-range-as-code-part1.html) and part 1 of this series. The Ansible playbook can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/ansible/proxmox_config.yml), and is also depicted below:
+After setting up Ansible, the next step is to write and execute the Ansible Playbooks to apply the configurations to Proxmox, which were initially applied manually and escribed on my [previous post](https://kostaskoutrou.github.io/2026/02/02/cyber-range-as-code-part1.html) and part 1 of this series. The Ansible playbook can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/ansible/proxmox_config.yml), and is also depicted below, with more details in comments and afterwards:
 
 ```yaml
 ---
@@ -252,8 +252,20 @@ After setting up Ansible, the next step is to write and execute the Ansible Play
       when: (node_fw_status.stdout | from_json).enable | default(0) | int != 1
 ```
 
-How to run
-Screenshots of it running
+One point to note is that the playbooks consists of two plays:
+
+1. Configuring Proxmox via API: This is the bulk of the configuration, because the Proxmox Community Ansible collection supports most of the configurations required.
+2. Configuring Proxmox via SSH: This contains tasks that cannot be executed using the avaialble Ansible collection. It includes executing manual commands on Proxmox using its CLI `pvesh`.
+
+To run this playbook, the following command is executed:
+
+`ansible-playbook -i inventory.ini proxmox_config.yml`
+
+Running the playbook outputs the following:
+
+<img alt="image" src="https://github.com/user-attachments/assets/e19c0be3-adcb-4af4-a3b1-30725f455332" />
+
+As shown in the screenshot, the configuration is already applied, and all tasks output status `ok`. The two tasks that output `skipped` are the ones executed via SSH. Because they manually set values on Proxmox, the `when` keyword is used to skip the execution if the value is already set. Otherwise, the task would always output status `changed`, making the total output of the playbook confusing to read.
 
 Describe issues in word
 
