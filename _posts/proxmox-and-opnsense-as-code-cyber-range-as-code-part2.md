@@ -17,7 +17,7 @@ This means:
 1. Create a Proxmox firewall rule to allow SSH Access: This is not needed, as this rule exists by default when enabling firewall on Proxmox, see [Default firewall rules](https://pve.proxmox.com/pve-docs/pve-admin-guide.html#pve_firewall_default_rules).
 2. Create role for all automation steps: The following permissions are required for all steps of this project:
 
-
+<img alt="image" src="https://github.com/user-attachments/assets/65d09a28-516a-4173-928b-13e1692482c5" />
 
 4. Create user:
 5. API key
