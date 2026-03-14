@@ -19,7 +19,10 @@ This means:
 
 <img alt="image" src="https://github.com/user-attachments/assets/65d09a28-516a-4173-928b-13e1692482c5" />
 
-4. Create user:
+3. Create user: The pakcer user created in the initial lab is used. It is a simple user and the above role is assigned to it.
+
+
+
 5. API key
 
 Proxmox Ansible
