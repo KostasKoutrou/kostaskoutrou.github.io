@@ -17,19 +17,53 @@ This means:
 1. Create a Proxmox firewall rule to allow SSH Access: This is not needed, as this rule exists by default when enabling firewall on Proxmox, see [Default firewall rules](https://pve.proxmox.com/pve-docs/pve-admin-guide.html#pve_firewall_default_rules).
 2. Create role for all automation steps: The following permissions are required for all steps of this project:
 
-<img alt="image" src="https://github.com/user-attachments/assets/65d09a28-516a-4173-928b-13e1692482c5" />
+  <img alt="image" src="https://github.com/user-attachments/assets/65d09a28-516a-4173-928b-13e1692482c5" />
 
 3. Create user: The pakcer user created in the initial lab is used. It is a simple user and the above role is assigned to it.
 
+  <img alt="image" src="https://github.com/user-attachments/assets/84bc030f-e6b3-4e47-abd1-139a2d7e77f5" />
 
+4. API key: An API key was generated and assigned to the above user, in order for Ansible to execute API calls to Proxmox.
 
-5. API key
+  <img alt="image" src="https://github.com/user-attachments/assets/d8031359-89ed-46b9-97b7-8933de6a5e9a" />
 
-Proxmox Ansible
-Install collections
-Add SSH public key on proxmox's trusted keys
+### Proxmox Ansible
 
-Add envars
+In this step, the Ansible Control Node is prepared for Proxmox configurations.
+
+The Community Proxmox Ansible Collection was used for this project, which can be found [here](https://galaxy.ansible.com/ui/repo/published/community/proxmox/docs/).
+
+To install the collection the following command was executed:
+
+`ansible-galaxy collection install community.proxmox`
+
+<img alt="image" src="https://github.com/user-attachments/assets/c604ab1e-eb4b-4887-8687-82597fafe540" />
+
+Since Ansible executes SSH using certificate-based authentication, the public key of the Ansible Control Node is needed to be added on Proxmox's trusted keys. Since the public key is the one that exists on the physical PC currently running all the commands, the easiest way to do this task is with the following command:
+
+`ssh-copy-id -i ~/.ssh/id_rsa.pub root@192.168.0.50`
+
+After running the command, it is now possible to ping Proxmox via Ansible:
+
+<img alt="image" src="https://github.com/user-attachments/assets/4dd29f39-14cb-4b8a-9f4e-93211562291d" />
+
+In the above command, the `inventory.ini` file includes machines which are in the scope of configurations via Ansible. For now it only includes the Proxmox host:
+
+```ini
+[proxmox]
+192.168.0.50 ansible_user=root
+```
+
+Because the Community Proxmox Ansible Collection requires a few specific [parameters](https://galaxy.ansible.com/ui/repo/published/community/proxmox/content/module/proxmox_node/#parameters) for every task being run, it is also supported to configure these parameters as Environment Variables:
+
+|Parameter|Comments|
+|-|-|
+|api_hoststring / required|Specify the target host of the Proxmox VE cluster.<br>Uses the PROXMOX_HOST environment variable if not specified.|
+|api_passwordstring|Specify the password to authenticate with.<br>Uses the PROXMOX_PASSWORD environment variable if not specified.|
+|api_portinteger|Specify the target port of the Proxmox VE cluster.<br>Uses the PROXMOX_PORT environment variable if not specified.|
+|api_token_idstring|Specify the token ID.<br>Uses the PROXMOX_TOKEN_ID environment variable if not specified.|
+|api_token_secretstring|Specify the token secret.<br>Uses the PROXMOX_TOKEN_SECRET environment variable if not specified.|
+|api_userstring / required|Specify the user to authenticate with.<br>Uses the PROXMOX_USER environment variable if not specified.|
 
 Describe issues in word
 
