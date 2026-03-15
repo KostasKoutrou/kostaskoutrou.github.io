@@ -20,6 +20,8 @@ As shown above, the architecture is a relatively simple and typical network infr
       - The External Attacks will occur from.
 - There will also be Internal Attack Simulations, executed from within the different zones, bypassing the firewall ("assume breach").
 
+> In this post, the focus is on Proxmox itself, and the central Firewall, which will be OPNSense.
+
 The code of the project can be find in my [GitHub Repository](https://github.com/KostasKoutrou/kostas-seclab)
 
 ## Automate Proxmox
