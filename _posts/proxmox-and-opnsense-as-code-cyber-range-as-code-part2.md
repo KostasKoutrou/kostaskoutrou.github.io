@@ -90,7 +90,7 @@ export PROXMOX_TOKEN_ID="packer-token"
 export PROXMOX_TOKEN_SECRET="<token_secret>"
 ```
 
-After setting up Ansible, the next step is to write and execute the Ansible Playbooks to apply the configurations to Proxmox, which were initially applied manually and escribed on my [previous post](https://kostaskoutrou.github.io/2026/02/02/cyber-range-as-code-part1.html) and part 1 of this series. The Ansible playbook can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/ansible/proxmox_config.yml), and is also depicted below, with more details in the comments and afterwards:
+After setting up Ansible, the next step is to write and execute the Ansible Playbooks to apply the configurations to Proxmox, which were initially applied manually and described on my [previous post](https://kostaskoutrou.github.io/2026/02/02/cyber-range-as-code-part1.html) and part 1 of this series. The Ansible playbook can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/ansible/proxmox_config.yml), and is also depicted below, with more details in the comments and afterwards:
 
 ```yaml
 ---
@@ -265,6 +265,14 @@ After setting up Ansible, the next step is to write and execute the Ansible Play
       when: (node_fw_status.stdout | from_json).enable | default(0) | int != 1
 ```
 
+With this playbook, the following Proxmox settings are configured:
+
+1. DNS Settings
+2. Network Interfaces
+3. Network Configuration
+4. Firewall Rules
+5. Enabling Firewall
+
 One point to note is that the playbooks consists of two plays:
 
 1. Configuring Proxmox via API: This is the bulk of the configuration, because the Proxmox Community Ansible collection supports most of the configurations required.
@@ -301,7 +309,129 @@ To fix this, in VS Code, the new line character needs to be changed on the botto
 
 As described on my first post of the series, the idea of this lab is to build VMs automatically in 3 steps:
 
-1. Using Packer, build a template to be used 
+1. Using Packer, build a relatively blank template (more on the "relatively" part later)
+2. Use that template with Terraform to provision VMs ready to be configured by
+3. Ansible, where the rest of the configuration and final touches happens
+
+Regarding OPNSense specifically, which is actually a custom machine based on FreeBSD, unfortunately the design towards automation is not complete. Therefore, several workarounds were needed in order to achieve automated deployment.
+
+First of all, in order to get the initial "blank" state of the machine, the most controllable way to do that was by configuring an OPNSense VM manually exactly up to the point where it functions and is ready to be used by Terraform, without any more settings configured. These configurations are:
+
+1. Assigning the WAN interface
+2. Assigning the WAN interface IP with DHCP (this will be changed with Terraform)
+3. Enabling SSH for management
+4. Installing QEMU agent so that Proxmox will be able to read the IP address assigned to the VM
+5. Auto-start the QEMU agent service
+
+After applying the above configurations manually to the OPNSense VM, the configuration of the machine was exported to a file `config.xml`.
+
+<img alt="image" src="https://github.com/user-attachments/assets/163b3fef-0b37-4b4d-8afe-c9cc63b4a9af" />
+
+This config.xml file contains all the information required for a VM ready to be used by Terraform.
+
+The idea is to use the config.xml and import it on a new OPNSense VM by utilizing its "Configuration Importer" feature, where during boot time you can select to import a config.xml file from an external drive (in this case a CD created by Packer containing the above exported `config.xml`).
+
+The packer script can be found under the [project's repository](https://github.com/KostasKoutrou/kostas-seclab/blob/master/packer/opnsense/opnsense.pkr.hcl), and is also presented below
+
+```terraform
+packer {
+  required_plugins {
+    name = {
+      version = "~> 1"
+      source  = "github.com/hashicorp/proxmox"
+    }
+  }
+}
+
+# Declare variables, we will pull them later in the packer build command
+variable "proxmox_api_url" { type = string }
+variable "proxmox_api_token_id" { type = string }
+variable "proxmox_api_token_secret" {
+  type      = string
+  sensitive = true
+}
+
+source "proxmox-iso" "opnsense" { #Resource type and local name
+  proxmox_url = var.proxmox_api_url
+  username    = var.proxmox_api_token_id
+  token       = var.proxmox_api_token_secret
+  # Skip TLS Verification for self-signed certificates
+  insecure_skip_tls_verify = true
+  qemu_agent = true # Default is true anyway
+  node = "kkproxmox"
+  vm_id = 1001
+  vm_name = "opnsense-template"
+  ssh_username = "root"
+  ssh_password = "opnsense" # Default root password, can be changed later.
+  ssh_timeout = "20m"
+  cores = 4
+  memory = 4096 # RAM must be more than 3GB, otherwise the boot_command is different and will not work
+  os = "other" # for FreeBSD, you choose "other"
+  cpu_type = "host"
+  scsi_controller = "virtio-scsi-single"
+
+
+  boot_iso {
+    # type = "scsi"
+    type = "ide"
+    iso_file = "local:iso/OPNsense-25.7-dvd-amd64.iso" # ISO stored locally on Proxmox. In the future this can be changed to downloading from the internet.
+    iso_checksum = "sha256:e4c178840ab1017bf80097424da76d896ef4183fe10696e92f288d0641475871"
+    unmount = true
+  }
+
+  additional_iso_files { # this will created a cd in "cd1", which will be selected in the boot_command
+    cd_content = {
+    "conf/config.xml" = templatefile("${path.root}/conf/config.xml", {
+      dynamic_ssh_key = base64encode(file("~/.ssh/id_rsa.pub"))}) # pull the public SSH key, base64 encode it, and write it in config.xml
+    }
+    cd_label = "config"
+    iso_storage_pool = "local"
+  }
+  
+
+  network_adapters {
+    model  = "virtio"
+    bridge = "vmbr0" # Will change it in the Terraform script, this is only for packer.
+  }
+
+  disks {
+    disk_size    = "20G"
+    storage_pool = "local-lvm"
+    type         = "scsi"
+    ssd          = true
+  }
+
+  boot_command = [
+    # There is already a 10 sec wait for boot, adding another 12.
+    # Start configuration importer and select cd1 where the cd_content is stored.
+    "<wait12s><enter><wait5s>cd1<enter><wait25s>",
+
+    # Put the default credentials to install the OS.
+    "installer<enter><wait2s>",
+    "opnsense<enter><wait10s>",
+    
+    # Going through the installation options:
+    # Accept default Keymap and ZFS installation.
+    "<enter><wait2s><enter><wait10s><enter><wait2s><spacebar><wait1s><enter><wait1s>",
+    
+    # Confirm formatting (Yes) and wait 2 minutes for installation.
+    "<left><wait1s><enter><wait120s>",
+    
+    # Do not change password and reboot.
+    "<down><wait1s><enter><wait1s><enter>",
+
+    # Enable qemu agent service autostart and Update from console to latest version,
+    # because qemu requires the latest OPNSense version.
+    "<wait45s>root<enter><wait2s>opnsense<enter><wait5s>",
+    "8<enter><wait2s>sysrc qemu_guest_agent_enable='YES'<wait1s><enter><wait1s>exit<enter><wait1s>",
+    "12<enter><wait6s>y<enter><wait3s>q"
+  ]
+}
+
+build {
+  sources = ["source.proxmox-iso.opnsense"]
+}
+```
 
 method used config.xml, config one OPNSense manually and export and config.xml to be used by packer.
 
