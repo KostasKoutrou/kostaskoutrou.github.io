@@ -557,6 +557,234 @@ During development of Packer OPNSense, the following issues were identified:
 
 When it comes to using Terraform for provisioning OPNSense, the process was initially straightforward, but more and more settings were added during development, as it was discovered that Ansible for OPNSense does not provide enough flexibility to implement what was needed. Therefore, more implementation points were moved from the "Ansible phase" to the "Terraform phase".
 
+The code can be found in the project's repository and is also written below:
+
+```terraform
+resource "proxmox_vm_qemu" "c-opnsense" {
+    name = "c-opnsense"
+    target_node = "kkproxmox"
+    clone = "opnsense-template"
+    agent = 1 #enable QEMU guest agent
+    memory = 4096
+    balloon = 4096
+    bios = "seabios"
+    scsihw = "virtio-scsi-single"
+    os_type = "other"
+    skip_ipv6 = true
+
+    cpu {
+        cores = 4
+        sockets = 1
+        type = "host"
+    }
+
+    disk {
+        slot = "scsi0"
+        cache = "none"
+        discard = true
+        iothread = true
+        emulatessd = true
+        asyncio = "io_uring"
+        size = "20G"
+        type = "disk"
+        storage = "local-lvm"
+        format = "raw"
+    }
+
+    startup_shutdown {
+        order = -1
+        shutdown_timeout = -1
+        startup_delay = -1
+    }
+
+    # Configure the network interfaces
+    network {
+        id = 0
+        model = "virtio"
+        bridge = "vmbr0"
+        firewall = true
+    }
+    
+    network {
+        id = 1
+        model = "virtio"
+        bridge = "vmbrDMZ20"
+        firewall = true
+    }
+
+    network {
+        id = 2
+        model = "virtio"
+        bridge = "vmbrIZ30"
+        firewall = true
+    }
+
+    network {
+        id = 3
+        model = "virtio"
+        bridge = "vmbrEUZ40"
+        firewall = true
+    }
+
+    # connection used for the provisioners below
+    connection {
+      type = "ssh"
+      user = "root"
+      private_key = file("~/.ssh/id_rsa")
+      host = self.ssh_host
+    }
+
+    # replace the config.xml file with the one below.
+    # This one uses dynamic variables to also configure the network interfaces IPs.
+    provisioner "file" {
+      content = templatefile("${path.module}/template_config_opnsense_lab.xml",
+        {
+            dynamic_ssh_key = base64encode(file("~/.ssh/id_rsa.pub"))
+            wan_if = "vtnet0"
+            wan_descr = "WAN"
+            wan_ip = "192.168.0.51"
+            wan_subnet = "24"
+            wan_gw = "WAN_GW"
+            dmz20_if = "vtnet1"
+            dmz20_descr = "DMZ20"
+            dmz20_ip = "10.0.20.1"
+            dmz20_subnet = "24"
+            iz30_if = "vtnet2"
+            iz30_descr = "IZ30"
+            iz30_ip = "10.0.30.1"
+            iz30_subnet = "24"
+            euz40_if = "vtnet3"
+            euz40_descr = "EUZ40"
+            euz40_ip = "10.0.40.1"
+            euz40_subnet = "24"
+        }
+      )
+      destination = "/conf/config.xml"
+    }
+
+    # reboot the machine so that the new config.xml is applied
+    provisioner "remote-exec" {
+      inline = [ 
+        "echo 'Injecting Cyber Range Topology by restarting OPNSense. VM will restart in 3 seconds...'",
+        "daemon -f /bin/sh -c 'sleep 3; /sbin/reboot'"
+       ]
+    }
+}
+```
+
+A few interesting notes to point out:
+
+1. **Dynamic variables**: as was the case with Packer, too, several variables in the config.xml file are written dynamically. The config.xml file part where these variables are expected is shown below:
+
+```xml
+<wan>
+  <if>${wan_if}</if>
+  <descr>${wan_descr}</descr>
+  <enable>1</enable>
+  <spoofmac />
+  <blockbogons>1</blockbogons>
+  <ipaddr>${wan_ip}</ipaddr>
+  <subnet>${wan_subnet}</subnet>
+  <gateway>${wan_gw}</gateway>
+</wan>
+<opt1>
+  <if>${dmz20_if}</if>
+  <descr>${dmz20_descr}</descr>
+  <enable>1</enable>
+  <spoofmac />
+  <ipaddr>${dmz20_ip}</ipaddr>
+  <subnet>${dmz20_subnet}</subnet>
+</opt1>
+<opt2>
+  <if>${iz30_if}</if>
+  <descr>${iz30_descr}</descr>
+  <enable>1</enable>
+  <spoofmac />
+  <ipaddr>${iz30_ip}</ipaddr>
+  <subnet>${iz30_subnet}</subnet>
+</opt2>
+<opt3>
+  <if>${euz40_if}</if>
+  <descr>${euz40_descr}</descr>
+  <enable>1</enable>
+  <spoofmac />
+  <ipaddr>${euz40_ip}</ipaddr>
+  <subnet>${euz40_subnet}</subnet>
+</opt3>
+```
+
+2. **config.xml firewall rules needed**: The Ansible collections used in the next phase require API connectivity and SSH access. Therefore, two firewall rules were needed to be added to the config.xml file:
+
+```xml
+<rule uuid="cf7ad3fc-4924-4fa6-b9c5-77e6f5d81746">
+  <type>pass</type>
+  <interface>wan</interface>
+  <ipprotocol>inet</ipprotocol>
+  <statetype>keep state</statetype>
+  <direction>in</direction>
+  <log>1</log>
+  <quick>1</quick>
+  <protocol>tcp</protocol>
+  <source>
+    <any>1</any>
+  </source>
+  <destination>
+    <network>wanip</network>
+    <port>22</port>
+  </destination>
+  <description>Allow SSH to OPNSense</description>
+</rule>
+<rule uuid="7409d103-737c-4866-83d8-2c1adc5dbcf7">
+  <enabled>1</enabled>
+  <statetype>keep</statetype>
+  <state-policy/>
+  <action>pass</action>
+  <quick>1</quick>
+  <interfacenot>0</interfacenot>
+  <interface>wan</interface>
+  <direction>in</direction>
+  <ipprotocol>inet</ipprotocol>
+  <protocol>TCP</protocol>
+  <source_net>wan</source_net>
+  <source_not>0</source_not>
+  <destination_net>wanip</destination_net>
+  <destination_not>0</destination_not>
+  <destination_port>443</destination_port>
+  <disablereplyto>0</disablereplyto>
+  <log>1</log>
+  <allowopts>0</allowopts>
+  <nosync>0</nosync>
+  <nopfsync>0</nopfsync>
+  <description>Allow HTTPS to OPNSense WebUI</description>
+</rule>
+```
+
+3. **config.xml API key needed**: The Ansible collections used in the next phase require API connectivity, and therefore an API key. This was generated manually from OPNSense, and the configuration was added to the config.xml file:
+
+```xml
+<user uuid="083dd1a5-394d-441f-aae3-481a4ce478c5">
+  <uid>0</uid>
+  <name>root</name>
+  <disabled>0</disabled>
+  <scope>system</scope>
+  <expires/>
+  <authorizedkeys>${dynamic_ssh_key}</authorizedkeys>
+  <otp_seed/>
+  <shell/>
+  <password>$2y$10$YRVoF4SgskIsrXOvOQjGieB9XqHPRra9R7d80B3BZdbY/j21TwBfS</password>
+  <pwd_changed_at/>
+  <landing_page/>
+  <comment/>
+  <email/>
+  **<apikeys>ooyOnJ5Y7NiPxeTXkTxEgM+9steLsU+I+UehjuiXtNdBL0ckTvUQM6PWa5AxpdnUXGLGLtyRQFNCnJI8|$6$$c9GWtGrIy25Ez358v52fDrfyTfD3Q5rnzVlc7je/MKL0EzxnTOrOL0mnSh78O.t6iA8hrtd4.OfsWUvUhJgCl0</apikeys>**
+  <priv/>
+  <language/>
+  <descr>System Administrator</descr>
+  <dashboard/>
+</user>
+```
+4. Configuring setting using the config.xml file: 
+
 
 
 describe code and issues and resolutions
