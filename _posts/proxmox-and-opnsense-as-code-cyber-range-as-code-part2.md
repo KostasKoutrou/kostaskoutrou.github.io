@@ -1,4 +1,25 @@
 
+## Brief reminder of project architecture
+
+Below is a brief description of the project architecture. For more details, see my previous post [Cyber Range as Code: Automating Security Lab with IaC - Part 1](https://kostaskoutrou.github.io/2026/02/02/cyber-range-as-code-part1.html)
+
+The initial infrastructure architecture is the following. It is important to note here that this is the initial architecture idea, it is not final, and there may very well be changes during implementation.
+
+![NetworkDesign-FW Rules drawio](https://github.com/user-attachments/assets/daeb1cd9-9816-49d0-874e-2836c15d9d86)
+
+As shown above, the architecture is a relatively simple and typical network infrastructure, with the following components:
+
+- The central Firewall, controlling the network traffic among the four network zones:
+  1. **Demilitarized Zone (DMZ)**: The zone that exposes services which are to be served to the Internet. In the context of the project, these will be served to the local network, and, most importantly for the project, will be accessible by the "External Attacker", enabling for attack scenarios initiated from the "Internet".
+  2. **Internal Zone**: The zone where all there internal servers and services will reside. This includes:
+      - Any internal servers, e.g., SQL Servers and AD DC, hosting and serving information which is destined to be consumed by internal resources only.
+      - Security Tools, including the SIEM/XDR/Monitoring tools.
+  3. **End Users**: The last zone will be for the End Users, where typical workstation VMs will reside, and have defined access to specific servers/services and to the internet.
+  4. **WAN Zone**: This is where the "Internet", in the context of the Infrastructure, lives. This is where:
+      - The PC from which the Proxmox management will be done, running the Packer, Terraform, and Ansible.
+      - The External Attacks will occur from.
+- There will also be Internal Attack Simulations, executed from within the different zones, bypassing the firewall ("assume breach").
+
 The code of the project can be find in my [GitHub Repository](https://github.com/KostasKoutrou/kostas-seclab)
 
 ## Automate Proxmox
@@ -517,11 +538,20 @@ https://github.com/user-attachments/assets/00279ca3-508d-4dca-ab70-39f3e5549aca
 
 #### OPNSense Packer Issues and resolutions
 
+During development of Packer OPNSense, the following issues were identified:
+
+1. **The cloud-init limitation:**
+  - **The Issue**: OPNsense is built on FreeBSD and functions as an appliance where the /conf/config.xml is the absolute source of truth. It does not officially support standard Linux cloud-init for initial provisioning (like setting IPs or users).
+  - **The Solution**: OPNsense’s native Configuration Importer was utilized. By packaging a pre-configured config.xml file into a virtual CD-ROM, OPNsense digests the configuration during the boot sequence and permanently bakes it into the hard drive during the installation.
+2. **QEMU guest agent issues with OPNSense version:**
+  - **The Issue**: Packer needs the QEMU Guest Agent to discover the VM's dynamic IP address to connect via SSH. However, the OPNsense base ISO (25.7) was out of date with the plugin repository, meaning the agent refused to install on boot and would not start its service. It was not possible to SSH in to run the update because the IP could not be detected due to the QEMU agent not running, and it was not possible to get the QEMU agent to run because it was not possible to run the update.
+  - **The Solution**: The setup was baked in the `boot_command` command list. Instead of stopping after the installation reboot, the command now continues typing in the console to drop into the shell, enabling the service to auto-start (sysrc qemu_guest_agent_enable='YES'), and trigger a system update via console option 12. This updats the OS and pulls the agent before Packer ever tries to connect.
+3. **OPNsense Firewall Blocking Packer**
+  - **The Issue**: OPNsense is a default-deny firewall that drops all WAN traffic. Packer needs to connect via the WAN interface (mapped to your Proxmox bridge) to finalize the template.
+  - **The Solution**: By ensuring no <lan> interface was strictly mapped initially, OPNsense's safety mechanisms trigger the Anti-Lockout rule on the WAN interface, automatically opening port 22 and allowing Packer/Ansible to connect without the need to add a firewall rule to explicitly allow this traffic. This rule will be created on the next phases anyway.
 
 
-describe issues and resolutions from word
-
-OPNSense Terraform
+### OPNSense Terraform
 
 describe code and issues and resolutions
 
