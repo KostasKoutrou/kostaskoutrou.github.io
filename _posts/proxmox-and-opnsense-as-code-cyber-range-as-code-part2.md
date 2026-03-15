@@ -433,6 +433,8 @@ build {
 
 Some interesting notes to point out:
 
+**1. config.xml import**
+
 In the CD that is being mounted which contains the `config.xml` file, the SSH public key of the host machine is being written to the config by creating a dynamic variable in the `config.xml`. This is done by using the `templatefile` [function](https://developer.hashicorp.com/terraform/language/functions/templatefile), and providing the path of the public key to it, as shown in the code snippet below:
 
 ```terraform
@@ -440,6 +442,14 @@ In the CD that is being mounted which contains the `config.xml` file, the SSH pu
     "conf/config.xml" = templatefile("${path.root}/conf/config.xml", {
       dynamic_ssh_key = base64encode(file("~/.ssh/id_rsa.pub"))}) # pull the public SSH key, base64 encode it, and write it in config.xml
     }
+```
+
+`cd_content` requires one of the following tools to create the CD: xorriso, mkisofs, hdiutil, oscdimg
+
+In this case, xorriso was installed
+
+```bash
+sudo apt install xorriso
 ```
 
 In the config.xml file, in order to make it so that it expects a variable in that part, the following was provided:
@@ -468,6 +478,8 @@ In the config.xml file, in order to make it so that it expects a variable in tha
 ```
 
 As shown, for SSH keys, the dynamic variable `${dynamic_ssh_key}` is provided instead of a static one.
+
+**2. boot command**
 
 Additionally, the `boot_command` includes all the commands executed via the keyboard during the installation of OPNSense using the configuration importer feature:
 
@@ -499,8 +511,11 @@ opnsense_pw = "opnsense-admin"
 
 The output of running the Packer tempalte build is the following:
 
+<img alt="image" src="https://github.com/user-attachments/assets/f3c1b178-711c-4a50-aa0e-5957f6d95aef" />
 
 https://github.com/user-attachments/assets/00279ca3-508d-4dca-ab70-39f3e5549aca
+
+#### OPNSense Packer Issues and resolutions
 
 
 
