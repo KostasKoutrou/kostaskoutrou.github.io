@@ -331,7 +331,7 @@ This config.xml file contains all the information required for a VM ready to be 
 
 The idea is to use the config.xml and import it on a new OPNSense VM by utilizing its "Configuration Importer" feature, where during boot time you can select to import a config.xml file from an external drive (in this case a CD created by Packer containing the above exported `config.xml`).
 
-The packer script can be found under the [project's repository](https://github.com/KostasKoutrou/kostas-seclab/blob/master/packer/opnsense/opnsense.pkr.hcl), and is also presented below
+The packer template can be found under the [project's repository](https://github.com/KostasKoutrou/kostas-seclab/blob/master/packer/opnsense/opnsense.pkr.hcl), and is also presented below, with several comments to explain how it works:
 
 ```terraform
 packer {
@@ -370,7 +370,6 @@ source "proxmox-iso" "opnsense" { #Resource type and local name
   cpu_type = "host"
   scsi_controller = "virtio-scsi-single"
 
-
   boot_iso {
     # type = "scsi"
     type = "ide"
@@ -388,7 +387,6 @@ source "proxmox-iso" "opnsense" { #Resource type and local name
     iso_storage_pool = "local"
   }
   
-
   network_adapters {
     model  = "virtio"
     bridge = "vmbr0" # Will change it in the Terraform script, this is only for packer.
@@ -433,11 +431,78 @@ build {
 }
 ```
 
-method used config.xml, config one OPNSense manually and export and config.xml to be used by packer.
+Some interesting notes to point out:
 
-config.xml has dynamic parameters.
+In the CD that is being mounted which contains the `config.xml` file, the SSH public key of the host machine is being written to the config by creating a dynamic variable in the `config.xml`. This is done by using the `templatefile` [function](https://developer.hashicorp.com/terraform/language/functions/templatefile), and providing the path of the public key to it, as shown in the code snippet below:
 
-describe code
+```terraform
+    cd_content = {
+    "conf/config.xml" = templatefile("${path.root}/conf/config.xml", {
+      dynamic_ssh_key = base64encode(file("~/.ssh/id_rsa.pub"))}) # pull the public SSH key, base64 encode it, and write it in config.xml
+    }
+```
+
+In the config.xml file, in order to make it so that it expects a variable in that part, the following was provided:
+
+```xml
+    <user uuid="083dd1a5-394d-441f-aae3-481a4ce478c5">
+      <uid>0</uid>
+      <name>root</name>
+      <disabled>0</disabled>
+      <scope>system</scope>
+      <expires/>
+      <authorizedkeys>${dynamic_ssh_key}</authorizedkeys>
+      <otp_seed/>
+      <shell/>
+      <password>$2y$10$YRVoF4SgskIsrXOvOQjGieB9XqHPRra9R7d80B3BZdbY/j21TwBfS</password>
+      <pwd_changed_at/>
+      <landing_page/>
+      <comment/>
+      <email/>
+      <apikeys/>
+      <priv/>
+      <language/>
+      <descr>System Administrator</descr>
+      <dashboard/>
+    </user>
+```
+
+As shown, for SSH keys, the dynamic variable `${dynamic_ssh_key}` is provided instead of a static one.
+
+Additionally, the `boot_command` includes all the commands executed via the keyboard during the installation of OPNSense using the configuration importer feature:
+
+1. Wait enough time to get to the option to use the configuration importer.
+2. Write the external drive's name to pull the config.xml file from.
+3. Install the configuration by logging in with the `installer` user.
+4. Go through the installation steps (accept default keymap, select ZFS installation, select disk, confirm format and reboot)
+5. Wait for the installation and reboot to complete.
+6. Pass the variable `qemu_guest_agent_enable='YES'` to auto start the QEMU agent service automatically.
+7. Update OPNSense to the latest version, because QEMU requires that. 
+
+The commands to build the Packer template are:
+
+```bash
+packer init .
+packer validate -var-file="../credentials.pkrvars.hcl" .
+packer build -var-file="../credentials.pkrvars.hcl" .
+```
+
+The file `credentials.pkrvars.hcl` contains the credentials used by Packer and the other components:
+
+```
+proxmox_api_url          = "https://192.168.0.50:8006/api2/json"
+proxmox_api_token_id     = "packer@pve!packer-token"
+proxmox_api_token_secret = "<proxmox_api_token>"
+ubuntu_pw = "lab-admin"
+opnsense_pw = "opnsense-admin"
+```
+
+The output of running the Packer tempalte build is the following:
+
+
+https://github.com/user-attachments/assets/00279ca3-508d-4dca-ab70-39f3e5549aca
+
+
 
 describe issues and resolutions from word
 
