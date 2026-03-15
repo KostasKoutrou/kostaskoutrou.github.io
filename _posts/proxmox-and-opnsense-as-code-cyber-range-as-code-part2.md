@@ -346,13 +346,13 @@ First of all, in order to get the initial "blank" state of the machine, the most
 4. Installing QEMU agent so that Proxmox will be able to read the IP address assigned to the VM
 5. Auto-start the QEMU agent service
 
-After applying the above configurations manually to the OPNSense VM, the configuration of the machine was exported to a file `config.xml`.
+After applying the above configurations manually to the OPNSense VM, the configuration of the machine was exported to a file `config.xml`, which can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/packer/opnsense/conf/config.xml)
 
 <img alt="image" src="https://github.com/user-attachments/assets/163b3fef-0b37-4b4d-8afe-c9cc63b4a9af" />
 
 This config.xml file contains all the information required for a VM ready to be used by Terraform.
 
-The idea is to use the config.xml and import it on a new OPNSense VM by utilizing its "Configuration Importer" feature, where during boot time you can select to import a config.xml file from an external drive (in this case a CD created by Packer containing the above exported `config.xml`).
+The idea is to use the `config.xml` and import it on a new OPNSense VM by utilizing its "Configuration Importer" feature, where during boot time you can select to import a config.xml file from an external drive (in this case a CD created by Packer containing the above exported `config.xml`).
 
 The packer template can be found under the [project's repository](https://github.com/KostasKoutrou/kostas-seclab/blob/master/packer/opnsense/opnsense.pkr.hcl), and is also presented below, with several comments to explain how it works:
 
@@ -674,7 +674,9 @@ resource "proxmox_vm_qemu" "c-opnsense" {
 
 A few interesting notes to point out:
 
-1. **Dynamic variables**: as was the case with Packer, too, several variables in the config.xml file are written dynamically. The config.xml file part where these variables are expected is shown below:
+1. **Configuring settings using the config.xml file**: As mentioned previously, OPNSense is not made to be configured "as-code" natively, i.e., by using Ansible. Therefore, several settings cannot be configured using Ansible. There is effort put towards achieving that, by implementing more API calls. However, for now, a few basic settings like configuring the network interfaces, were configured using the `config.xml` file of OPNSense. All these workarounds made me think if OPNSense is the right tool for the job, and I thought of switching to something more programmable like [VyOS](https://vyos.io/), but for now I pushed through with OPNSense. The config file used can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/terraform/template_config_opnsense_lab.xml)
+
+2. **Dynamic variables**: as was the case with Packer, too, several variables in the config.xml file are written dynamically. The config.xml file part where these variables are expected is shown below:
 
 ```xml
 <wan>
@@ -713,7 +715,7 @@ A few interesting notes to point out:
 </opt3>
 ```
 
-2. **config.xml firewall rules needed**: The Ansible collections used in the next phase require API connectivity and SSH access. Therefore, two firewall rules were needed to be added to the config.xml file:
+3. **config.xml firewall rules needed**: The Ansible collections used in the next phase require API connectivity and SSH access. Therefore, two firewall rules were needed to be added to the config.xml file:
 
 ```xml
 <rule uuid="cf7ad3fc-4924-4fa6-b9c5-77e6f5d81746">
@@ -759,7 +761,7 @@ A few interesting notes to point out:
 </rule>
 ```
 
-3. **config.xml API key needed**: The Ansible collections used in the next phase require API connectivity, and therefore an API key. This was generated manually from OPNSense, and the configuration was added to the config.xml file:
+4. **config.xml API key needed**: The Ansible collections used in the next phase require API connectivity, and therefore an API key. This was generated manually from OPNSense, and the configuration was added to the config.xml file:
 
 ```xml
 <user uuid="083dd1a5-394d-441f-aae3-481a4ce478c5">
@@ -783,13 +785,10 @@ A few interesting notes to point out:
   <dashboard/>
 </user>
 ```
-4. Configuring setting using the config.xml file: 
+ 
+So, while there were not any noteworthy issues by using Terraform for OPNSense, Terraform was actually used to solve some issues presented by Ansible, which is described in the next section.
 
-
-
-describe code and issues and resolutions
-
-OPNSense Ansible
+### OPNSense Ansible
 
 what was installed to run it
 
