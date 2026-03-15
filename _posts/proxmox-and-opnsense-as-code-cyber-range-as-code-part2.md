@@ -555,6 +555,10 @@ During development of Packer OPNSense, the following issues were identified:
 
 ### OPNSense Terraform
 
+When it comes to using Terraform for provisioning OPNSense, the process was initially straightforward, but more and more settings were added during development, as it was discovered that Ansible for OPNSense does not provide enough flexibility to implement what was needed. Therefore, more implementation points were moved from the "Ansible phase" to the "Terraform phase".
+
+
+
 describe code and issues and resolutions
 
 OPNSense Ansible
