@@ -887,7 +887,7 @@ The Ansible playbook for OPNSense with comments is provided below:
       oxlorg.opnsense.rule_multi:
         rules:
         # This rule is not needed because it is needed and was added before Ansible, because
-        # this Ansible collection talks via API, i.e., via port 443.
+        # this Ansible collection talks via API, i.e., via port 443. It is kept just for future reference.
         # - description: 'Allow HTTPS to OPNSense WebUI' #name: 'Allow HTTPS to OPNSense WebUI'
         #   source_net: 'wan'
         #   destination_net: 'wanip'
@@ -896,7 +896,7 @@ The Ansible playbook for OPNSense with comments is provided below:
         #   protocol: 'TCP'
         #   action: 'pass'
 
-        - description: 'EUZ40 allow all traffic' #name: EUZ40 allow all traffic
+        - description: 'EUZ40 allow all traffic'
           source_net: 'any'
           destination_net: 'any'
           # destination_port: leave empty for all
@@ -924,14 +924,12 @@ A few interesting notes about the Ansible playbook:
 
   <img alt="image" src="https://github.com/user-attachments/assets/dc8c25bf-00f9-4949-81ce-362e901d6ac3" />
 
-Changing the format at all results in the following error:
+Changing the format in any way results in the following error:
 
 <img alt="image" src="https://github.com/user-attachments/assets/cc474444-4f96-40dd-898b-c27a313a11ad" />
 
-2. 
+## Next Steps
 
-describe code and issues and resolutions
 
-next steps
 
-conclusion
+## Conclusion
