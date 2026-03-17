@@ -1,3 +1,15 @@
+# Cyber Range as Code - Part 2 - Automating the base - Hypervisor + Firewall
+
+## Introduction
+
+---
+
+## Contents
+
+* TOC
+{:toc}
+
+---
 
 ## Brief reminder of project architecture
 
@@ -22,7 +34,9 @@ As shown above, the architecture is a relatively simple and typical network infr
 
 > In this post, the focus is on Proxmox itself, and the central Firewall, which will be OPNSense.
 
-The code of the project can be find in my [GitHub Repository](https://github.com/KostasKoutrou/kostas-seclab)
+The code of the project can be find in the project's [GitHub Repository](https://github.com/KostasKoutrou/kostas-seclab)
+
+So let's get started with the configurations.
 
 ## Automate Proxmox
 
@@ -930,6 +944,14 @@ Changing the format in any way results in the following error:
 
 ## Next Steps
 
+The next steps include implementing some not mandatory final touches on the automation part of Proxmox and OPNSense, including:
 
+1. Automating the installation process of Proxmox itself. This is supported by Proxmox with the [Automated Installation](https://pve.proxmox.com/wiki/Automated_Installation).
+2. Automating the users creation to Proxmox
+3. Automating the changing of update repositories of Proxmox from the default ones which require a license to the free ones
+4. Adding the ISO files to Proxmox, or alternatively switching the Packer templates to download the ISOs from the internet directly instead of trying to grab them from Proxmox locally.
+5. Creating a file serving as the single source of truth. All the variables used in the project will be defined in that file, including IP addresses, usernames, etc. The file will be referenced by all code.
+
+Additionally, the next steps include the continuing of the other components described in the first post.
 
 ## Conclusion
