@@ -831,6 +831,105 @@ To install it, run:
 ansible-galaxy collection install puzzle.opnsense
 ```
 
+The Ansible playbook for OPNSense with comments is provided below:
+
+```yaml
+---
+- name: Configure OPNSense via SSH
+  hosts: opnsense
+  # connection: local  # execute modules on firewall
+  gather_facts: false
+  
+  tasks:
+    - name: Assign Interfaces
+      puzzle.opnsense.interfaces_assignments:
+        description: "{{ item.description }}"
+        device: "{{ item.device }}"
+        identifier: "{{ item.identifier }}"
+      loop:
+        - { description: "DMZ20", device: "vtnet1", identifier: "opt1" }
+        - { description: "IZ30", device: "vtnet2", identifier: "opt2" }
+        - { description: "EUZ40", device: "vtnet3", identifier: "opt3" }
+        - { description: "WAN", device: "vtnet0", identifier: "wan" }
+
+
+- name: Configure OPNSense via API
+  hosts: opnsense
+  connection: local  # execute modules on controller
+  gather_facts: false
+  vars:
+    # because this collection is designed to be ran on the OPNSense, it was trying to find
+    # the default FreeBSD python path, instead of the one running locally. Setting this
+    # variable defines the correct path for ansible.
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
+  module_defaults:
+    group/oxlorg.opnsense.all:
+      ssl_verify: false
+      firewall: "{{ inventory_hostname }}" # pull the IP directly from invetory.ini
+      api_credential_file: "{{ playbook_dir }}/OPNsense.internal_root_apikey.txt" # export of generated API keys from OPNSense
+
+  tasks:
+    # OPNSense Ansible and API do not support configuring ISC DHCP, so Kea DHCP was used instead
+    - name: Enable Kea DHCP EUZ40
+      oxlorg.opnsense.dhcp_general:
+        enabled: true
+        interfaces: ['opt3']
+        fw_rules: true
+        
+    - name: Set Kea DHCP EUZ40 Subnet
+      oxlorg.opnsense.dhcp_subnet:
+        subnet: "10.0.40.0/24"
+        pools: ["10.0.40.150-10.0.40.200"]
+        dns: ["1.1.1.1", "8.8.8.8"]
+        ipv: 4
+
+    - name: Set Firewall Rules
+      oxlorg.opnsense.rule_multi:
+        rules:
+        # This rule is not needed because it is needed and was added before Ansible, because
+        # this Ansible collection talks via API, i.e., via port 443.
+        # - description: 'Allow HTTPS to OPNSense WebUI' #name: 'Allow HTTPS to OPNSense WebUI'
+        #   source_net: 'wan'
+        #   destination_net: 'wanip'
+        #   destination_port: 443
+        #   interface: ['wan']
+        #   protocol: 'TCP'
+        #   action: 'pass'
+
+        - description: 'EUZ40 allow all traffic' #name: EUZ40 allow all traffic
+          source_net: 'any'
+          destination_net: 'any'
+          # destination_port: leave empty for all
+          interface: ['opt3']
+          protocol: 'any'
+          action: 'pass'
+          
+        match_fields: ['description']
+        reload: true
+
+    # These tasks can be used to retrieve information
+    # - name: Listing
+    #   oxlorg.opnsense.list:
+    #     target: 'rule'
+    #   register: existing_entries
+
+    # - name: Printing rules
+    #   ansible.builtin.debug:
+    #     var: existing_entries.data
+```
+
+A few interesting notes about the Ansible playbook:
+
+1. **API key definition**: the API key used to authenticate is pulled from the path `\{\{ playbook_dir \}\}/OPNsense.internal_root_apikey.txt`. This file was exported manually from an OPNSense, as described in the previous section, and saved at the path above. It is noteworthy that it is not supported to modify this file at all. The ansible tasks are looking for the format below:
+
+  <img alt="image" src="https://github.com/user-attachments/assets/dc8c25bf-00f9-4949-81ce-362e901d6ac3" />
+
+Changing the format at all results in the following error:
+
+<img alt="image" src="https://github.com/user-attachments/assets/cc474444-4f96-40dd-898b-c27a313a11ad" />
+
+2. 
+
 describe code and issues and resolutions
 
 next steps
