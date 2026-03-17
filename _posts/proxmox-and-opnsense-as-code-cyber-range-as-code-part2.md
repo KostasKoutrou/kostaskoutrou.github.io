@@ -785,12 +785,51 @@ A few interesting notes to point out:
   <dashboard/>
 </user>
 ```
- 
-So, while there were not any noteworthy issues by using Terraform for OPNSense, Terraform was actually used to solve some issues presented by Ansible, which is described in the next section.
+
+5. **Applying the configuration - Reboot the machine**: After provisioning the VM, it has the final configuration written to the `/conf/config.xml` file, but it has not pulled and applied it yet. It needs to restart to apply it. The provisioner "remote-exec" was used to execute a reboot command. However, if the reboot command is executed before the script and the terraform configuration finishes, then terraform will believe that the provisioning failed. Therefore, a daemon was started that will reboot the machine in 3 seconds. So, terraform will be able to finish successfully and consider the machine fully provisioned, and then the machine will reboot to pull the configuration.
+
+```terraform
+provisioner "remote-exec" {
+  inline = [ 
+    "echo 'Injecting Cyber Range Topology by restarting OPNSense. VM will restart in 3 seconds...'",
+    "daemon -f /bin/sh -c 'sleep 3; /sbin/reboot'"
+   ]
+}
+```
+
+In conclusion, while there were not any noteworthy issues by using Terraform for OPNSense, Terraform was actually used to solve some issues presented by Ansible, which is described in the next section.
 
 ### OPNSense Ansible
 
-what was installed to run it
+As mentioned previously, OPNSense is not designed to be configured through command line automatically. It is a GUI-first firewall. However, efforts have been put towards improving that, and an API is built through which most of its settings can be set.
+
+Considering that the API itself is not yet fully functioning, it was even more difficult to find an Ansible Collection supporting all the configurations needed to be implemented for this project.
+
+The following Ansible collections were found which were all used in combination:
+
+1. [oxlorg.opnsense](https://ansible-opnsense.oxl.app/): most configurations supported
+
+To install it, run:
+
+```bash
+sudo apt install python3-pip
+python3 -m pip install --upgrade httpx
+# latest version:
+ansible-galaxy collection install git+https://github.com/O-X-L/ansible-opnsense.git
+
+# stable/tested version:
+ansible-galaxy collection install git+https://github.com/O-X-L/ansible-opnsense.git,25.7.8
+## OR
+ansible-galaxy collection install oxlorg.opnsense # This option was selected for this project.
+```
+
+2. [puzzle.opnsense](https://puzzle.github.io/puzzle.opnsense/collections/puzzle/opnsense/index.html): Does not have many configurations, but it supports network interface assignments.
+
+To install it, run:
+
+```bash
+ansible-galaxy collection install puzzle.opnsense
+```
 
 describe code and issues and resolutions
 
