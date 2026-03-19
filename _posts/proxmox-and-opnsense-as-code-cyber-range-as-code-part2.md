@@ -594,7 +594,7 @@ After finishing with Packer, the result is a "blank" template, ready to be used 
 
 When it comes to using Terraform for provisioning OPNSense, the process was initially straightforward, but, during development, more and more settings were added to the Terraform phase, as it was discovered that Ansible for OPNSense does not provide enough flexibility to implement what was needed. Therefore, more implementation points were moved from the "Ansible phase" to the "Terraform phase".
 
-The code can be found in the project's repository and is also written below:
+The code can be found in the [project's repository](https://github.com/KostasKoutrou/kostas-seclab/blob/master/terraform/main.tf) and is also written below:
 
 ```terraform
 resource "proxmox_vm_qemu" "c-opnsense" {
@@ -711,9 +711,9 @@ resource "proxmox_vm_qemu" "c-opnsense" {
 
 A few interesting notes to point out:
 
-1. **Configuring settings using the config.xml file**: As mentioned previously, OPNSense is not made to be configured "as-code" natively, i.e., by using Ansible. Therefore, several settings cannot be configured using Ansible. There is effort put towards achieving that, by implementing more API calls. However, for now, a few basic settings like configuring the network interfaces, were configured using the `config.xml` file of OPNSense. All these workarounds made me think if OPNSense is the right tool for the job, and I thought of switching to something more programmable like [VyOS](https://vyos.io/), but for now I pushed through with OPNSense. The config file used can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/terraform/template_config_opnsense_lab.xml)
+1. **Configuring settings using the config.xml file**: As mentioned previously, OPNSense is not made to be configured "as-code" natively, i.e., by using Ansible. Therefore, several settings cannot be configured using Ansible. There is effort put by the community towards achieving that, by implementing more API calls. However, for now, a few basic settings, like configuring the network interfaces, were configured using the `config.xml` file of OPNSense. All these workarounds made me think if OPNSense is the right tool for the job, and I thought of switching to something more programmable like [VyOS](https://vyos.io/), but for now I pushed through with OPNSense. The `config.xml` file used can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/terraform/template_config_opnsense_lab.xml)
 
-2. **Dynamic variables**: as was the case with Packer, too, several variables in the config.xml file are written dynamically. The config.xml file part where these variables are expected is shown below:
+2. **Dynamic variables**: As was the case with Packer, too, several variables in the `config.xml` file were written dynamically. The `config.xml` file part where these variables are expected is shown below:
 
 ```xml
 <wan>
@@ -752,7 +752,7 @@ A few interesting notes to point out:
 </opt3>
 ```
 
-3. **config.xml firewall rules needed**: The Ansible collections used in the next phase require API connectivity and SSH access. Therefore, two firewall rules were needed to be added to the config.xml file:
+3. **config.xml firewall rules needed**: The Ansible collections used in the next phase require API connectivity and SSH access. Therefore, two firewall rules were needed to be added to the `config.xml` file:
 
 ```xml
 <rule uuid="cf7ad3fc-4924-4fa6-b9c5-77e6f5d81746">
@@ -798,7 +798,7 @@ A few interesting notes to point out:
 </rule>
 ```
 
-4. **config.xml API key needed**: The Ansible collections used in the next phase require API connectivity, and therefore an API key. This was generated manually from OPNSense, and the configuration was added to the config.xml file:
+4. **config.xml API key needed**: The Ansible collections used in the next phase require API connectivity, and therefore an API key. This was generated manually from OPNSense, and the configuration was added to the `config.xml` file:
 
 ```xml
 <user uuid="083dd1a5-394d-441f-aae3-481a4ce478c5">
@@ -815,7 +815,7 @@ A few interesting notes to point out:
   <landing_page/>
   <comment/>
   <email/>
-  **<apikeys>ooyOnJ5Y7NiPxeTXkTxEgM+9steLsU+I+UehjuiXtNdBL0ckTvUQM6PWa5AxpdnUXGLGLtyRQFNCnJI8|$6$$c9GWtGrIy25Ez358v52fDrfyTfD3Q5rnzVlc7je/MKL0EzxnTOrOL0mnSh78O.t6iA8hrtd4.OfsWUvUhJgCl0</apikeys>**
+  <apikeys>ooyOnJ5Y7NiPxeTXkTxEgM+9steLsU+I+UehjuiXtNdBL0ckTvUQM6PWa5AxpdnUXGLGLtyRQFNCnJI8|$6$$c9GWtGrIy25Ez358v52fDrfyTfD3Q5rnzVlc7je/MKL0EzxnTOrOL0mnSh78O.t6iA8hrtd4.OfsWUvUhJgCl0</apikeys>
   <priv/>
   <language/>
   <descr>System Administrator</descr>
@@ -823,7 +823,7 @@ A few interesting notes to point out:
 </user>
 ```
 
-5. **Applying the configuration - Reboot the machine**: After provisioning the VM, it has the final configuration written to the `/conf/config.xml` file, but it has not pulled and applied it yet. It needs to restart to apply it. The provisioner "remote-exec" was used to execute a reboot command. However, if the reboot command is executed before the script and the terraform configuration finishes, then terraform will believe that the provisioning failed. Therefore, a daemon was started that will reboot the machine in 3 seconds. So, terraform will be able to finish successfully and consider the machine fully provisioned, and then the machine will reboot to pull the configuration.
+5. **Applying the configuration - Reboot the machine**: After provisioning the VM, it has the final configuration written to the `/conf/config.xml` file, but it has not pulled and applied it yet. It needs to restart to apply it. The provisioner `remote-exec` was used to execute a reboot command. However, if the reboot command is executed before the script and the terraform configuration finishes, then terraform will believe that the provisioning failed. Therefore, a daemon was started that will reboot the machine in 3 seconds. So, terraform will be able to finish successfully and consider the machine fully provisioned, and then the machine will reboot to pull the configuration.
 
 ```terraform
 provisioner "remote-exec" {
@@ -840,7 +840,7 @@ In conclusion, while there were not any noteworthy issues by using Terraform for
 
 As mentioned previously, OPNSense is not designed to be configured through command line automatically. It is a GUI-first firewall. However, efforts have been put towards improving that, and an API is built through which most of its settings can be set.
 
-Considering that the API itself is not yet fully functioning, it was even more difficult to find an Ansible Collection supporting all the configurations needed to be implemented for this project.
+Considering that the API itself is not yet fully functioning, it was even more difficult to find an Ansible Collection utilizing the API and supporting all the configurations needed to be implemented for this project.
 
 The following Ansible collections were found which were all used in combination:
 
@@ -868,7 +868,7 @@ To install it, run:
 ansible-galaxy collection install puzzle.opnsense
 ```
 
-The Ansible playbook for OPNSense with comments is provided below:
+The Ansible playbook for OPNSense with comments can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/ansible/opnsense_config.yml) and is provided below:
 
 ```yaml
 ---
@@ -964,6 +964,8 @@ A few interesting notes about the Ansible playbook:
 Changing the format in any way results in the following error:
 
 <img alt="image" src="https://github.com/user-attachments/assets/cc474444-4f96-40dd-898b-c27a313a11ad" />
+
+After configuring OPNSense with Ansible, this part of the project is finished. Now let's take a look a potential next steps.
 
 ## Next Steps
 
