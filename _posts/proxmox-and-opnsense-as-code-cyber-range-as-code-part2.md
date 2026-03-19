@@ -2,6 +2,16 @@
 
 ## Introduction
 
+Welcome to the 2nd part of the project "Cyber Range as Code", where a Cyber Range is built using Infrastructure as Code and IT automation concepts.
+
+If you want to see the concept as a whole, please take a look at [part 1](https://kostaskoutrou.github.io/2026/02/02/cyber-range-as-code-part1.html).
+
+The basic idea is to use HashiCorp Packer, Terraform, and Ansible as the tools to build a fully functioning Cyber Range, for testing attack scenarios, implementing security standards, and architecting a secure infrastructure. The highlight of the concept is the IaC part. The whole point is to be able to recover seamlessly, i.e., all the infrasturcutre must be deployable automatically. If it is ever needed to redeploy the infrastructure on a new host server, it should be doable with minimal manual effort.
+
+> In **Part 2**, the base is built. This includes the **Hypervisor** itself, where **Proxmox** is used, as well as the central **Firewall** of the Cyber Range, where **OPNSense** is used.
+
+Now that the picture is painted, let's begin.
+
 ---
 
 ## Contents
@@ -13,7 +23,7 @@
 
 ## Brief reminder of project architecture
 
-Below is a brief description of the project architecture. For more details, see my previous post [Cyber Range as Code: Automating Security Lab with IaC - Part 1](https://kostaskoutrou.github.io/2026/02/02/cyber-range-as-code-part1.html)
+Below is a brief reminder of the project architecture. For more details, see my previous post [Cyber Range as Code: Automating Security Lab with IaC - Part 1](https://kostaskoutrou.github.io/2026/02/02/cyber-range-as-code-part1.html)
 
 The initial infrastructure architecture is the following. It is important to note here that this is the initial architecture idea, it is not final, and there may very well be changes during implementation.
 
@@ -32,11 +42,7 @@ As shown above, the architecture is a relatively simple and typical network infr
       - The External Attacks will occur from.
 - There will also be Internal Attack Simulations, executed from within the different zones, bypassing the firewall ("assume breach").
 
-> In this post, the focus is on Proxmox itself, and the central Firewall, which will be OPNSense.
-
 The code of the project can be find in the project's [GitHub Repository](https://github.com/KostasKoutrou/kostas-seclab)
-
-So let's get started with the configurations.
 
 ## Automate Proxmox
 
@@ -44,43 +50,47 @@ Regarding automating the configuration of Proxmox, this essentially includes:
 
 ### Initial Setup
 
-This step includes the installation of Proxmox on a machine, setting up the network configuration, i.e., IP Address, Gateway, DNS, and setting up the root user credentials. You can always take a look at the description of the configuration to be achieved in my [previous post](https://kostaskoutrou.github.io/2026/02/02/cyber-range-as-code-part1.html).
-
-One point of improvement here is to potentially automate the installation parameters. This is supported by Proxmox with the [Automated Installation](https://pve.proxmox.com/wiki/Automated_Installation). This would be a very interesting improvement point towards a fully hands-off installation and configuration. But this will be left as a future exercise.
+This step includes the installation of Proxmox on a machine, setting up the network configuration, i.e., IP Address, Gateway, DNS, and setting up the root user credentials. One point of improvement here is to potentially automate the parameters during the initial installation of Proxmox. This is supported by Proxmox with the [Automated Installation](https://pve.proxmox.com/wiki/Automated_Installation). This would be a very interesting improvement point towards a fully hands-off installation and configuration. But this will be left as a future exercise.
 
 After the initial setup and reaching the point of being able to sign in to the Proxmox GUI, the next step is to set up Proxmox so that Ansible can communicate with it.
 
 This means:
 
-1. Create a Proxmox firewall rule to allow SSH Access: This is not needed, as this rule exists by default when enabling firewall on Proxmox, see [Default firewall rules](https://pve.proxmox.com/pve-docs/pve-admin-guide.html#pve_firewall_default_rules).
-2. Create role for all automation steps: The following permissions are required for all steps of this project:
+1. **Create a Proxmox firewall rule to allow SSH Access**: This is not needed, as this rule exists by default when enabling firewall on Proxmox, see [Default firewall rules](https://pve.proxmox.com/pve-docs/pve-admin-guide.html#pve_firewall_default_rules).
+2. **Create a role for all automation steps**: The following permissions are required for all steps of this project:
 
   <img alt="image" src="https://github.com/user-attachments/assets/65d09a28-516a-4173-928b-13e1692482c5" />
 
-3. Create user: The pakcer user created in the initial lab is used. It is a simple user and the above role is assigned to it.
+3. **Create user**: The packer user created in the initial lab (part 1) is used. It is a simple user and the above role is assigned to it.
 
   <img alt="image" src="https://github.com/user-attachments/assets/84bc030f-e6b3-4e47-abd1-139a2d7e77f5" />
 
-4. API key: An API key was generated and assigned to the above user, in order for Ansible to execute API calls to Proxmox.
+4. **API key**: An API key was generated and assigned to the above user, in order for Ansible to execute API calls to Proxmox.
 
   <img alt="image" src="https://github.com/user-attachments/assets/d8031359-89ed-46b9-97b7-8933de6a5e9a" />
 
 ### Proxmox Ansible
 
-In this step, the Ansible Control Node is prepared for Proxmox configurations.
+In this step, the Ansible Control Node (i.e., the PC where all the code is written and executed) is prepared for Proxmox configurations.
 
-The Community Proxmox Ansible Collection was used for this project, which can be found [here](https://galaxy.ansible.com/ui/repo/published/community/proxmox/docs/).
+#### Ansible Collection
+
+[Ansible Collections](https://docs.ansible.com/projects/ansible/latest/collections_guide/index.html) are a distribution format for Ansible content that can include playbooks, roles, modules, and plugins. Essentially, a collection is like a program library containing all the functionalities required for configuring a specific component.
+
+The **Community Proxmox** Ansible Collection was used for this project, which can be found [here](https://galaxy.ansible.com/ui/repo/published/community/proxmox/docs/).
 
 To install the collection the following command was executed:
 
-`ansible-galaxy collection install community.proxmox`
+```bash
+ansible-galaxy collection install community.proxmox
+```
 
 <img alt="image" src="https://github.com/user-attachments/assets/c604ab1e-eb4b-4887-8687-82597fafe540" />
 
-Additionally, the community.proxmox ansible collection requires the Python libraries `proxmoxer` and `requests` to talk to the Proxmox API. To install them, run one of the following:
+Additionally, the `community.proxmox` ansible collection requires the Python libraries `proxmoxer` and `requests` to talk to the Proxmox API. To install them, run one of the following:
 
 ```bash
-# If you are on Ubuntu/Debian in WSL
+# If you are on Ubuntu/Debian in WSL. Since the project is ran on WSL, this was selected:
 sudo apt update
 sudo apt install python3-proxmoxer python3-requests
 
@@ -91,6 +101,8 @@ pip3 install proxmoxer requests
 Without these libraries, the following error is shown when trying to run the Ansible playbook:
 
 <img alt="image" src="https://github.com/user-attachments/assets/fb69ef22-ac75-41a8-bc5f-1d0bc0032e24" />
+
+#### Setting up SSH
 
 Since Ansible executes SSH using certificate-based authentication, the public key of the Ansible Control Node is needed to be added on Proxmox's trusted keys. Since the public key is the one that exists on the physical PC currently running all the commands, the easiest way to do this task is with the following command:
 
@@ -106,6 +118,8 @@ In the above command, the `inventory.ini` file includes machines which are in th
 [proxmox]
 192.168.0.50 ansible_user=root
 ```
+
+#### Initializing Ansible for Proxmox
 
 Because the Community Proxmox Ansible Collection requires a few specific [parameters](https://galaxy.ansible.com/ui/repo/published/community/proxmox/content/module/proxmox_node/#parameters) for every task being run, it is also supported to configure these parameters as Environment Variables:
 
@@ -126,6 +140,8 @@ export PROXMOX_USER="packer@pve"
 export PROXMOX_TOKEN_ID="packer-token"
 export PROXMOX_TOKEN_SECRET="<token_secret>"
 ```
+
+#### Running Ansible to configure Proxmox
 
 After setting up Ansible, the next step is to write and execute the Ansible Playbooks to apply the configurations to Proxmox, which were initially applied manually and described on my [previous post](https://kostaskoutrou.github.io/2026/02/02/cyber-range-as-code-part1.html) and part 1 of this series. The Ansible playbook can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/ansible/proxmox_config.yml), and is also depicted below, with more details in the comments and afterwards:
 
@@ -310,14 +326,16 @@ With this playbook, the following Proxmox settings are configured:
 4. Firewall Rules
 5. Enabling Firewall
 
-One point to note is that the playbooks consists of two plays:
+One point to note is that the playbook consists of two plays:
 
-1. Configuring Proxmox via API: This is the bulk of the configuration, because the Proxmox Community Ansible collection supports most of the configurations required.
-2. Configuring Proxmox via SSH: This contains tasks that cannot be executed using the avaialble Ansible collection. It includes executing manual commands on Proxmox using its CLI `pvesh`.
+1. **Configuring Proxmox via API**: This is the bulk of the configuration, because the Proxmox Community Ansible collection supports most of the configurations required.
+2. **Configuring Proxmox via SSH**: This contains tasks that cannot be executed using the avaialble Ansible collection. It includes executing manual commands on Proxmox using its CLI `pvesh`.
 
 To run this playbook, the following command is executed:
 
-`ansible-playbook -i inventory.ini proxmox_config.yml`
+```bash
+ansible-playbook -i inventory.ini proxmox_config.yml
+```
 
 Running the playbook outputs the following:
 
@@ -327,46 +345,50 @@ As shown in the screenshot, the configuration is already applied, and all tasks 
 
 #### Issues met and resolutions
 
+While developing the Ansible playbook, the follow issues were faced:
+
 **CRLF vs LF in VS Code**
 
-In my current setup, I am runnig VS Code on Windows (my host machine) and running all the code using Windows Subsystem for Linux (WSL). There is a discrepancy was to how the new line character is saved in Windows and expected to be read in Linux. More specifically:
+In current setup of writing the code, VS Code is used on Windows (PC) and  Windows Subsystem for Linux (WSL) is used to run all the code. There is a discrepancy on how the 'new line' character is saved in Windows and expected to be read in Linux. More specifically:
 
-1. Windows saves a new line as CRLF (\\r\\n).
-2. Linux expects a new line to be LF (\\n).
+1. Windows saves a new line as `CRLF` (\\r\\n).
+2. Linux expects a new line to be `LF` (\\n).
 
 When Ansible (running in Linux) reads the `inventory.ini` file, it sees the carriage return as part of the text. It reads the group name as `[proxmox\r]`. The playbook, on the other hand asks for `proxmox`. Since `proxmox` does not equal `proxmox\r`, Ansible skips it.
 
-To fix this, in VS Code, the new line character needs to be changed on the bottom right of the window for CRLF to LF:
+To fix this, in VS Code, the new line character needs to be changed on the bottom right of the window for `CRLF` to `LF`:
 
 <img alt="image" src="https://github.com/user-attachments/assets/350a5d79-058d-419c-965f-f55f6dbe0adc" />
+
+After configuring Proxmox, the next step is to automatically configure the central Firewall, which is OPNSense.
 
 ## Automate OPNSense
 
 ### OPNSense Packer
 
-As described on my first post of the series, the idea of this lab is to build VMs automatically in 3 steps:
+As described on the first post of the series, the idea of this lab is to build VMs automatically in 3 steps:
 
-1. Using Packer, build a relatively blank template (more on the "relatively" part later)
-2. Use that template with Terraform to provision VMs ready to be configured by
-3. Ansible, where the rest of the configuration and final touches happens
+1. Using **Packer**, build a relatively blank template (more on the "relatively" part later)
+2. Use that template with **Terraform** to provision VMs ready to be configured by
+3. **Ansible**, where the rest of the configuration and final touches happen.
 
-Regarding OPNSense specifically, which is actually a custom machine based on FreeBSD, unfortunately the design towards automation is not complete. Therefore, several workarounds were needed in order to achieve automated deployment.
+Regarding OPNSense specifically, which is actually a custom machine based on FreeBSD, unfortunately it is not fully designed to be deployed and configured using automation tools. Therefore, several workarounds were needed in order to achieve an automated deployment.
 
-First of all, in order to get the initial "blank" state of the machine, the most controllable way to do that was by configuring an OPNSense VM manually exactly up to the point where it functions and is ready to be used by Terraform, without any more settings configured. These configurations are:
+First of all, in order to get the initial "blank" state of the machine, the most controllable way to do that was by configuring an OPNSense VM manually exactly up to and not any further than the point where it functions and is ready to be used by Terraform, without any more settings configured. These configurations are:
 
 1. Assigning the WAN interface
 2. Assigning the WAN interface IP with DHCP (this will be changed with Terraform)
 3. Enabling SSH for management
-4. Installing QEMU agent so that Proxmox will be able to read the IP address assigned to the VM
+4. Installing the QEMU agent so that Proxmox will be able to read the IP address assigned to the VM
 5. Auto-start the QEMU agent service
 
 After applying the above configurations manually to the OPNSense VM, the configuration of the machine was exported to a file `config.xml`, which can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/packer/opnsense/conf/config.xml)
 
 <img alt="image" src="https://github.com/user-attachments/assets/163b3fef-0b37-4b4d-8afe-c9cc63b4a9af" />
 
-This config.xml file contains all the information required for a VM ready to be used by Terraform.
+This `config.xml` file contains all the information required for a VM ready to be used by Terraform.
 
-The idea is to use the `config.xml` and import it on a new OPNSense VM by utilizing its "Configuration Importer" feature, where during boot time you can select to import a config.xml file from an external drive (in this case a CD created by Packer containing the above exported `config.xml`).
+The idea is to use the `config.xml` and import it on a new OPNSense VM by utilizing its [Configuration Importer](https://docs.opnsense.org/manual/install.html#opnsense-importer) feature, where during boot time there is the option to select to import a `config.xml` file from an external drive (in this case a CD created by Packer containing the above exported `config.xml`).
 
 The packer template can be found under the [project's repository](https://github.com/KostasKoutrou/kostas-seclab/blob/master/packer/opnsense/opnsense.pkr.hcl), and is also presented below, with several comments to explain how it works:
 
@@ -475,13 +497,13 @@ Some interesting notes to point out:
 In the CD that is being mounted which contains the `config.xml` file, the SSH public key of the host machine is being written to the config by creating a dynamic variable in the `config.xml`. This is done by using the `templatefile` [function](https://developer.hashicorp.com/terraform/language/functions/templatefile), and providing the path of the public key to it, as shown in the code snippet below:
 
 ```terraform
-    cd_content = {
-    "conf/config.xml" = templatefile("${path.root}/conf/config.xml", {
-      dynamic_ssh_key = base64encode(file("~/.ssh/id_rsa.pub"))}) # pull the public SSH key, base64 encode it, and write it in config.xml
-    }
+cd_content = {
+"conf/config.xml" = templatefile("${path.root}/conf/config.xml", {
+  dynamic_ssh_key = base64encode(file("~/.ssh/id_rsa.pub"))}) # pull the public SSH key, base64 encode it, and write it in config.xml
+}
 ```
 
-`cd_content` requires one of the following tools to create the CD: xorriso, mkisofs, hdiutil, oscdimg
+Note that `cd_content` requires one of the following tools to create the CD: xorriso, mkisofs, hdiutil, oscdimg
 
 In this case, xorriso was installed
 
@@ -489,44 +511,44 @@ In this case, xorriso was installed
 sudo apt install xorriso
 ```
 
-In the config.xml file, in order to make it so that it expects a variable in that part, the following was provided:
+In the `config.xml` file, in order to make it so that it expects a variable in the SSH key field <authorizedkeys>, the dynamic variable was defined as follows:
 
 ```xml
-    <user uuid="083dd1a5-394d-441f-aae3-481a4ce478c5">
-      <uid>0</uid>
-      <name>root</name>
-      <disabled>0</disabled>
-      <scope>system</scope>
-      <expires/>
-      <authorizedkeys>${dynamic_ssh_key}</authorizedkeys>
-      <otp_seed/>
-      <shell/>
-      <password>$2y$10$YRVoF4SgskIsrXOvOQjGieB9XqHPRra9R7d80B3BZdbY/j21TwBfS</password>
-      <pwd_changed_at/>
-      <landing_page/>
-      <comment/>
-      <email/>
-      <apikeys/>
-      <priv/>
-      <language/>
-      <descr>System Administrator</descr>
-      <dashboard/>
-    </user>
+<user uuid="083dd1a5-394d-441f-aae3-481a4ce478c5">
+  <uid>0</uid>
+  <name>root</name>
+  <disabled>0</disabled>
+  <scope>system</scope>
+  <expires/>
+  <authorizedkeys>${dynamic_ssh_key}</authorizedkeys>
+  <otp_seed/>
+  <shell/>
+  <password>$2y$10$YRVoF4SgskIsrXOvOQjGieB9XqHPRra9R7d80B3BZdbY/j21TwBfS</password>
+  <pwd_changed_at/>
+  <landing_page/>
+  <comment/>
+  <email/>
+  <apikeys/>
+  <priv/>
+  <language/>
+  <descr>System Administrator</descr>
+  <dashboard/>
+</user>
 ```
 
 As shown, for SSH keys, the dynamic variable `${dynamic_ssh_key}` is provided instead of a static one.
 
 **2. boot command**
 
-Additionally, the `boot_command` includes all the commands executed via the keyboard during the installation of OPNSense using the configuration importer feature:
+Additionally, the `boot_command` includes all the commands executed via the keyboard during the installation of OPNSense using the configuration importer feature. These commands are described below:
 
 1. Wait enough time to get to the option to use the configuration importer.
-2. Write the external drive's name to pull the config.xml file from.
+2. Write the external drive's name (cd1) to pull the `config.xml` file from.
 3. Install the configuration by logging in with the `installer` user.
 4. Go through the installation steps (accept default keymap, select ZFS installation, select disk, confirm format and reboot)
 5. Wait for the installation and reboot to complete.
-6. Pass the variable `qemu_guest_agent_enable='YES'` to auto start the QEMU agent service automatically.
-7. Update OPNSense to the latest version, because QEMU requires that. 
+6. Open a shell (press option "8"), and pass the variable `qemu_guest_agent_enable='YES'` to auto start the QEMU agent service automatically.
+7. Update OPNSense to the latest version (press option "12"), because QEMU requires that. 
 
 The commands to build the Packer template are:
 
@@ -546,7 +568,7 @@ ubuntu_pw = "lab-admin"
 opnsense_pw = "opnsense-admin"
 ```
 
-The output of running the Packer tempalte build is the following:
+The output of running the Packer template build is the following:
 
 <img alt="image" src="https://github.com/user-attachments/assets/f3c1b178-711c-4a50-aa0e-5957f6d95aef" />
 
@@ -557,19 +579,20 @@ https://github.com/user-attachments/assets/00279ca3-508d-4dca-ab70-39f3e5549aca
 During development of Packer OPNSense, the following issues were identified:
 
 1. **The cloud-init limitation:**
-  - **The Issue**: OPNsense is built on FreeBSD and functions as an appliance where the /conf/config.xml is the absolute source of truth. It does not officially support standard Linux cloud-init for initial provisioning (like setting IPs or users).
-  - **The Solution**: OPNsense’s native Configuration Importer was utilized. By packaging a pre-configured config.xml file into a virtual CD-ROM, OPNsense digests the configuration during the boot sequence and permanently bakes it into the hard drive during the installation.
+  - **The Issue**: OPNsense is built on FreeBSD and functions as an appliance where the `/conf/config.xml` is the absolute source of truth. It does not officially support standard Linux cloud-init for initial provisioning (like setting IPs or users).
+  - **The Solution**: OPNsense’s native Configuration Importer was utilized. By packaging a pre-configured config.xml file into a virtual CD drive, OPNsense digests the configuration during the boot sequence and permanently bakes it into the hard drive during the installation.
 2. **QEMU guest agent issues with OPNSense version:**
-  - **The Issue**: Packer needs the QEMU Guest Agent to discover the VM's dynamic IP address to connect via SSH. However, the OPNsense base ISO (25.7) was out of date with the plugin repository, meaning the agent refused to install on boot and would not start its service. It was not possible to SSH in to run the update because the IP could not be detected due to the QEMU agent not running, and it was not possible to get the QEMU agent to run because it was not possible to run the update.
-  - **The Solution**: The setup was baked in the `boot_command` command list. Instead of stopping after the installation reboot, the command now continues typing in the console to drop into the shell, enabling the service to auto-start (sysrc qemu_guest_agent_enable='YES'), and trigger a system update via console option 12. This updats the OS and pulls the agent before Packer ever tries to connect.
+  - **The Issue**: Packer needs the QEMU Guest Agent to discover the VM's dynamic IP address to connect via SSH. However, the OPNsense base ISO (25.7) was out of date with the plugin repository, meaning the agent would install but would not start its service. It was a "chicken and egg" situation, where it was not possible to SSH in to run the update because the IP could not be detected due to the QEMU agent not running, and it was not possible to get the QEMU agent to run because it was not possible to run the update.
+  - **The Solution**: The setup was baked in the `boot_command` command list. Instead of stopping after the installation reboot, the command now continues typing in the console to drop into the shell, enabling the service to auto-start (sysrc qemu_guest_agent_enable='YES'), and trigger a system update via console option 12. This updates the OS and pulls the agent before Packer ever tries to connect.
 3. **OPNsense Firewall Blocking Packer**
   - **The Issue**: OPNsense is a default-deny firewall that drops all WAN traffic. Packer needs to connect via the WAN interface (mapped to your Proxmox bridge) to finalize the template.
   - **The Solution**: By ensuring no <lan> interface was strictly mapped initially, OPNsense's safety mechanisms trigger the Anti-Lockout rule on the WAN interface, automatically opening port 22 and allowing Packer/Ansible to connect without the need to add a firewall rule to explicitly allow this traffic. This rule will be created on the next phases anyway.
 
+After finishing with Packer, the result is a "blank" template, ready to be used by Terraform to provision a VM with the final settings.
 
 ### OPNSense Terraform
 
-When it comes to using Terraform for provisioning OPNSense, the process was initially straightforward, but more and more settings were added during development, as it was discovered that Ansible for OPNSense does not provide enough flexibility to implement what was needed. Therefore, more implementation points were moved from the "Ansible phase" to the "Terraform phase".
+When it comes to using Terraform for provisioning OPNSense, the process was initially straightforward, but, during development, more and more settings were added to the Terraform phase, as it was discovered that Ansible for OPNSense does not provide enough flexibility to implement what was needed. Therefore, more implementation points were moved from the "Ansible phase" to the "Terraform phase".
 
 The code can be found in the project's repository and is also written below:
 
@@ -955,3 +978,7 @@ The next steps include implementing some not mandatory final touches on the auto
 Additionally, the next steps include the continuing of the other components described in the first post.
 
 ## Conclusion
+
+In this post, the base was built under the context and concept of the project, i.e. utilizing IaC.
+
+As it is probably understood through the post, building each component of this project requires effort, as each component has its own peculiarities and workarounds required in order for it to work in the context of IaC and Configuration Management.
