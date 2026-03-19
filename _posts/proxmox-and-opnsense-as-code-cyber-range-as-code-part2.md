@@ -983,4 +983,4 @@ Additionally, the next steps include the continuing of the other components desc
 
 In this post, the base was built under the context and concept of the project, i.e. utilizing IaC.
 
-As it is probably understood through the post, building each component of this project requires effort, as each component has its own peculiarities and workarounds required in order for it to work in the context of IaC and Configuration Management.
+As it is probably understood through the post, building each component of this project proved to be more complex than expected, as each component has its own peculiarities and workarounds required in order for it to work in the context of IaC and Configuration Management.
