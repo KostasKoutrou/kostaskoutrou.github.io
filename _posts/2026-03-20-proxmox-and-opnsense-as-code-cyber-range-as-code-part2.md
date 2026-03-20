@@ -1,4 +1,4 @@
-# Cyber Range as Code - Part 2 - Automating the base - Hypervisor \& Firewall
+# Cyber Range as Code - Part 2 - Automating the base - Hypervisor and Firewall
 
 ## Introduction
 
