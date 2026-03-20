@@ -572,8 +572,6 @@ The output of running the Packer template build is the following:
 
 <img alt="image" src="https://github.com/user-attachments/assets/f3c1b178-711c-4a50-aa0e-5957f6d95aef" />
 
-https://github.com/user-attachments/assets/00279ca3-508d-4dca-ab70-39f3e5549aca
-
 #### OPNSense Packer Issues and resolutions
 
 During development of Packer OPNSense, the following issues were identified:
