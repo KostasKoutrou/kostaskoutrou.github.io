@@ -709,6 +709,20 @@ resource "proxmox_vm_qemu" "c-opnsense" {
 }
 ```
 
+To run the terraform configuration:
+
+```bash
+terraform init
+terraform plan -var-file=../packer/credentials.pkrvars.hcl
+terraform apply -var-file=../packer/credentials.pkrvars.hcl
+```
+
+The var-file is the one used also in packer and contains the connection variables so that Terraform can talk to Proxmox.
+
+Running the terraform configuration outputs the following. Note that 2 additional Linux VMs are also provisioned, as they were described in the previous post, but there is no reason to get into them in this post. The interesting lines are the ones starting with `proxmox_vm_qemu.c-opnsense`, because these ones are about the OPNSense VM:
+
+<img alt="image" src="https://github.com/user-attachments/assets/994f387e-e7c4-4cb3-850d-fb33e57f7e5b" />
+
 A few interesting notes to point out:
 
 1. **Configuring settings using the config.xml file**: As mentioned previously, OPNSense is not made to be configured "as-code" natively, i.e., by using Ansible. Therefore, several settings cannot be configured using Ansible. There is effort put by the community towards achieving that, by implementing more API calls. However, for now, a few basic settings, like configuring the network interfaces, were configured using the `config.xml` file of OPNSense. All these workarounds made me think if OPNSense is the right tool for the job, and I thought of switching to something more programmable like [VyOS](https://vyos.io/), but for now I pushed through with OPNSense. The `config.xml` file used can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/terraform/template_config_opnsense_lab.xml)
@@ -965,7 +979,63 @@ Changing the format in any way results in the following error:
 
 <img alt="image" src="https://github.com/user-attachments/assets/cc474444-4f96-40dd-898b-c27a313a11ad" />
 
-After configuring OPNSense with Ansible, this part of the project is finished. Now let's take a look a potential next steps.
+After configuring OPNSense with Ansible, the next step is to configure Proxmox itself for the OPNSense VM.
+
+### Configuring Proxmox for OPNSense with Ansible
+
+In addition to configuring OPNSense itself, some settings need to be configured on Proxmox regarding the hosted OPNSense VM. More specifically, these include configuring the Proxmox firewall settings for the VM.
+
+The Ansible playbook for this purpose is relatively short, can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/ansible/proxmox_opnsense_config.yml) and is the following:
+
+```yaml
+---
+- name: Config Proxmox for OPNSense
+  hosts: proxmox
+  connection: local
+  gather_facts: false
+
+  tasks:
+
+    - name: Config Firewall OPNSense
+      community.proxmox.proxmox_firewall:
+        level: vm
+        vmid: 101
+        update: true
+        state: present
+        rules:
+          - action: allowguesttraffic # same rule for both cluster and node levels
+            pos: 0
+            type: group
+            enable: true
+          - action: blockhomenwtraffic
+            pos: 1
+            type: group
+            enable: true
+
+    # These tasks can be used to retrieve the current config
+    # - name: Config Firewall OPNSense
+    #   community.proxmox.proxmox_firewall_info:
+    #     level: vm
+    #     vmid: 100
+    #   register: debug_fw_opnsense
+
+    # - name: Show debug
+    #   debug:
+    #     var: debug_fw_opnsense
+```
+
+It is straightforward, and assigned the security groups (created in the previous sections) to the VM.
+
+To run the playbook, as was the case with the playbook for proxmox itself, the envars described in the previous section need to be set firstly. To run the playbook, run:
+
+```bash
+ansible-playbook -i inventory.ini proxmox_opnsense_config.yml 
+```
+Running the playbook outputs the following:
+
+<img alt="image" src="https://github.com/user-attachments/assets/00775ec7-ea55-49ef-ba79-fa437b9d9579" />
+
+Now that Proxmox is configured for the hosted OPNSense VM, this part of the project is finished. Now let's take a look a potential next steps.
 
 ## Next Steps
 
