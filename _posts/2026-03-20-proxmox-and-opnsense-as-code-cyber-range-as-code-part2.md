@@ -50,7 +50,7 @@ Regarding automating the configuration of Proxmox, this essentially includes:
 
 ### Initial Setup
 
-This step includes the installation of Proxmox on a machine, setting up the network configuration, i.e., IP Address, Gateway, DNS, and setting up the root user credentials. One point of improvement here is to potentially automate the parameters during the initial installation of Proxmox. This is supported by Proxmox with the [Automated Installation](https://pve.proxmox.com/wiki/Automated_Installation). This would be a very interesting improvement point towards a fully hands-off installation and configuration. But this will be left as a future exercise.
+This step includes the **installation of Proxmox on a host machine**, setting up the **network configuration**, i.e., IP Address, Gateway, DNS, and setting up the **root user credentials**. One point of improvement here is to potentially automate the parameters during the initial installation of Proxmox. This is supported by Proxmox with the [Automated Installation](https://pve.proxmox.com/wiki/Automated_Installation). This would be a very interesting improvement point towards a fully hands-off installation and configuration. But this will be left as a future exercise. For now, these steps were done manually, and can be found in my [previous post](https://kostaskoutrou.github.io/2026/02/02/cyber-range-as-code-part1.html).
 
 After the initial setup and reaching the point of being able to sign in to the Proxmox GUI, the next step is to set up Proxmox so that Ansible can communicate with it.
 
@@ -104,9 +104,11 @@ Without these libraries, the following error is shown when trying to run the Ans
 
 #### Setting up SSH
 
-Since Ansible executes SSH using certificate-based authentication, the public key of the Ansible Control Node must be added to Proxmox's trusted keys. Since the public key is the one that exists on the physical PC currently running all the commands, the easiest way to do this task is with the following command:
+Since Ansible executes SSH using certificate-based authentication, **the public key of the Ansible Control Node must be added to Proxmox's trusted keys**. Since the public key is the one that exists on the physical PC currently running all the commands, the easiest way to do this task is with the following command:
 
-`ssh-copy-id -i ~/.ssh/id_rsa.pub root@192.168.0.50`
+```bash
+ssh-copy-id -i ~/.ssh/id_rsa.pub root@192.168.0.50
+```
 
 After running the command, it is now possible to ping Proxmox via Ansible:
 
@@ -121,7 +123,7 @@ In the above command, the `inventory.ini` file includes machines which are in th
 
 #### Initializing Ansible for Proxmox
 
-Because the Community Proxmox Ansible Collection requires a few specific [parameters](https://galaxy.ansible.com/ui/repo/published/community/proxmox/content/module/proxmox_node/#parameters) for every task being run, it is also supported to configure these parameters as Environment Variables:
+The Community Proxmox Ansible Collection requires a few specific [parameters](https://galaxy.ansible.com/ui/repo/published/community/proxmox/content/module/proxmox_node/#parameters) for every task being run, and it is also supported to configure these parameters as Environment Variables:
 
 |Parameter|Comments|
 |-|-|
@@ -143,7 +145,7 @@ export PROXMOX_TOKEN_SECRET="<token_secret>"
 
 #### Running Ansible to configure Proxmox
 
-After setting up Ansible, the next step is to write and execute the Ansible Playbooks to apply the configurations to Proxmox, which were initially applied manually and described on my [previous post](https://kostaskoutrou.github.io/2026/02/02/cyber-range-as-code-part1.html) and part 1 of this series. The Ansible playbook can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/ansible/proxmox_config.yml), and is also depicted below, with more details in the comments and afterwards:
+After setting up Ansible, the next step is to write and **execute the Ansible Playbooks to apply the configurations to Proxmox**, which were initially applied manually and described on my [previous post](https://kostaskoutrou.github.io/2026/02/02/cyber-range-as-code-part1.html) and part 1 of this series. The Ansible playbook can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/ansible/proxmox_config.yml), and is also depicted below, with more details in the comments and afterwards:
 
 {% raw %}
 ```yaml
@@ -363,7 +365,7 @@ While developing the Ansible playbook, the follow issues were faced:
 
 **CRLF vs LF in VS Code**
 
-In current setup of writing the code, VS Code is used on Windows (PC) and  Windows Subsystem for Linux (WSL) is used to run all the code. There is a discrepancy on how the 'new line' character is saved in Windows and expected to be read in Linux. More specifically:
+In the current setup of writing the code, VS Code is used on Windows (PC) and  Windows Subsystem for Linux (WSL) is used to run all the code. There is a discrepancy on how the 'new line' character is saved in Windows and expected to be read in Linux. More specifically:
 
 1. Windows saves a new line as `CRLF` (\\r\\n).
 2. Linux expects a new line to be `LF` (\\n).
@@ -374,7 +376,7 @@ To fix this, in VS Code, the new line character needs to be changed on the botto
 
 <img alt="image" src="https://github.com/user-attachments/assets/350a5d79-058d-419c-965f-f55f6dbe0adc" />
 
-After configuring Proxmox, the next step is to automatically configure the central Firewall, which is OPNSense.
+After configuring Proxmox, the next step is to **automatically configure the central Firewall**, which is OPNSense.
 
 ## Automate OPNSense
 
@@ -386,7 +388,7 @@ As described on the first post of the series, the idea of this lab is to build V
 2. Use that template with **Terraform** to provision VMs ready to be configured by
 3. **Ansible**, where the rest of the configuration and final touches happen.
 
-Regarding OPNSense specifically, which is actually a custom machine based on FreeBSD, unfortunately it is not fully designed to be deployed and configured using automation tools. Therefore, several workarounds were needed in order to achieve an automated deployment.
+Regarding OPNSense specifically, which is actually a **custom machine based on FreeBSD**, unfortunately it is **not fully designed to be deployed and configured using automation tools**. Therefore, several **workarounds were needed in order to achieve an automated deployment**.
 
 First of all, in order to get the initial "blank" state of the machine, the most controllable way to do that was by configuring an OPNSense VM manually exactly up to and not any further than the point where it functions and is ready to be used by Terraform, without any more settings configured. These configurations are:
 
@@ -396,7 +398,7 @@ First of all, in order to get the initial "blank" state of the machine, the most
 4. Installing the QEMU agent so that Proxmox will be able to read the IP address assigned to the VM
 5. Auto-start the QEMU agent service
 
-After applying the above configurations manually to the OPNSense VM, the configuration of the machine was exported to a file `config.xml`, which can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/packer/opnsense/conf/config.xml)
+After applying the above configurations manually to the OPNSense VM, the configuration of the machine was exported to a file `config.xml`, which can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/packer/opnsense/conf/config.xml). This XML file is the configuration file of OPNSense, contains all the settings previously configured, and can be imported on a clean-slate OPNSense and have the configuration applied to it.
 
 <img alt="image" src="https://github.com/user-attachments/assets/163b3fef-0b37-4b4d-8afe-c9cc63b4a9af" />
 
@@ -513,7 +515,7 @@ Some interesting notes to point out:
 
 **1. config.xml import**
 
-In the CD that is being mounted which contains the `config.xml` file, the SSH public key of the host machine is being written to the config by creating a dynamic variable in the `config.xml`. This is done by using the `templatefile` [function](https://developer.hashicorp.com/terraform/language/functions/templatefile), and providing the path of the public key to it, as shown in the code snippet below:
+In the CD that is being mounted which contains the `config.xml` file, the **SSH public key** of the host machine is being written to the config by creating a **dynamic variable** in the `config.xml`. This is done by using the `templatefile` [function](https://developer.hashicorp.com/terraform/language/functions/templatefile), and providing the path of the public key to it, as shown in the code snippet below:
 
 {% raw %}
 ```terraform
@@ -527,7 +529,7 @@ cd_content = {
 
 Note that `cd_content` requires one of the following tools to create the CD: xorriso, mkisofs, hdiutil, oscdimg
 
-In this case, xorriso was installed
+In this case, `xorriso` was installed
 
 ```bash
 sudo apt install xorriso
@@ -566,13 +568,13 @@ As shown, for SSH keys, the dynamic variable `${dynamic_ssh_key}` is provided in
 
 Additionally, the `boot_command` includes all the commands executed via the keyboard during the installation of OPNSense using the configuration importer feature. These commands are described below:
 
-1. Wait enough time to get to the option to use the configuration importer.
+1. **Wait** enough time to get to the option to use the **configuration importer**.
 2. Write the external drive's name (cd1) to pull the `config.xml` file from.
-3. Install the configuration by logging in with the `installer` user.
-4. Go through the installation steps (accept default keymap, select ZFS installation, select disk, confirm format and reboot)
-5. Wait for the installation and reboot to complete.
-6. Open a shell (press option "8"), and pass the variable `qemu_guest_agent_enable='YES'` to auto start the QEMU agent service automatically.
-7. Update OPNSense to the latest version (press option "12"), because QEMU requires that. 
+3. **Install the configuration** by logging in with the `installer` user.
+4. Go through the **installation steps** (accept default keymap, select ZFS installation, select disk, confirm format and reboot)
+5. **Wait** for the installation and reboot to complete.
+6. Open a shell (press option "8"), and pass the variable `qemu_guest_agent_enable='YES'` to **auto start the QEMU agent service** on boot.
+7. **Update OPNSense** to the latest version (press option "12"), because QEMU requires that. 
 
 The commands to build the Packer template are:
 
@@ -604,8 +606,8 @@ During development of Packer OPNSense, the following issues were identified:
   - **The Issue**: OPNsense is built on FreeBSD and functions as an appliance where the `/conf/config.xml` is the absolute source of truth. It does not officially support standard Linux cloud-init for initial provisioning (like setting IPs or users).
   - **The Solution**: OPNsense’s native Configuration Importer was utilized. By packaging a pre-configured config.xml file into a virtual CD drive, OPNsense digests the configuration during the boot sequence and permanently bakes it into the hard drive during the installation.
 2. **QEMU guest agent issues with OPNSense version:**
-  - **The Issue**: Packer needs the QEMU Guest Agent to discover the VM's dynamic IP address to connect via SSH. However, the OPNsense base ISO (25.7) was out of date with the plugin repository, meaning the agent would install but would not start its service. It was a classic 'chicken-and-egg' scenario: Packer couldn't SSH in to run the update because the missing QEMU agent meant the IP was undetectable, but the QEMU agent couldn't be installed without first running the update.
-  - **The Solution**: The setup was baked in the `boot_command` command list. Instead of stopping after the installation reboot, the command now continues typing in the console to drop into the shell, enabling the service to auto-start (sysrc qemu_guest_agent_enable='YES'), and trigger a system update via console option 12. This updates the OS and pulls the agent before Packer ever tries to connect.
+  - **The Issue**: Packer needs the QEMU Guest Agent to discover the VM's dynamic IP address to connect via SSH. However, the OPNsense base ISO (25.7) was **out of date** with the plugin repository, meaning the agent would install but would not start its service. It was a classic 'chicken-and-egg' scenario: Packer couldn't SSH in to run the update because the missing QEMU agent meant the IP was undetectable, but the QEMU agent couldn't be installed without first running the update.
+  - **The Solution**: The setup was baked in the `boot_command` command list. Instead of stopping after the installation reboot, the command now continues typing in the console to drop into the shell, enabling the **service to auto-start** (sysrc qemu_guest_agent_enable='YES'), and **trigger a system update** via console option 12. This updates the OS and pulls the agent before Packer ever tries to connect.
 3. **OPNsense Firewall Blocking Packer**
   - **The Issue**: OPNsense is a default-deny firewall that drops all WAN traffic. Packer needs to connect via the WAN interface (mapped to your Proxmox bridge) to finalize the template.
   - **The Solution**: By ensuring no `lan` interface was strictly mapped initially, OPNsense's safety mechanisms trigger the Anti-Lockout rule on the WAN interface, automatically opening port 22 and allowing Packer/Ansible to connect without the need to add a firewall rule to explicitly allow this traffic. This rule will be created on the next phases anyway.
@@ -614,7 +616,7 @@ After finishing with Packer, the result is a "blank" template, ready to be used 
 
 ### OPNSense Terraform
 
-When it comes to using Terraform for provisioning OPNSense, the process was initially straightforward, but, during development, more and more settings were added to the Terraform phase, as it was discovered that Ansible for OPNSense does not provide enough flexibility to implement what was needed. Therefore, more implementation points were moved from the "Ansible phase" to the "Terraform phase".
+When it comes to using Terraform for provisioning OPNSense, the process was initially straightforward, but, during development, **more and more settings were added to the Terraform phase**, as it was discovered that **Ansible for OPNSense does not provide enough flexibility** to implement what was needed. Therefore, more implementation points were moved from the "Ansible phase" to the "Terraform phase".
 
 The code can be found in the [project's repository](https://github.com/KostasKoutrou/kostas-seclab/blob/master/terraform/main.tf) and is also written below:
 
@@ -743,13 +745,13 @@ terraform apply -var-file=../packer/credentials.pkrvars.hcl
 
 The var-file is the one used also in Packer and contains the connection variables so that Terraform can talk to Proxmox.
 
-Running the terraform configuration outputs the following. Note that 2 additional Linux VMs are also provisioned, as they were described in the previous post, but there is no reason to get into them in this post. The interesting lines are the ones starting with `proxmox_vm_qemu.c-opnsense`, because these ones are about the OPNSense VM:
+Running the terraform configuration outputs the following. Note that 2 additional test Linux VMs are also provisioned, as they were described in the previous post, but there is no reason to get into them in this post. **The interesting lines are the ones starting with `proxmox_vm_qemu.c-opnsense`**, because these ones are about the OPNSense VM:
 
 <img alt="image" src="https://github.com/user-attachments/assets/994f387e-e7c4-4cb3-850d-fb33e57f7e5b" />
 
 A few interesting notes to point out:
 
-1. **Configuring settings using the config.xml file**: As mentioned previously, OPNSense is not made to be configured "as-code" natively, i.e., by using Ansible. Therefore, several settings cannot be configured using Ansible. There is effort put by the community towards achieving that, by implementing more API calls. However, for now, a few basic settings, like configuring the network interfaces, were configured using the `config.xml` file of OPNSense. All these workarounds made me question whether OPNSense is the right tool for an IaC pipeline, and I thought of switching to something more programmable like [VyOS](https://vyos.io/), but for now I pushed through with OPNSense. The `config.xml` file used can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/terraform/template_config_opnsense_lab.xml)
+1. **Configuring settings using the config.xml file**: As mentioned previously, **OPNSense is not made to be configured "as-code" natively**, i.e., by using Ansible. Therefore, several settings cannot be configured using Ansible. There is effort put by the community towards achieving that, by implementing more API calls. However, for now, a few basic settings, like configuring the network interfaces, were configured using the `config.xml` file of OPNSense. All these workarounds made me question whether OPNSense is the right tool for an IaC pipeline, and I thought of switching to something more programmable like [VyOS](https://vyos.io/), but for now I pushed through with OPNSense. The `config.xml` file used can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/terraform/template_config_opnsense_lab.xml)
 
 2. **Dynamic variables**: As was the case with Packer, too, several variables in the `config.xml` file were written dynamically. The `config.xml` file part where these variables are expected is shown below:
 
@@ -867,7 +869,7 @@ A few interesting notes to point out:
     ```
     {% endraw %}
 
-5. **Applying the configuration - Reboot the machine**: After provisioning the VM, it has the final configuration written to the `/conf/config.xml` file, but it has not pulled and applied it yet. It needs to restart to apply it. The provisioner `remote-exec` was used to execute a reboot command. However, if the reboot command is executed before the script and the terraform configuration finishes, then terraform will believe that the provisioning failed. Therefore, a daemon was started that will reboot the machine in 3 seconds. So, terraform will be able to finish successfully and consider the machine fully provisioned, and then the machine will reboot to pull the configuration.
+5. **Applying the configuration - Reboot the machine**: After provisioning the VM, it has the **final configuration** written to the `/conf/config.xml` file, but it **has not pulled and applied it yet**. It needs to restart to apply it. The provisioner `remote-exec` was used to execute a reboot command. However, if the reboot command is executed before the script and the terraform configuration finishes, then terraform will believe that the provisioning failed. Therefore, a daemon was started that will reboot the machine in 3 seconds. So, terraform will be able to finish successfully and consider the machine fully provisioned, and then the machine will reboot to pull the configuration.
 
     {% raw %}
     ```terraform
@@ -884,7 +886,7 @@ In conclusion, while there were not any noteworthy issues by using Terraform for
 
 ### OPNSense Ansible
 
-As mentioned previously, OPNSense is not designed to be configured through command line automatically. It is a GUI-first firewall. However, efforts have been put towards improving that, and an API is built through which most of its settings can be set.
+As mentioned previously, OPNSense is not designed to be configured through command line automatically. **It is a GUI-first firewall**. However, efforts have been put towards improving that, and an API is built through which most of its settings can be set.
 
 Considering that the API itself is not yet fully functioning, it was even more difficult to find an Ansible Collection utilizing the API and supporting all the configurations needed to be implemented for this project.
 
