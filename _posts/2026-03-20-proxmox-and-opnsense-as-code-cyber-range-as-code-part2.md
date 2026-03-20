@@ -6,7 +6,7 @@ Welcome to the 2nd part of the project "Cyber Range as Code", where a Cyber Rang
 
 If you want to see the concept as a whole, please take a look at [part 1](https://kostaskoutrou.github.io/2026/02/02/cyber-range-as-code-part1.html).
 
-The basic idea is to use HashiCorp Packer, Terraform, and Ansible as the tools to build a fully functioning Cyber Range, for testing attack scenarios, implementing security standards, and architecting a secure infrastructure. The highlight of the concept is the IaC part. The whole point is to be able to recover seamlessly, i.e., all the infrasturcutre must be deployable automatically. If it is ever needed to redeploy the infrastructure on a new host server, it should be doable with minimal manual effort.
+The basic idea is to use HashiCorp Packer, Terraform, and Ansible as the tools to build a fully functioning Cyber Range, for testing attack scenarios, implementing security standards, and architecting a secure infrastructure. The highlight of the concept is the IaC part. The whole point is to be able to recover seamlessly, i.e., all the infrastructure must be deployable automatically. If it is ever needed to redeploy the infrastructure on a new host server, it should be doable with minimal manual effort.
 
 > In **Part 2**, the base is built. This includes the **Hypervisor** itself, where **Proxmox** is used, as well as the central **Firewall** of the Cyber Range, where **OPNSense** is used.
 
@@ -33,7 +33,7 @@ As shown above, the architecture is a relatively simple and typical network infr
 
 - The central Firewall, controlling the network traffic among the four network zones:
   1. **Demilitarized Zone (DMZ)**: The zone that exposes services which are to be served to the Internet. In the context of the project, these will be served to the local network, and, most importantly for the project, will be accessible by the "External Attacker", enabling for attack scenarios initiated from the "Internet".
-  2. **Internal Zone**: The zone where all there internal servers and services will reside. This includes:
+  2. **Internal Zone**: The zone where all the internal servers and services will reside. This includes:
       - Any internal servers, e.g., SQL Servers and AD DC, hosting and serving information which is destined to be consumed by internal resources only.
       - Security Tools, including the SIEM/XDR/Monitoring tools.
   3. **End Users**: The last zone will be for the End Users, where typical workstation VMs will reside, and have defined access to specific servers/services and to the internet.
@@ -42,7 +42,7 @@ As shown above, the architecture is a relatively simple and typical network infr
       - The External Attacks will occur from.
 - There will also be Internal Attack Simulations, executed from within the different zones, bypassing the firewall ("assume breach").
 
-The code of the project can be find in the project's [GitHub Repository](https://github.com/KostasKoutrou/kostas-seclab)
+The code of the project can be found in the project's [GitHub Repository](https://github.com/KostasKoutrou/kostas-seclab)
 
 ## Automate Proxmox
 
@@ -56,7 +56,7 @@ After the initial setup and reaching the point of being able to sign in to the P
 
 This means:
 
-1. **Create a Proxmox firewall rule to allow SSH Access**: This is not needed, as this rule exists by default when enabling firewall on Proxmox, see [Default firewall rules](https://pve.proxmox.com/pve-docs/pve-admin-guide.html#pve_firewall_default_rules).
+1. **Verify SSH Access**: A rule to allow SSH access is actually created by default when enabling the Proxmox firewall, so no manual rule creation is required here, see [Default firewall rules](https://pve.proxmox.com/pve-docs/pve-admin-guide.html#pve_firewall_default_rules).
 2. **Create a role for all automation steps**: The following permissions are required for all steps of this project:
 
     <img alt="image" src="https://github.com/user-attachments/assets/65d09a28-516a-4173-928b-13e1692482c5" />
@@ -104,7 +104,7 @@ Without these libraries, the following error is shown when trying to run the Ans
 
 #### Setting up SSH
 
-Since Ansible executes SSH using certificate-based authentication, the public key of the Ansible Control Node is needed to be added on Proxmox's trusted keys. Since the public key is the one that exists on the physical PC currently running all the commands, the easiest way to do this task is with the following command:
+Since Ansible executes SSH using certificate-based authentication, the public key of the Ansible Control Node must be added on Proxmox's trusted keys. Since the public key is the one that exists on the physical PC currently running all the commands, the easiest way to do this task is with the following command:
 
 `ssh-copy-id -i ~/.ssh/id_rsa.pub root@192.168.0.50`
 
@@ -466,7 +466,7 @@ source "proxmox-iso" "opnsense" { #Resource type and local name
   
   network_adapters {
     model  = "virtio"
-    bridge = "vmbr0" # Will change it in the Terraform script, this is only for packer.
+    bridge = "vmbr0" # Will change it in the Terraform configuration, this is only for packer.
   }
 
   disks {
@@ -604,7 +604,7 @@ During development of Packer OPNSense, the following issues were identified:
   - **The Issue**: OPNsense is built on FreeBSD and functions as an appliance where the `/conf/config.xml` is the absolute source of truth. It does not officially support standard Linux cloud-init for initial provisioning (like setting IPs or users).
   - **The Solution**: OPNsense’s native Configuration Importer was utilized. By packaging a pre-configured config.xml file into a virtual CD drive, OPNsense digests the configuration during the boot sequence and permanently bakes it into the hard drive during the installation.
 2. **QEMU guest agent issues with OPNSense version:**
-  - **The Issue**: Packer needs the QEMU Guest Agent to discover the VM's dynamic IP address to connect via SSH. However, the OPNsense base ISO (25.7) was out of date with the plugin repository, meaning the agent would install but would not start its service. It was a "chicken and egg" situation, where it was not possible to SSH in to run the update because the IP could not be detected due to the QEMU agent not running, and it was not possible to get the QEMU agent to run because it was not possible to run the update.
+  - **The Issue**: Packer needs the QEMU Guest Agent to discover the VM's dynamic IP address to connect via SSH. However, the OPNsense base ISO (25.7) was out of date with the plugin repository, meaning the agent would install but would not start its service. It was a classic 'chicken-and-egg' scenario: Packer couldn't SSH in to run the update because the missing QEMU agent meant the IP was undetectable, but the QEMU agent couldn't be installed without first running the update.
   - **The Solution**: The setup was baked in the `boot_command` command list. Instead of stopping after the installation reboot, the command now continues typing in the console to drop into the shell, enabling the service to auto-start (sysrc qemu_guest_agent_enable='YES'), and trigger a system update via console option 12. This updates the OS and pulls the agent before Packer ever tries to connect.
 3. **OPNsense Firewall Blocking Packer**
   - **The Issue**: OPNsense is a default-deny firewall that drops all WAN traffic. Packer needs to connect via the WAN interface (mapped to your Proxmox bridge) to finalize the template.
@@ -749,7 +749,7 @@ Running the terraform configuration outputs the following. Note that 2 additiona
 
 A few interesting notes to point out:
 
-1. **Configuring settings using the config.xml file**: As mentioned previously, OPNSense is not made to be configured "as-code" natively, i.e., by using Ansible. Therefore, several settings cannot be configured using Ansible. There is effort put by the community towards achieving that, by implementing more API calls. However, for now, a few basic settings, like configuring the network interfaces, were configured using the `config.xml` file of OPNSense. All these workarounds made me think if OPNSense is the right tool for the job, and I thought of switching to something more programmable like [VyOS](https://vyos.io/), but for now I pushed through with OPNSense. The `config.xml` file used can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/terraform/template_config_opnsense_lab.xml)
+1. **Configuring settings using the config.xml file**: As mentioned previously, OPNSense is not made to be configured "as-code" natively, i.e., by using Ansible. Therefore, several settings cannot be configured using Ansible. There is effort put by the community towards achieving that, by implementing more API calls. However, for now, a few basic settings, like configuring the network interfaces, were configured using the `config.xml` file of OPNSense. All these workarounds made me question whether OPNSense is the right tool for an IaC pipeline, and I thought of switching to something more programmable like [VyOS](https://vyos.io/), but for now I pushed through with OPNSense. The `config.xml` file used can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/terraform/template_config_opnsense_lab.xml)
 
 2. **Dynamic variables**: As was the case with Packer, too, several variables in the `config.xml` file were written dynamically. The `config.xml` file part where these variables are expected is shown below:
 
@@ -792,7 +792,7 @@ A few interesting notes to point out:
     ```
     {% endraw %}
 
-3. **config.xml firewall rules needed**: The Ansible collections used in the next phase require API connectivity and SSH access. Therefore, two firewall rules were needed to be added to the `config.xml` file:
+3. **config.xml firewall rules needed**: The Ansible collections used in the next phase require API connectivity and SSH access. Therefore, two firewall rules needed to be injected into the `config.xml` file:
 
     {% raw %}
     ```xml
@@ -1061,7 +1061,7 @@ The Ansible playbook for this purpose is relatively short, can be found [here](h
 ```
 {% endraw %}
 
-It is straightforward, and assigned the security groups (created in the previous sections) to the VM.
+The playbook is straightforward, and assigns the security groups (created in the previous sections) to the VM.
 
 To run the playbook, as was the case with the playbook for proxmox itself, the envars described in the previous section need to be set firstly. To run the playbook, run:
 
@@ -1084,7 +1084,7 @@ The next steps include implementing some not mandatory final touches on the auto
 4. Adding the ISO files to Proxmox, or alternatively switching the Packer templates to download the ISOs from the internet directly instead of trying to grab them from Proxmox locally.
 5. Creating a file serving as the single source of truth. All the variables used in the project will be defined in that file, including IP addresses, usernames, etc. The file will be referenced by all code.
 
-Additionally, the next steps include the continuing of the other components described in the first post.
+Additionally, the next steps include building out the rest of the components described in the first post.
 
 ## Conclusion
 
