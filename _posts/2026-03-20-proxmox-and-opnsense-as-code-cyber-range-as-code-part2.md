@@ -156,20 +156,26 @@ After setting up Ansible, the next step is to write and execute the Ansible Play
 
 - name: Configure Proxmox via API
   hosts: proxmox
-  connection: local # because this play configures Proxmox via API, with this keyword the playbook is executed at the ansible control node instead of SSH'ing and running it locally on the managed node.
+  # because this play configures Proxmox via API, with the keyword below
+  # the playbook is executed at the ansible control node instead of
+  # SSH'ing and running it locally on the managed node.
+  connection: local
   gather_facts: false
 
   tasks:
-    - name: Set DNS # Task to configure the central DNS settings of Proxmox
+    # Task to configure the central DNS settings of Proxmox
+    - name: Set DNS
       community.proxmox.proxmox_node:
         node_name: kkproxmox
         dns:
           dns1: 1.1.1.1
           dns2: 8.8.8.8
           search: kostas.local
-      # delegate_to: localhost # this is not needed if the "connection: local" is at the start of the playbook
+      # delegate_to: localhost # this is not needed if the
+      # "connection: local" is at the start of the playbook
 
-    - name: Set Network # Task to create the Virtual Network Bridges in Proxmox
+    # Task to create the Virtual Network Bridges in Proxmox
+    - name: Set Network
       community.proxmox.proxmox_node_network:
         node: kkproxmox
         autostart: true
@@ -186,19 +192,22 @@ After setting up Ansible, the next step is to write and execute the Ansible Play
         - { iface: "vmbrEUZ40", cidr: "10.0.40.2/24", comments: "End User Zone" , bridge_ports: "" , gateway: "" }
         - { iface: "vmbr0", cidr: "192.168.0.50/24", comments: "Bridge to home router" , bridge_ports: "nic1" , gateway: "192.168.0.1" }
       
-    - name: Set Network interfaces # Task to connect the physical interface to the physical network
+    # Task to connect the physical interface to the physical network
+    - name: Set Network interfaces
       community.proxmox.proxmox_node_network:
         node: kkproxmox
         iface_type: eth
         iface: nic1
         comments: "Physical Interface of Proxmox to home router"
 
-    - name: Apply Network # Apply the above network configurations
+    # Apply the above network configurations
+    - name: Apply Network
       community.proxmox.proxmox_node_network:
         node: kkproxmox
         state: "apply"
 
-    - name: Set Firewall Aliases # Set firewall aliases to be used for the firewall rules below
+    # Set firewall aliases to be used for the firewall rules below
+    - name: Set Firewall Aliases
       community.proxmox.proxmox_firewall:
         level: cluster
         aliases:
@@ -209,7 +218,8 @@ After setting up Ansible, the next step is to write and execute the Ansible Play
           - name: subnet192
             cidr: "192.168.0.0/16"
     
-    - name: Create Firewall Security Groups # security groups to be applied on the different Proxmox levels
+    # security groups to be applied on the different Proxmox levels
+    - name: Create Firewall Security Groups
       community.proxmox.proxmox_firewall:
         level: cluster
         group_conf: true # Whether security group should be created or deleted
@@ -219,7 +229,8 @@ After setting up Ansible, the next step is to write and execute the Ansible Play
         - { group: "allowguesttraffic" }
         - { group: "blockhomenwtraffic" }
     
-    - name: Set Firewall Security Groups rules # configure rules of the above security groups
+    # configure rules of the above security groups
+    - name: Set Firewall Security Groups rules
       community.proxmox.proxmox_firewall:
         level: group
         state: present # Create/update/delete firewall rules or security group.
@@ -265,7 +276,8 @@ After setting up Ansible, the next step is to write and execute the Ansible Play
               comment: "Block Local Traffic"
               dest: dc/subnet192
 
-    - name: Apply Security Groups # apply security groups for both cluster and node levels
+    # apply security groups for both cluster and node levels
+    - name: Apply Security Groups
       community.proxmox.proxmox_firewall:
         level: "{{ item.level }}"
         node: "{{ item.node }}"
@@ -435,15 +447,18 @@ source "proxmox-iso" "opnsense" { #Resource type and local name
   boot_iso {
     # type = "scsi"
     type = "ide"
-    iso_file = "local:iso/OPNsense-25.7-dvd-amd64.iso" # ISO stored locally on Proxmox. In the future this can be changed to downloading from the internet.
+    # ISO stored locally on Proxmox. In the future this can be changed to downloading from the internet.
+    iso_file = "local:iso/OPNsense-25.7-dvd-amd64.iso"
     iso_checksum = "sha256:e4c178840ab1017bf80097424da76d896ef4183fe10696e92f288d0641475871"
     unmount = true
   }
 
-  additional_iso_files { # this will created a cd in "cd1", which will be selected in the boot_command
+  # this will created a cd in "cd1", which will be selected in the boot_command
+  additional_iso_files {
     cd_content = {
     "conf/config.xml" = templatefile("${path.root}/conf/config.xml", {
-      dynamic_ssh_key = base64encode(file("~/.ssh/id_rsa.pub"))}) # pull the public SSH key, base64 encode it, and write it in config.xml
+      # pull the public SSH key, base64 encode it, and write it in config.xml
+      dynamic_ssh_key = base64encode(file("~/.ssh/id_rsa.pub"))})
     }
     cd_label = "config"
     iso_storage_pool = "local"
@@ -504,7 +519,8 @@ In the CD that is being mounted which contains the `config.xml` file, the SSH pu
 ```terraform
 cd_content = {
 "conf/config.xml" = templatefile("${path.root}/conf/config.xml", {
-  dynamic_ssh_key = base64encode(file("~/.ssh/id_rsa.pub"))}) # pull the public SSH key, base64 encode it, and write it in config.xml
+  # pull the public SSH key, base64 encode it, and write it in config.xml
+  dynamic_ssh_key = base64encode(file("~/.ssh/id_rsa.pub"))})
 }
 ```
 {% endraw %}
@@ -934,7 +950,8 @@ The Ansible playbook for OPNSense with comments can be found [here](https://gith
     group/oxlorg.opnsense.all:
       ssl_verify: false
       firewall: "{{ inventory_hostname }}" # pull the IP directly from invetory.ini
-      api_credential_file: "{{ playbook_dir }}/OPNsense.internal_root_apikey.txt" # export of generated API keys from OPNSense
+      # export of generated API keys from OPNSense
+      api_credential_file: "{{ playbook_dir }}/OPNsense.internal_root_apikey.txt"
 
   tasks:
     # OPNSense Ansible and API do not support configuring ISC DHCP, so Kea DHCP was used instead
@@ -955,7 +972,7 @@ The Ansible playbook for OPNSense with comments can be found [here](https://gith
       oxlorg.opnsense.rule_multi:
         rules:
         # This rule is not needed because it is needed and was added before Ansible, because
-        # this Ansible collection talks via API, i.e., via port 443. It is kept just for future reference.
+        # this Ansible collection talks via API, i.e., via port 443.
         # - description: 'Allow HTTPS to OPNSense WebUI' #name: 'Allow HTTPS to OPNSense WebUI'
         #   source_net: 'wan'
         #   destination_net: 'wanip'
@@ -964,7 +981,7 @@ The Ansible playbook for OPNSense with comments can be found [here](https://gith
         #   protocol: 'TCP'
         #   action: 'pass'
 
-        - description: 'EUZ40 allow all traffic'
+        - description: 'EUZ40 allow all traffic' #name: EUZ40 allow all traffic
           source_net: 'any'
           destination_net: 'any'
           # destination_port: leave empty for all
