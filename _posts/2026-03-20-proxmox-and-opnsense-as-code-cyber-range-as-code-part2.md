@@ -542,9 +542,9 @@ In the `config.xml` file, in order to make it so that it expects a variable in t
   <dashboard/>
 </user>
 ```
+{% endraw %}
 
 As shown, for SSH keys, the dynamic variable `${dynamic_ssh_key}` is provided instead of a static one.
-{% endraw %}
 
 **2. boot command**
 
