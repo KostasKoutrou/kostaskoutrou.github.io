@@ -2,11 +2,11 @@
 
 ## Introduction
 
-Welcome to the 2nd part of the project "Cyber Range as Code", where a Cyber Range is built using Infrastructure as Code and IT automation concepts.
+Welcome to the 2nd part of the **project "Cyber Range as Code"**, where a Cyber Range is built using Infrastructure as Code and IT automation concepts.
 
 If you want to see the concept as a whole, please take a look at [part 1](https://kostaskoutrou.github.io/2026/02/02/cyber-range-as-code-part1.html).
 
-The basic idea is to use HashiCorp Packer, Terraform, and Ansible as the tools to build a fully functioning Cyber Range, for testing attack scenarios, implementing security standards, and architecting a secure infrastructure. The highlight of the concept is the IaC part. The whole point is to be able to recover seamlessly, i.e., all the infrastructure must be deployable automatically. If it is ever needed to redeploy the infrastructure on a new host server, it should be doable with minimal manual effort.
+The basic idea is to use **HashiCorp Packer, Terraform, and Ansible** as the tools to build **a fully functioning Cyber Range**, for testing attack scenarios, implementing security standards, and architecting a secure infrastructure. The highlight of the concept is the IaC part. The whole point is to be able to **recover seamlessly**, i.e., **all the infrastructure must be deployable automatically**. If it is ever needed to redeploy the infrastructure on a new host server, it should be doable with minimal manual effort.
 
 > In **Part 2**, the base is built. This includes the **Hypervisor** itself, where **Proxmox** is used, as well as the central **Firewall** of the Cyber Range, where **OPNSense** is used.
 
