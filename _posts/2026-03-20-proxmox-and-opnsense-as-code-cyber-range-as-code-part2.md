@@ -2,6 +2,7 @@
 
 ## Introduction
 
+{% raw %}
 Welcome to the 2nd part of the project "Cyber Range as Code", where a Cyber Range is built using Infrastructure as Code and IT automation concepts.
 
 If you want to see the concept as a whole, please take a look at [part 1](https://kostaskoutrou.github.io/2026/02/02/cyber-range-as-code-part1.html).
@@ -969,7 +970,7 @@ The Ansible playbook for OPNSense with comments can be found [here](https://gith
 
 A few interesting notes about the Ansible playbook:
 
-1. **API key definition**: the API key used to authenticate is pulled from the path `\{\{ playbook_dir \}\}/OPNsense.internal_root_apikey.txt`. This file was exported manually from an OPNSense, as described in the previous section, and saved at the path above. It is noteworthy that it is not supported to modify this file at all. The ansible tasks are looking for the format below:
+1. **API key definition**: the API key used to authenticate is pulled from the path `{{ playbook_dir }}/OPNsense.internal_root_apikey.txt`. This file was exported manually from an OPNSense, as described in the previous section, and saved at the path above. It is noteworthy that it is not supported to modify this file at all. The ansible tasks are looking for the format below:
 
   <img alt="image" src="https://github.com/user-attachments/assets/dc8c25bf-00f9-4949-81ce-362e901d6ac3" />
 
@@ -1052,3 +1053,4 @@ Additionally, the next steps include the continuing of the other components desc
 In this post, the base was built under the context and concept of the project, i.e. utilizing IaC.
 
 As it is probably understood through the post, building each component of this project proved to be more complex than expected, as each component has its own peculiarities and workarounds required in order for it to work in the context of IaC and Configuration Management.
+{% endraw %}
