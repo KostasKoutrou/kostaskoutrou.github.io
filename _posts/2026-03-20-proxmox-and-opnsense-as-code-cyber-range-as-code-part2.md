@@ -2,7 +2,6 @@
 
 ## Introduction
 
-{% raw %}
 Welcome to the 2nd part of the project "Cyber Range as Code", where a Cyber Range is built using Infrastructure as Code and IT automation concepts.
 
 If you want to see the concept as a whole, please take a look at [part 1](https://kostaskoutrou.github.io/2026/02/02/cyber-range-as-code-part1.html).
@@ -146,6 +145,7 @@ export PROXMOX_TOKEN_SECRET="<token_secret>"
 
 After setting up Ansible, the next step is to write and execute the Ansible Playbooks to apply the configurations to Proxmox, which were initially applied manually and described on my [previous post](https://kostaskoutrou.github.io/2026/02/02/cyber-range-as-code-part1.html) and part 1 of this series. The Ansible playbook can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/ansible/proxmox_config.yml), and is also depicted below, with more details in the comments and afterwards:
 
+{% raw %}
 ```yaml
 ---
 #before running, run the following:
@@ -318,6 +318,7 @@ After setting up Ansible, the next step is to write and execute the Ansible Play
       # Only run this command IF the 'enable' value is not 1 (or if it doesn't exist yet)
       when: (node_fw_status.stdout | from_json).enable | default(0) | int != 1
 ```
+{% endraw %}
 
 With this playbook, the following Proxmox settings are configured:
 
@@ -393,6 +394,7 @@ The idea is to use the `config.xml` and import it on a new OPNSense VM by utiliz
 
 The packer template can be found under the [project's repository](https://github.com/KostasKoutrou/kostas-seclab/blob/master/packer/opnsense/opnsense.pkr.hcl), and is also presented below, with several comments to explain how it works:
 
+{% raw %}
 ```terraform
 packer {
   required_plugins {
@@ -490,6 +492,7 @@ build {
   sources = ["source.proxmox-iso.opnsense"]
 }
 ```
+{% endraw %}
 
 Some interesting notes to point out:
 
@@ -497,12 +500,14 @@ Some interesting notes to point out:
 
 In the CD that is being mounted which contains the `config.xml` file, the SSH public key of the host machine is being written to the config by creating a dynamic variable in the `config.xml`. This is done by using the `templatefile` [function](https://developer.hashicorp.com/terraform/language/functions/templatefile), and providing the path of the public key to it, as shown in the code snippet below:
 
+{% raw %}
 ```terraform
 cd_content = {
 "conf/config.xml" = templatefile("${path.root}/conf/config.xml", {
   dynamic_ssh_key = base64encode(file("~/.ssh/id_rsa.pub"))}) # pull the public SSH key, base64 encode it, and write it in config.xml
 }
 ```
+{% endraw %}
 
 Note that `cd_content` requires one of the following tools to create the CD: xorriso, mkisofs, hdiutil, oscdimg
 
@@ -514,6 +519,7 @@ sudo apt install xorriso
 
 In the `config.xml` file, in order to make it so that it expects a variable in the SSH key field <authorizedkeys>, the dynamic variable was defined as follows:
 
+{% raw %}
 ```xml
 <user uuid="083dd1a5-394d-441f-aae3-481a4ce478c5">
   <uid>0</uid>
@@ -538,6 +544,7 @@ In the `config.xml` file, in order to make it so that it expects a variable in t
 ```
 
 As shown, for SSH keys, the dynamic variable `${dynamic_ssh_key}` is provided instead of a static one.
+{% endraw %}
 
 **2. boot command**
 
@@ -595,6 +602,7 @@ When it comes to using Terraform for provisioning OPNSense, the process was init
 
 The code can be found in the [project's repository](https://github.com/KostasKoutrou/kostas-seclab/blob/master/terraform/main.tf) and is also written below:
 
+{% raw %}
 ```terraform
 resource "proxmox_vm_qemu" "c-opnsense" {
     name = "c-opnsense"
@@ -707,6 +715,7 @@ resource "proxmox_vm_qemu" "c-opnsense" {
     }
 }
 ```
+{% endraw %}
 
 To run the terraform configuration:
 
@@ -728,6 +737,7 @@ A few interesting notes to point out:
 
 2. **Dynamic variables**: As was the case with Packer, too, several variables in the `config.xml` file were written dynamically. The `config.xml` file part where these variables are expected is shown below:
 
+{% raw %}
   ```xml
   <wan>
     <if>${wan_if}</if>
@@ -764,9 +774,11 @@ A few interesting notes to point out:
     <subnet>${euz40_subnet}</subnet>
   </opt3>
   ```
+{% endraw %}
 
 3. **config.xml firewall rules needed**: The Ansible collections used in the next phase require API connectivity and SSH access. Therefore, two firewall rules were needed to be added to the `config.xml` file:
 
+{% raw %}
   ```xml
   <rule uuid="cf7ad3fc-4924-4fa6-b9c5-77e6f5d81746">
     <type>pass</type>
@@ -810,9 +822,11 @@ A few interesting notes to point out:
     <description>Allow HTTPS to OPNSense WebUI</description>
   </rule>
   ```
+{% endraw %}
 
 4. **config.xml API key needed**: The Ansible collections used in the next phase require API connectivity, and therefore an API key. This was generated manually from OPNSense, and the configuration was added to the `config.xml` file:
 
+{% raw %}
   ```xml
   <user uuid="083dd1a5-394d-441f-aae3-481a4ce478c5">
     <uid>0</uid>
@@ -835,9 +849,11 @@ A few interesting notes to point out:
     <dashboard/>
   </user>
   ```
+{% endraw %}
 
 5. **Applying the configuration - Reboot the machine**: After provisioning the VM, it has the final configuration written to the `/conf/config.xml` file, but it has not pulled and applied it yet. It needs to restart to apply it. The provisioner `remote-exec` was used to execute a reboot command. However, if the reboot command is executed before the script and the terraform configuration finishes, then terraform will believe that the provisioning failed. Therefore, a daemon was started that will reboot the machine in 3 seconds. So, terraform will be able to finish successfully and consider the machine fully provisioned, and then the machine will reboot to pull the configuration.
 
+{% raw %}
 ```terraform
 provisioner "remote-exec" {
   inline = [ 
@@ -846,6 +862,7 @@ provisioner "remote-exec" {
    ]
 }
 ```
+{% endraw %}
 
 In conclusion, while there were not any noteworthy issues by using Terraform for OPNSense, Terraform was actually used to solve some issues presented by Ansible, which is described in the next section.
 
@@ -875,14 +892,15 @@ The following Ansible collections were found which were all used in combination:
 
 2. [puzzle.opnsense](https://puzzle.github.io/puzzle.opnsense/collections/puzzle/opnsense/index.html): Does not have many configurations, but it supports network interface assignments.
 
-To install it, run:
-
-```bash
-ansible-galaxy collection install puzzle.opnsense
-```
+  To install it, run:
+  
+  ```bash
+  ansible-galaxy collection install puzzle.opnsense
+  ```
 
 The Ansible playbook for OPNSense with comments can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/ansible/opnsense_config.yml) and is provided below:
 
+{% raw %}
 ```yaml
 ---
 - name: Configure OPNSense via SSH
@@ -967,12 +985,13 @@ The Ansible playbook for OPNSense with comments can be found [here](https://gith
     #   ansible.builtin.debug:
     #     var: existing_entries.data
 ```
+{% endraw %}
 
 A few interesting notes about the Ansible playbook:
 
-1. **API key definition**: the API key used to authenticate is pulled from the path `{{ playbook_dir }}/OPNsense.internal_root_apikey.txt`. This file was exported manually from an OPNSense, as described in the previous section, and saved at the path above. It is noteworthy that it is not supported to modify this file at all. The ansible tasks are looking for the format below:
+**API key definition**: the API key used to authenticate is pulled from the path `{{ playbook_dir }}/OPNsense.internal_root_apikey.txt`. This file was exported manually from an OPNSense, as described in the previous section, and saved at the path above. It is noteworthy that it is not supported to modify this file at all. The ansible tasks are looking for the format below:
 
-  <img alt="image" src="https://github.com/user-attachments/assets/dc8c25bf-00f9-4949-81ce-362e901d6ac3" />
+<img alt="image" src="https://github.com/user-attachments/assets/dc8c25bf-00f9-4949-81ce-362e901d6ac3" />
 
 Changing the format in any way results in the following error:
 
@@ -986,6 +1005,7 @@ In addition to configuring OPNSense itself, some settings need to be configured 
 
 The Ansible playbook for this purpose is relatively short, can be found [here](https://github.com/KostasKoutrou/kostas-seclab/blob/master/ansible/proxmox_opnsense_config.yml) and is the following:
 
+{% raw %}
 ```yaml
 ---
 - name: Config Proxmox for OPNSense
@@ -1022,6 +1042,7 @@ The Ansible playbook for this purpose is relatively short, can be found [here](h
     #   debug:
     #     var: debug_fw_opnsense
 ```
+{% endraw %}
 
 It is straightforward, and assigned the security groups (created in the previous sections) to the VM.
 
@@ -1053,4 +1074,3 @@ Additionally, the next steps include the continuing of the other components desc
 In this post, the base was built under the context and concept of the project, i.e. utilizing IaC.
 
 As it is probably understood through the post, building each component of this project proved to be more complex than expected, as each component has its own peculiarities and workarounds required in order for it to work in the context of IaC and Configuration Management.
-{% endraw %}
