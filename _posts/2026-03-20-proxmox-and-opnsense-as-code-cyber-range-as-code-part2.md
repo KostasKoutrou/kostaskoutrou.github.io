@@ -1,4 +1,4 @@
-# Cyber Range as Code - Part 2 - Automating the base - Hypervisor + Firewall
+# Cyber Range as Code - Part 2 - Automating the base - Hypervisor & Firewall
 
 ## Introduction
 
@@ -729,113 +729,113 @@ A few interesting notes to point out:
 
 2. **Dynamic variables**: As was the case with Packer, too, several variables in the `config.xml` file were written dynamically. The `config.xml` file part where these variables are expected is shown below:
 
-```xml
-<wan>
-  <if>${wan_if}</if>
-  <descr>${wan_descr}</descr>
-  <enable>1</enable>
-  <spoofmac />
-  <blockbogons>1</blockbogons>
-  <ipaddr>${wan_ip}</ipaddr>
-  <subnet>${wan_subnet}</subnet>
-  <gateway>${wan_gw}</gateway>
-</wan>
-<opt1>
-  <if>${dmz20_if}</if>
-  <descr>${dmz20_descr}</descr>
-  <enable>1</enable>
-  <spoofmac />
-  <ipaddr>${dmz20_ip}</ipaddr>
-  <subnet>${dmz20_subnet}</subnet>
-</opt1>
-<opt2>
-  <if>${iz30_if}</if>
-  <descr>${iz30_descr}</descr>
-  <enable>1</enable>
-  <spoofmac />
-  <ipaddr>${iz30_ip}</ipaddr>
-  <subnet>${iz30_subnet}</subnet>
-</opt2>
-<opt3>
-  <if>${euz40_if}</if>
-  <descr>${euz40_descr}</descr>
-  <enable>1</enable>
-  <spoofmac />
-  <ipaddr>${euz40_ip}</ipaddr>
-  <subnet>${euz40_subnet}</subnet>
-</opt3>
-```
+  ```xml
+  <wan>
+    <if>${wan_if}</if>
+    <descr>${wan_descr}</descr>
+    <enable>1</enable>
+    <spoofmac />
+    <blockbogons>1</blockbogons>
+    <ipaddr>${wan_ip}</ipaddr>
+    <subnet>${wan_subnet}</subnet>
+    <gateway>${wan_gw}</gateway>
+  </wan>
+  <opt1>
+    <if>${dmz20_if}</if>
+    <descr>${dmz20_descr}</descr>
+    <enable>1</enable>
+    <spoofmac />
+    <ipaddr>${dmz20_ip}</ipaddr>
+    <subnet>${dmz20_subnet}</subnet>
+  </opt1>
+  <opt2>
+    <if>${iz30_if}</if>
+    <descr>${iz30_descr}</descr>
+    <enable>1</enable>
+    <spoofmac />
+    <ipaddr>${iz30_ip}</ipaddr>
+    <subnet>${iz30_subnet}</subnet>
+  </opt2>
+  <opt3>
+    <if>${euz40_if}</if>
+    <descr>${euz40_descr}</descr>
+    <enable>1</enable>
+    <spoofmac />
+    <ipaddr>${euz40_ip}</ipaddr>
+    <subnet>${euz40_subnet}</subnet>
+  </opt3>
+  ```
 
 3. **config.xml firewall rules needed**: The Ansible collections used in the next phase require API connectivity and SSH access. Therefore, two firewall rules were needed to be added to the `config.xml` file:
 
-```xml
-<rule uuid="cf7ad3fc-4924-4fa6-b9c5-77e6f5d81746">
-  <type>pass</type>
-  <interface>wan</interface>
-  <ipprotocol>inet</ipprotocol>
-  <statetype>keep state</statetype>
-  <direction>in</direction>
-  <log>1</log>
-  <quick>1</quick>
-  <protocol>tcp</protocol>
-  <source>
-    <any>1</any>
-  </source>
-  <destination>
-    <network>wanip</network>
-    <port>22</port>
-  </destination>
-  <description>Allow SSH to OPNSense</description>
-</rule>
-<rule uuid="7409d103-737c-4866-83d8-2c1adc5dbcf7">
-  <enabled>1</enabled>
-  <statetype>keep</statetype>
-  <state-policy/>
-  <action>pass</action>
-  <quick>1</quick>
-  <interfacenot>0</interfacenot>
-  <interface>wan</interface>
-  <direction>in</direction>
-  <ipprotocol>inet</ipprotocol>
-  <protocol>TCP</protocol>
-  <source_net>wan</source_net>
-  <source_not>0</source_not>
-  <destination_net>wanip</destination_net>
-  <destination_not>0</destination_not>
-  <destination_port>443</destination_port>
-  <disablereplyto>0</disablereplyto>
-  <log>1</log>
-  <allowopts>0</allowopts>
-  <nosync>0</nosync>
-  <nopfsync>0</nopfsync>
-  <description>Allow HTTPS to OPNSense WebUI</description>
-</rule>
-```
+  ```xml
+  <rule uuid="cf7ad3fc-4924-4fa6-b9c5-77e6f5d81746">
+    <type>pass</type>
+    <interface>wan</interface>
+    <ipprotocol>inet</ipprotocol>
+    <statetype>keep state</statetype>
+    <direction>in</direction>
+    <log>1</log>
+    <quick>1</quick>
+    <protocol>tcp</protocol>
+    <source>
+      <any>1</any>
+    </source>
+    <destination>
+      <network>wanip</network>
+      <port>22</port>
+    </destination>
+    <description>Allow SSH to OPNSense</description>
+  </rule>
+  <rule uuid="7409d103-737c-4866-83d8-2c1adc5dbcf7">
+    <enabled>1</enabled>
+    <statetype>keep</statetype>
+    <state-policy/>
+    <action>pass</action>
+    <quick>1</quick>
+    <interfacenot>0</interfacenot>
+    <interface>wan</interface>
+    <direction>in</direction>
+    <ipprotocol>inet</ipprotocol>
+    <protocol>TCP</protocol>
+    <source_net>wan</source_net>
+    <source_not>0</source_not>
+    <destination_net>wanip</destination_net>
+    <destination_not>0</destination_not>
+    <destination_port>443</destination_port>
+    <disablereplyto>0</disablereplyto>
+    <log>1</log>
+    <allowopts>0</allowopts>
+    <nosync>0</nosync>
+    <nopfsync>0</nopfsync>
+    <description>Allow HTTPS to OPNSense WebUI</description>
+  </rule>
+  ```
 
 4. **config.xml API key needed**: The Ansible collections used in the next phase require API connectivity, and therefore an API key. This was generated manually from OPNSense, and the configuration was added to the `config.xml` file:
 
-```xml
-<user uuid="083dd1a5-394d-441f-aae3-481a4ce478c5">
-  <uid>0</uid>
-  <name>root</name>
-  <disabled>0</disabled>
-  <scope>system</scope>
-  <expires/>
-  <authorizedkeys>${dynamic_ssh_key}</authorizedkeys>
-  <otp_seed/>
-  <shell/>
-  <password>$2y$10$YRVoF4SgskIsrXOvOQjGieB9XqHPRra9R7d80B3BZdbY/j21TwBfS</password>
-  <pwd_changed_at/>
-  <landing_page/>
-  <comment/>
-  <email/>
-  <apikeys>ooyOnJ5Y7NiPxeTXkTxEgM+9steLsU+I+UehjuiXtNdBL0ckTvUQM6PWa5AxpdnUXGLGLtyRQFNCnJI8|$6$$c9GWtGrIy25Ez358v52fDrfyTfD3Q5rnzVlc7je/MKL0EzxnTOrOL0mnSh78O.t6iA8hrtd4.OfsWUvUhJgCl0</apikeys>
-  <priv/>
-  <language/>
-  <descr>System Administrator</descr>
-  <dashboard/>
-</user>
-```
+  ```xml
+  <user uuid="083dd1a5-394d-441f-aae3-481a4ce478c5">
+    <uid>0</uid>
+    <name>root</name>
+    <disabled>0</disabled>
+    <scope>system</scope>
+    <expires/>
+    <authorizedkeys>${dynamic_ssh_key}</authorizedkeys>
+    <otp_seed/>
+    <shell/>
+    <password>$2y$10$YRVoF4SgskIsrXOvOQjGieB9XqHPRra9R7d80B3BZdbY/j21TwBfS</password>
+    <pwd_changed_at/>
+    <landing_page/>
+    <comment/>
+    <email/>
+    <apikeys>ooyOnJ5Y7NiPxeTXkTxEgM+9steLsU+I+UehjuiXtNdBL0ckTvUQM6PWa5AxpdnUXGLGLtyRQFNCnJI8|$6$$c9GWtGrIy25Ez358v52fDrfyTfD3Q5rnzVlc7je/MKL0EzxnTOrOL0mnSh78O.t6iA8hrtd4.OfsWUvUhJgCl0</apikeys>
+    <priv/>
+    <language/>
+    <descr>System Administrator</descr>
+    <dashboard/>
+  </user>
+  ```
 
 5. **Applying the configuration - Reboot the machine**: After provisioning the VM, it has the final configuration written to the `/conf/config.xml` file, but it has not pulled and applied it yet. It needs to restart to apply it. The provisioner `remote-exec` was used to execute a reboot command. However, if the reboot command is executed before the script and the terraform configuration finishes, then terraform will believe that the provisioning failed. Therefore, a daemon was started that will reboot the machine in 3 seconds. So, terraform will be able to finish successfully and consider the machine fully provisioned, and then the machine will reboot to pull the configuration.
 
