@@ -104,7 +104,7 @@ Without these libraries, the following error is shown when trying to run the Ans
 
 #### Setting up SSH
 
-Since Ansible executes SSH using certificate-based authentication, the public key of the Ansible Control Node must be added on Proxmox's trusted keys. Since the public key is the one that exists on the physical PC currently running all the commands, the easiest way to do this task is with the following command:
+Since Ansible executes SSH using certificate-based authentication, the public key of the Ansible Control Node must be added to Proxmox's trusted keys. Since the public key is the one that exists on the physical PC currently running all the commands, the easiest way to do this task is with the following command:
 
 `ssh-copy-id -i ~/.ssh/id_rsa.pub root@192.168.0.50`
 
@@ -125,12 +125,12 @@ Because the Community Proxmox Ansible Collection requires a few specific [parame
 
 |Parameter|Comments|
 |-|-|
-|api_hoststring / required|Specify the target host of the Proxmox VE cluster.<br>Uses the PROXMOX_HOST environment variable if not specified.|
-|api_passwordstring|Specify the password to authenticate with.<br>Uses the PROXMOX_PASSWORD environment variable if not specified.|
-|api_portinteger|Specify the target port of the Proxmox VE cluster.<br>Uses the PROXMOX_PORT environment variable if not specified.|
-|api_token_idstring|Specify the token ID.<br>Uses the PROXMOX_TOKEN_ID environment variable if not specified.|
-|api_token_secretstring|Specify the token secret.<br>Uses the PROXMOX_TOKEN_SECRET environment variable if not specified.|
-|api_userstring / required|Specify the user to authenticate with.<br>Uses the PROXMOX_USER environment variable if not specified.|
+|api_host (required)|Specify the target host of the Proxmox VE cluster.<br>Uses the PROXMOX_HOST environment variable if not specified.|
+|api_password|Specify the password to authenticate with.<br>Uses the PROXMOX_PASSWORD environment variable if not specified.|
+|api_port|Specify the target port of the Proxmox VE cluster.<br>Uses the PROXMOX_PORT environment variable if not specified.|
+|api_token_id|Specify the token ID.<br>Uses the PROXMOX_TOKEN_ID environment variable if not specified.|
+|api_token_secret|Specify the token secret.<br>Uses the PROXMOX_TOKEN_SECRET environment variable if not specified.|
+|api_user (required)|Specify the user to authenticate with.<br>Uses the PROXMOX_USER environment variable if not specified.|
 
 Therefore, the following Envars are set before running Proxmox Ansible playbooks:
 
@@ -608,7 +608,7 @@ During development of Packer OPNSense, the following issues were identified:
   - **The Solution**: The setup was baked in the `boot_command` command list. Instead of stopping after the installation reboot, the command now continues typing in the console to drop into the shell, enabling the service to auto-start (sysrc qemu_guest_agent_enable='YES'), and trigger a system update via console option 12. This updates the OS and pulls the agent before Packer ever tries to connect.
 3. **OPNsense Firewall Blocking Packer**
   - **The Issue**: OPNsense is a default-deny firewall that drops all WAN traffic. Packer needs to connect via the WAN interface (mapped to your Proxmox bridge) to finalize the template.
-  - **The Solution**: By ensuring no <lan> interface was strictly mapped initially, OPNsense's safety mechanisms trigger the Anti-Lockout rule on the WAN interface, automatically opening port 22 and allowing Packer/Ansible to connect without the need to add a firewall rule to explicitly allow this traffic. This rule will be created on the next phases anyway.
+  - **The Solution**: By ensuring no `lan` interface was strictly mapped initially, OPNsense's safety mechanisms trigger the Anti-Lockout rule on the WAN interface, automatically opening port 22 and allowing Packer/Ansible to connect without the need to add a firewall rule to explicitly allow this traffic. This rule will be created on the next phases anyway.
 
 After finishing with Packer, the result is a "blank" template, ready to be used by Terraform to provision a VM with the final settings.
 
@@ -741,7 +741,7 @@ terraform plan -var-file=../packer/credentials.pkrvars.hcl
 terraform apply -var-file=../packer/credentials.pkrvars.hcl
 ```
 
-The var-file is the one used also in packer and contains the connection variables so that Terraform can talk to Proxmox.
+The var-file is the one used also in Packer and contains the connection variables so that Terraform can talk to Proxmox.
 
 Running the terraform configuration outputs the following. Note that 2 additional Linux VMs are also provisioned, as they were described in the previous post, but there is no reason to get into them in this post. The interesting lines are the ones starting with `proxmox_vm_qemu.c-opnsense`, because these ones are about the OPNSense VM:
 
