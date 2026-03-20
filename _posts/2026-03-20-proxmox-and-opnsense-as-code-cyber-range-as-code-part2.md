@@ -858,19 +858,19 @@ The following Ansible collections were found which were all used in combination:
 
 1. [oxlorg.opnsense](https://ansible-opnsense.oxl.app/): most configurations supported
 
-To install it, run:
-
-```bash
-sudo apt install python3-pip
-python3 -m pip install --upgrade httpx
-# latest version:
-ansible-galaxy collection install git+https://github.com/O-X-L/ansible-opnsense.git
-
-# stable/tested version:
-ansible-galaxy collection install git+https://github.com/O-X-L/ansible-opnsense.git,25.7.8
-## OR
-ansible-galaxy collection install oxlorg.opnsense # This option was selected for this project.
-```
+  To install it, run:
+  
+  ```bash
+  sudo apt install python3-pip
+  python3 -m pip install --upgrade httpx
+  # latest version:
+  ansible-galaxy collection install git+https://github.com/O-X-L/ansible-opnsense.git
+  
+  # stable/tested version:
+  ansible-galaxy collection install git+https://github.com/O-X-L/ansible-opnsense.git,25.7.8
+  ## OR
+  ansible-galaxy collection install oxlorg.opnsense # This option was selected for this project.
+  ```
 
 2. [puzzle.opnsense](https://puzzle.github.io/puzzle.opnsense/collections/puzzle/opnsense/index.html): Does not have many configurations, but it supports network interface assignments.
 
