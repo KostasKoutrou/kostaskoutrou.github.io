@@ -8,6 +8,7 @@ TOC
 
 event tables to look for and what they include
 
+
 ## ASR
 
 ## CFA
@@ -27,3 +28,11 @@ event tables to look for and what they include
 ## WDAC and AppLocker
 
 ## General XML for all detections
+
+## MDE
+
+https://learn.microsoft.com/en-us/defender-endpoint/event-error-codes
+
+Applications and Services Logs > Microsoft > Windows > SENSE and select Operational.
+
+SENSE is the internal name used to refer to the behavioral sensor that powers Microsoft Defender for Endpoint.
