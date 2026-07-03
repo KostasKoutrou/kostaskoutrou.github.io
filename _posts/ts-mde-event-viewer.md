@@ -9,7 +9,9 @@ TOC
 event tables to look for and what they include
 
 
-## ASR
+## ASR rules
+
+ASR rule events are located in the **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational** log. The following 
 
 ## CFA
 
@@ -22,6 +24,8 @@ event tables to look for and what they include
 ## Tamper Protection
 
 ## MDAV Detections
+
+https://learn.microsoft.com/en-us/defender-endpoint/troubleshoot-microsoft-defender-antivirus
 
 ## PUA
 
