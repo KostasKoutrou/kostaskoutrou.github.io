@@ -10,6 +10,15 @@ event tables to look for and what they include
 
 A great thing about the event viewer is that custom views can be created with XML files, where only the needed events from the needed logs can be filtered out. This allows for creating filtered views where only the detections and blocks done by Defender are shown, which results in similar reports to the ones created using the KQL queries shown in the previous post [Using KQL to identify detections from MDE - Getting to know MDE Part 2](https://kostaskoutrou.github.io/2026/01/06/using-kql-for-mde.html). More details on the specific XML in the sections below.
 
+
+An interesting and useful event is the one with Event ID 5007 with description "Event when settings are changed". A lot of events with Event ID 5007 occur because it includes any change happening to the MDAV configuration, such as:
+
+- Signature/Engine updates
+- Policy syncs from Group Policy, Intune, SCCM
+- Cloud-Delivered Protection Adjustments
+
+Investigating these logs are useful to identify suspicious tampering of the MDAV configuration, like disabling ASR rules or Real-Time protection, but this is out of the scope of this post. It is useful to keep this Event ID in mind for further investigations, such as to identify when an ASR rule switched from Audit mode to Block mode.
+
 ## ASR rules
 
 Attack Surface Reduction (ASR) rules in Microsoft Defender Antivirus (MDAV) protect against risky software behavior commonly exploited, such as:
@@ -30,7 +39,7 @@ When it comes to Windows Event logs, the ASR rule events are located in the Wind
 |1129|Event when user overrides block in warn mode|
 |5007|Event when settings are changed|
 
-Note that a lot of events with Event ID 5007 occur
+
 
 ## CFA
 
