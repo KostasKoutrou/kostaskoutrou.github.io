@@ -16,6 +16,7 @@ Using XPath allows for creating shareable filtered views where only the detectio
 
 In the next sections, XPath queries are shown for each MDAV feature. These can be used to facilitate troubleshooting towards identifying false positive detections and blocks. More details on the specific XPath queries is found in the sections below.
 
+How to import custom XPath queries:
 
 ## MDAV Changes logging
 
@@ -28,7 +29,16 @@ An interesting and useful event related to all Microsoft Defender Antivirus (MDA
 
 Investigating these logs is useful to identify suspicious tampering of the MDAV configuration, like disabling ASR rules or Real-Time protection, as well as to troubleshoot MDAV behavior that started unexpectedly, such as to identify when an ASR rule switched from Audit mode to Block mode.
 
-To search for Event ID 5007, which can be found under 
+To search for Event ID 5007, which can be found under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational**, the following XPath query can be used:
+
+```xml
+<QueryList>
+  <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
+   <Select Path="Microsoft-Windows-Windows Defender/Operational">*[System[(EventID=5007)]]</Select>
+   <Select Path="Microsoft-Windows-Windows Defender/WHC">*[System[(EventID=5007)]]</Select>
+  </Query>
+</QueryList>
+```
 
 ## ASR rules
 
@@ -76,9 +86,11 @@ What these XPath queries do is the following:
 1. Default path to look for is `Microsoft-Windows-Windows Defender/Operational`. This is needed to me stated even though other paths are specified below because when Microsoft build the XML structure for Event Viewer, they designed the `<Query>` node to act as the primary "container". The schema rules dictate that this container must declare a starting point.
 2. `Select Path="Microsoft-Windows-Windows Defender/Operational">`: Search in the path `Microsoft-Windows-Windows Defender/Operational`
 3. `*\[System\[\(EventID=1121 or EventID=1122 or EventID=1129\)\]\]`:
-  1. *: Search at any root event, i.e., grab all events in the log as a starting point.
+  1. `*`: Search at any root event, i.e., grab all events in the log as a starting point.
   2. The brackets contents in XPath are used to apply a filter to the item just before it, i.e., all the events.
-  3. System 
+  3. `System`: Every Windows event is split into two main XML sections: `<System>` (metadata like time, provider and Event ID) and `<EventData>` (the details of what happened). Here we are filtering the `<System>` section.
+  4. The brackets again filter to the item just before, i.e., the `<System>` section.
+  5. `EventID=...`: With this condition the specified Event IDs are filtered.
 
 ## CFA
 
