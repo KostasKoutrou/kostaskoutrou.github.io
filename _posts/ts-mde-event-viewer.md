@@ -92,6 +92,10 @@ What these XPath queries do is the following:
   4. The brackets again filter to the item just before, i.e., the `<System>` section.
   5. `EventID=...`: With this condition the specified Event IDs are filtered.
 
+As noticed, the queries searches in two paths:
+1. `Microsoft-Windows-Windows Defender/Operational`: 
+2. `Microsoft-Windows-Windows Defender/WHC`: WHC stands for Windows Health Center
+
 ## CFA
 
 ## Device Control
@@ -111,6 +115,8 @@ https://learn.microsoft.com/en-us/defender-endpoint/troubleshoot-microsoft-defen
 ## WDAC and AppLocker
 
 ## General XML for all detections
+
+add all block event IDs in one query, and try to put an easy filter for date and time range.
 
 ## MDE
 
