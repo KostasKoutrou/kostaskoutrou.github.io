@@ -18,6 +18,40 @@ In the next sections, XPath queries are shown for each MDAV feature. These can b
 
 How to import custom XPath queries:
 
+## XPath query explanation
+
+All the XPath queries used here have the following format:
+
+```xml
+<QueryList>
+  <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
+   <Select Path="Microsoft-Windows-Windows Defender/Operational">*[System[(EventID=... or EventID=... or ...)]]</Select>
+   <Select Path="Microsoft-Windows-Windows Defender/WHC">*[System[(EventID=... or EventID=... or ...)]]</Select>
+  </Query>
+</QueryList>
+```
+
+The only difference between the queries are Windows Event channel paths and the Event IDs searched for. To not repeat the explanation of the query under each section, a general explanation is provided here:
+
+1. Default path to look for is `Microsoft-Windows-Windows Defender/Operational`. This is needed to me stated even though other paths are specified below because when Microsoft build the XML structure for Event Viewer, they designed the `<Query>` node to act as the primary "container". The schema rules dictate that this container must declare a starting point.
+2. `Select Path="Microsoft-Windows-Windows Defender/Operational">`: Search in the path `Microsoft-Windows-Windows Defender/Operational`
+3. `*\[System\[\(EventID=1121 or EventID=1122 or EventID=1129\)\]\]`:
+  1. `*`: Search at any root event, i.e., grab all events in the log as a starting point.
+  2. The brackets contents in XPath are used to apply a filter to the item just before it, i.e., all the events.
+  3. `System`: Every Windows event is split into two main XML sections: `<System>` (metadata like time, provider and Event ID) and `<EventData>` (the details of what happened). Here we are filtering the `<System>` section.
+  4. The brackets again filter to the item just before, i.e., the `<System>` section.
+  5. `EventID=...`: With this condition the specified Event IDs are filtered.
+
+The queries searches in the following paths, depending on the MDAV feature:
+1. `Microsoft-Windows-Windows Defender/Operational`: This channel logs all the actual events related to MDAV. The full list of all Event IDs can be found [here](https://learn.microsoft.com/en-us/defender-endpoint/troubleshoot-microsoft-defender-antivirus).
+2. `Microsoft-Windows-Windows Defender/WHC`: WHC stands for Windows Health Center, and is a channel which provides mostly informational events about the state of the Windows Defender process. I have not found any official documentation regarding what exactly is reported in this channel, but if you have more information, please let me know.
+
+The reason to search for both paths is for redundancy and if for any reason an event is logged in the WHC channel instead of the Operational channel.
+
+## Demo Files
+
+If there are no Events for a specific feature and there is a need to produce some for confirmation of the query working as expected, there are [demo files provided by Microsoft](https://learn.microsoft.com/en-us/defender-endpoint/defender-endpoint-demonstrations), which can be used to force MDAV detections and produce Windows Events.
+
 ## MDAV Changes logging
 
 An interesting and useful event related to all Microsoft Defender Antivirus (MDAV) features is Event ID 5007 with description "Event when settings are changed". A lot of events with Event ID 5007 are logged because it includes any change happening to the MDAV configuration, such as:
@@ -40,7 +74,7 @@ To search for Event ID 5007, which can be found under **Applications and Service
 </QueryList>
 ```
 
-## ASR rules
+## Attack Surface Reduction (ASR) rules
 
 Attack Surface Reduction (ASR) rules in MDAV protect against risky software behavior commonly exploited, such as:
 
@@ -70,7 +104,7 @@ The following XPath query will filter our ASR rule detections, blocks, and user 
 </QueryList>
 ```
 
-If you just want to find blocks only, just keep Event ID 1121:
+If you just want to **find blocks only**, just keep Event ID 1121:
 
 ```xml
 <QueryList>
@@ -80,23 +114,30 @@ If you just want to find blocks only, just keep Event ID 1121:
   </Query>
 </QueryList>
 ```
+## Controlled Folder Access (CFA)
 
-What these XPath queries do is the following:
+The basic idea with CFA is that you define a set of directories (folders) and a set of applications. Only that set of apps is allowed to process in any way the set of directories. For more info, click [here](https://learn.microsoft.com/en-us/defender-endpoint/controlled-folder-access-overview)
 
-1. Default path to look for is `Microsoft-Windows-Windows Defender/Operational`. This is needed to me stated even though other paths are specified below because when Microsoft build the XML structure for Event Viewer, they designed the `<Query>` node to act as the primary "container". The schema rules dictate that this container must declare a starting point.
-2. `Select Path="Microsoft-Windows-Windows Defender/Operational">`: Search in the path `Microsoft-Windows-Windows Defender/Operational`
-3. `*\[System\[\(EventID=1121 or EventID=1122 or EventID=1129\)\]\]`:
-  1. `*`: Search at any root event, i.e., grab all events in the log as a starting point.
-  2. The brackets contents in XPath are used to apply a filter to the item just before it, i.e., all the events.
-  3. `System`: Every Windows event is split into two main XML sections: `<System>` (metadata like time, provider and Event ID) and `<EventData>` (the details of what happened). Here we are filtering the `<System>` section.
-  4. The brackets again filter to the item just before, i.e., the `<System>` section.
-  5. `EventID=...`: With this condition the specified Event IDs are filtered.
+When it comes to Windows Event logs, the CFA events are located in the Windows Event log under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational**. The following event IDs are related to CFA:
 
-As noticed, the queries searches in two paths:
-1. `Microsoft-Windows-Windows Defender/Operational`: 
-2. `Microsoft-Windows-Windows Defender/WHC`: WHC stands for Windows Health Center
+|Event ID|Description|
+|-|-|
+|5007|Event when settings are changed|
+|1124|Audited controlled folder access event|
+|1123|Blocked controlled folder access event|
+|1127|Blocked controlled folder access sector write block event|
+|1128|Audited controlled folder access sector write block event|
 
-## CFA
+The following XPath query will filter for all detection and block events:
+
+```xml
+<QueryList>
+  <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
+   <Select Path="Microsoft-Windows-Windows Defender/Operational">*[System[(EventID=1121 or EventID=1122 or EventID=1129)]]</Select>
+   <Select Path="Microsoft-Windows-Windows Defender/WHC">*[System[(EventID=1121 or EventID=1122 or EventID=1129)]]</Select>
+  </Query>
+</QueryList>
+```
 
 ## Device Control
 
