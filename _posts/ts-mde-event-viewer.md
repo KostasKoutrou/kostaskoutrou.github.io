@@ -88,7 +88,7 @@ For more info about ASR rules, visit [Microsoft's relevant documentation](https:
 When it comes to Windows Event logs, the ASR rule events are located in the Windows Event log under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational**. The following event IDs are related to ASR rules:
 
 |Event ID|Description|
-|-|-|
+|:-:|-|
 |1121|Event when rule fires in block mode|
 |1122|Event when rule fires in audit mode|
 |1129|Event when user overrides block in warn mode|
@@ -122,7 +122,7 @@ The basic idea with CFA is that you define a set of directories (folders) and a 
 When it comes to Windows Event logs, the CFA events are located in the Windows Event log under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational**. The following event IDs are related to CFA:
 
 |Event ID|Description|
-|-|-|
+|:-:|-|
 |1124|Audited controlled folder access event|
 |1123|Blocked controlled folder access event|
 |1127|Blocked controlled folder access sector write block event|
@@ -164,7 +164,7 @@ When it comes to Windows Event logs, most Exploit Protection events are located 
 
 **Security-Mitigations > Kernel Mode and Security-Mitigations > User Mode**
 |Event ID|Description|
-|-|-|
+|:-:|-|
 |1|ACG audit|
 |2|ACG enforce|
 |3|Don't allow child processes audit|
@@ -192,12 +192,12 @@ When it comes to Windows Event logs, most Exploit Protection events are located 
 
 **WER-Diagnostics > Operational**
 |Event ID|Description|
-|-|-|
+|:-:|-|
 |5|CFG Block|
 
 **Win32k > Operational**
 |Event ID|Description|
-|-|-|
+|:-:|-|
 |260|Untrusted Font|
 
 ## Network Protection, Web Protection, and SmartScreen
