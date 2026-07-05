@@ -114,6 +114,7 @@ If you just want to **find blocks only**, just keep Event ID 1121:
   </Query>
 </QueryList>
 ```
+
 ## Controlled Folder Access (CFA)
 
 The basic idea with CFA is that you define a set of directories (folders) and a set of applications. Only that set of apps is allowed to process in any way the set of directories. For more info, click [here](https://learn.microsoft.com/en-us/defender-endpoint/controlled-folder-access-overview)
@@ -122,7 +123,6 @@ When it comes to Windows Event logs, the CFA events are located in the Windows E
 
 |Event ID|Description|
 |-|-|
-|5007|Event when settings are changed|
 |1124|Audited controlled folder access event|
 |1123|Blocked controlled folder access event|
 |1127|Blocked controlled folder access sector write block event|
@@ -133,17 +133,36 @@ The following XPath query will filter for all detection and block events:
 ```xml
 <QueryList>
   <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
-   <Select Path="Microsoft-Windows-Windows Defender/Operational">*[System[(EventID=1121 or EventID=1122 or EventID=1129)]]</Select>
-   <Select Path="Microsoft-Windows-Windows Defender/WHC">*[System[(EventID=1121 or EventID=1122 or EventID=1129)]]</Select>
+   <Select Path="Microsoft-Windows-Windows Defender/Operational">*[System[(EventID=1123 or EventID=1124 or EventID=1127 or EventID=1128)]]</Select>
+   <Select Path="Microsoft-Windows-Windows Defender/WHC">*[System[(EventID=1123 or EventID=1124 or EventID=1127 or EventID=1128)]]</Select>
+  </Query>
+</QueryList>
+```
+
+For blocks only, use the following:
+
+```xml
+<QueryList>
+  <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
+   <Select Path="Microsoft-Windows-Windows Defender/Operational">*[System[(EventID=1123 or EventID=1127)]]</Select>
+   <Select Path="Microsoft-Windows-Windows Defender/WHC">*[System[(EventID=1123 or EventID=1127)]]</Select>
   </Query>
 </QueryList>
 ```
 
 ## Device Control
 
+basic info
+
+When it comes to Windows Event logs, the CFA events are located in the Windows Event log under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational**. The following event IDs are related to CFA:
+
 ## Exploit Protection
 
+When it comes to Windows Event logs, the CFA events are located in the Windows Event log under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational**. The following event IDs are related to CFA:
+
 ## Network Protection, Web Protection, and SmartScreen
+
+When it comes to Windows Event logs, the CFA events are located in the Windows Event log under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational**. The following event IDs are related to CFA:
 
 ## Tamper Protection
 
