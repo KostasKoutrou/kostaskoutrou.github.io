@@ -31,11 +31,11 @@ All the XPath queries used here have the following format:
 </QueryList>
 ```
 
-The only difference between the queries are Windows Event channel paths and the Event IDs searched for. To not repeat the explanation of the query under each section, a general explanation is provided here:
+The only difference between the queries are **Windows Event channel paths** and the **Event IDs** searched for. To not repeat the explanation of the query under each section, a general explanation is provided here:
 
 1. Default path to look for is `Microsoft-Windows-Windows Defender/Operational`. This is needed to me stated even though other paths are specified below because when Microsoft build the XML structure for Event Viewer, they designed the `<Query>` node to act as the primary "container". The schema rules dictate that this container must declare a starting point.
 2. `Select Path="Microsoft-Windows-Windows Defender/Operational">`: Search in the path `Microsoft-Windows-Windows Defender/Operational`
-3. `*\[System\[\(EventID=1121 or EventID=1122 or EventID=1129\)\]\]`:
+3. `*\[System\[\(EventID=... or EventID=... or EventID=...\)\]\]`:
   1. `*`: Search at any root event, i.e., grab all events in the log as a starting point.
   2. The brackets contents in XPath are used to apply a filter to the item just before it, i.e., all the events.
   3. `System`: Every Windows event is split into two main XML sections: `<System>` (metadata like time, provider and Event ID) and `<EventData>` (the details of what happened). Here we are filtering the `<System>` section.
@@ -158,11 +158,51 @@ When it comes to Windows Event logs, the CFA events are located in the Windows E
 
 ## Exploit Protection
 
-When it comes to Windows Event logs, the CFA events are located in the Windows Event log under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational**. The following event IDs are related to CFA:
+Exploit Protection helps protect against malware that uses exploits to infect devices and spread. It consists of many mitigations that can be applied to either the whole OS or individual apps. Exploit Protection helps protect against malware that uses exploits to infect devices and spread. It consists of many mitigations that can be applied to either the whole OS or individual apps. For more info, click [here](https://learn.microsoft.com/en-us/defender-endpoint/exploit-protection).
+
+When it comes to Windows Event logs, most Exploit Protection events are located in the Windows Event log under **Security-Mitigations > Kernel Mode and Security-Mitigations > User Mode**, while some are located in **WER-Diagnostics > Operational** and **Win32k > Operational**. The following event IDs are related to CFA:
+
+**Security-Mitigations > Kernel Mode and Security-Mitigations > User Mode**
+|Event ID|Description|
+|-|-|
+|1|ACG audit|
+|2|ACG enforce|
+|3|Don't allow child processes audit|
+|4|Don't allow child processes block|
+|5|Block low integrity images audit|
+|6|Block low integrity images block|
+|7|Block remote images audit|
+|8|Block remote images block|
+|9|Disable win32k system calls audit|
+|10|Disable win32k system calls block|
+|11|Code integrity guard audit|
+|12|Code integrity guard block|
+|13|EAF audit|
+|14|EAF enforce|
+|15|EAF+ audit|
+|16|EAF+ enforce|
+|17|IAF audit|
+|18|IAF enforce|
+|19|ROP StackPivot audit|
+|20|ROP StackPivot enforce|
+|21|ROP CallerCheck audit|
+|22|ROP CallerCheck enforce|
+|23|ROP SimExec audit|
+|24|ROP SimExec enforce|
+**WER-Diagnostics > Operational**
+|Event ID|Description|
+|-|-|
+|5|CFG Block|
+**Win32k > Operational**
+|Event ID|Description|
+|-|-|
+|260|Untrusted Font|
 
 ## Network Protection, Web Protection, and SmartScreen
 
 When it comes to Windows Event logs, the CFA events are located in the Windows Event log under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational**. The following event IDs are related to CFA:
+
+
 
 ## Tamper Protection
 
