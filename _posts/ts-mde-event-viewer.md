@@ -189,10 +189,12 @@ When it comes to Windows Event logs, most Exploit Protection events are located 
 |22|ROP CallerCheck enforce|
 |23|ROP SimExec audit|
 |24|ROP SimExec enforce|
+
 **WER-Diagnostics > Operational**
 |Event ID|Description|
 |-|-|
 |5|CFG Block|
+
 **Win32k > Operational**
 |Event ID|Description|
 |-|-|
