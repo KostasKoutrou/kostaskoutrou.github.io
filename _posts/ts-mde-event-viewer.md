@@ -220,19 +220,52 @@ The following XPath query will filter for all detection and block events:
 </QueryList>
 ```
 
-
-
 ## Network Protection, Web Protection, and SmartScreen
 
-When it comes to Windows Event logs, the CFA events are located in the Windows Event log under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational**. The following event IDs are related to CFA:
+The combination of Network Protection, Web Protection, and SmartScreen provide the ability to block access to malicious websites, custom indicators, and web content filtering. For info, click [here](https://learn.microsoft.com/en-us/defender-endpoint/network-protection).
 
+When it comes to Windows Event logs, the Network Protection events are located in the Windows Event log under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational**. The following event IDs are related to Network Protection:
 
+|Event ID|Description|
+|:-:|-|
+|1125|Event when network protection fires in audit mode|
+|1126|Event when network protection fires in block mode|
+
+```xml
+<QueryList>
+ <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
+  <Select Path="Microsoft-Windows-Windows Defender/Operational">*[System[(EventID=1125 or EventID=1126)]]</Select>
+  <Select Path="Microsoft-Windows-Windows Defender/WHC">*[System[(EventID=1125 or EventID=1126)]]</Select>
+ </Query>
+</QueryList>
+```
+
+If only the block events are needed, the audit events can be emitted:
+
+```xml
+<QueryList>
+ <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
+  <Select Path="Microsoft-Windows-Windows Defender/Operational">*[System[(EventID=1126)]]</Select>
+  <Select Path="Microsoft-Windows-Windows Defender/WHC">*[System[(EventID=1126)]]</Select>
+ </Query>
+</QueryList>
+```
 
 ## Tamper Protection
 
 ## MDAV Detections
 
 https://learn.microsoft.com/en-us/defender-endpoint/troubleshoot-microsoft-defender-antivirus
+
+1006 MALWAREPROTECTION_MALWARE_DETECTED
+1007 MALWAREPROTECTION_MALWARE_ACTION_TAKEN
+1008 MALWAREPROTECTION_MALWARE_ACTION_FAILED
+
+Event ID 1009
+Symbolic name: MALWAREPROTECTION_QUARANTINE_RESTORE
+Event ID 1010
+Symbolic name: MALWAREPROTECTION_QUARANTINE_RESTORE_FAILED
+
 
 ## PUA
 
