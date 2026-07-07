@@ -283,6 +283,13 @@ If only the block events are needed, the audit events can be emitted:
 
 ## Tamper Protection
 
+Event ID 5013
+Symbolic name: MALWAREPROTECTION_SCAN_CANCELLED
+
+Message: Tamper protection blocked a change to Microsoft Defender Antivirus.
+
+Description: If Tamper protection is enabled then any attempt to change any of Defender's settings is blocked. Event ID 5013 is generated and states which setting change was blocked.
+
 ## MDAV Detections
 
 https://learn.microsoft.com/en-us/defender-endpoint/troubleshoot-microsoft-defender-antivirus
@@ -309,6 +316,8 @@ Message: The antimalware platform encountered a critical error when trying to ta
 
 
 ## PUA
+
+Same events as malware detections. search for Category maybe
 
 ## WDAC and AppLocker
 
