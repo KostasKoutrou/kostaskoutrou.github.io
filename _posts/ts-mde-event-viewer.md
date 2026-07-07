@@ -63,6 +63,36 @@ An interesting and useful event related to all Microsoft Defender Antivirus (MDA
 
 Investigating these logs is useful to identify suspicious tampering of the MDAV configuration, like disabling ASR rules or Real-Time protection, as well as to troubleshoot MDAV behavior that started unexpectedly, such as to identify when an ASR rule switched from Audit mode to Block mode.
 
+Event ID 5000
+Symbolic name: MALWAREPROTECTION_RTP_ENABLED
+
+Message: Real-time protection is enabled.
+Event ID 5001
+Symbolic name: MALWAREPROTECTION_RTP_DISABLED
+
+Message: Real-time protection is disabled.
+Event ID 5004
+Symbolic name: MALWAREPROTECTION_RTP_FEATURE_CONFIGURED
+
+Message: The real-time protection configuration changed.
+Event ID 5009
+Symbolic name: MALWAREPROTECTION_ANTISPYWARE_ENABLED
+
+Message: Scanning for malware and other potentially unwanted software is enabled.
+Event ID 5010
+Symbolic name: MALWAREPROTECTION_ANTISPYWARE_DISABLED
+
+Message: Scanning for malware and other potentially unwanted software is disabled.
+Event ID 5011
+Symbolic name: MALWAREPROTECTION_ANTIVIRUS_ENABLED
+
+Message: Scanning for viruses is enabled.
+
+Event ID 5012
+Symbolic name: MALWAREPROTECTION_ANTIVIRUS_DISABLED
+
+Message: Scanning for viruses is disabled.
+
 To search for Event ID 5007, which can be found under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational**, the following XPath query can be used:
 
 ```xml
@@ -125,7 +155,7 @@ When it comes to Windows Event logs, the CFA events are located in the Windows E
 |:-:|-|
 |1124|Audited controlled folder access event|
 |1123|Blocked controlled folder access event|
-|1127|Blocked controlled folder access sector write block event|
+|1127|Controlled Folder Access blocked an untrusted process from potentially modifying disk sectors.|
 |1128|Audited controlled folder access sector write block event|
 
 The following XPath query will filter for all detection and block events:
@@ -268,6 +298,14 @@ Event ID 1015 The antimalware platform detected suspicious behavior.
 Symbolic name: MALWAREPROTECTION_BEHAVIOR_DETECTED
 Event ID 1116 The antimalware platform detected malware or other potentially unwanted software.
 Symbolic name: MALWAREPROTECTION_STATE_MALWARE_DETECTED
+Event ID 1117
+Symbolic name: MALWAREPROTECTION_STATE_MALWARE_ACTION_TAKEN
+Event ID 1118
+Symbolic name: MALWAREPROTECTION_STATE_MALWARE_ACTION_FAILED
+Event ID 1119
+Symbolic name: MALWAREPROTECTION_STATE_MALWARE_ACTION_CRITICALLY_FAILED
+
+Message: The antimalware platform encountered a critical error when trying to take action on malware or other potentially unwanted software. There are more details in the event message.
 
 
 ## PUA
