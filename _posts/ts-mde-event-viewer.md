@@ -10,6 +10,8 @@ TOC
 
 event tables to look for and what they include
 
+how an event XML is formatted (System and EventData).
+
 A great thing about the Windows Event Viewer is that all of its logs are stored as XML data, so custom views can be created using XPath queries, where only the needed events can be filtered out. XPath (XML Path Language) is a query language used to find and extract specific information from an XML document.
 
 Using XPath allows for creating shareable filtered views where only the detections and blocks done by Defender are shown, which results in similar reports to the ones created using the KQL queries shown in the previous post [Using KQL to identify detections from MDE - Getting to know MDE Part 2](https://kostaskoutrou.github.io/2026/01/06/using-kql-for-mde.html).
@@ -313,12 +315,43 @@ The XPath query to filter for those events is the following:
 ```xml
 <QueryList>
   <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
-   <Select Path="Microsoft-Windows-Windows Defender/Operational">*[System[(EventID=1006 or EventID=1007 or EventID=1008 or EventID=1011 or EventID=1012 or EventID=1015 or EventID=1116 or EventID=1117 or EventID=1118 or EventID=1119)]]</Select>
+   <Select Path="Microsoft-Windows-Windows Defender/Operational">*[
+    System[(EventID=1006 or EventID=1007 or EventID=1008 or
+    EventID=1011 or EventID=1012 or EventID=1015 or EventID=1116 or
+    EventID=1117 or EventID=1118 or EventID=1119)]
+    ]
+    </Select>
   </Query>
 </QueryList>
 ```
 
-As described in the Event IDs table, these events log also events of Potentially Unwanted Software/Applications (PUA). If only events not related to PUA are needed, the following XPath query can be used:
+As described in the Event IDs table, these events log also events of Potentially Unwanted Software/Applications (PUA). If only events **not** related to PUA are needed, the following XPath query can be used:
+
+```xml
+<QueryList>
+  <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
+   <Select Path="Microsoft-Windows-Windows Defender/Operational">*[
+    EventData[Data[@Name='Category Name']!='Potentially Unwanted Software'] and 
+    System[(EventID=1006 or EventID=1007 or EventID=1008 or EventID=1011 or 
+    EventID=1012 or EventID=1015 or EventID=1116 or EventID=1117 or 
+    EventID=1118 or EventID=1119)]
+    ]
+    </Select>
+  </Query>
+</QueryList>
+```
+
+## Potentially Unwanted Apps (PUA)
+
+PUA is a category of software that can:
+
+- Cause the machine to run slowly
+- Display unexpected apps
+- Install other software that might be unwanted
+
+For more info, click [here](https://learn.microsoft.com/en-us/defender-endpoint/detect-block-potentially-unwanted-apps-microsoft-defender-antivirus)
+
+As mentioned in the previous section, PUA is logged under the same Event IDs as MDAV. Therefore, if events related only PUA are needed, an additional filter is needed to be applied in the "Category Name" field of the EventData 
 
 ```xml
 <QueryList>
@@ -328,20 +361,17 @@ As described in the Event IDs table, these events log also events of Potentially
     System[(EventID=1006 or EventID=1007 or EventID=1008 or EventID=1011 or 
     EventID=1012 or EventID=1015 or EventID=1116 or EventID=1117 or 
     EventID=1118 or EventID=1119)]
-    ]</Select>
+    ]
+    </Select>
   </Query>
 </QueryList>
 ```
-
-## PUA
-
-Same events as malware detections. search for Category maybe
 
 ## WDAC and AppLocker
 
 ## General XML for all detections
 
-add all block event IDs in one query, and try to put an easy filter for date and time range.
+add all block event IDs in one query, and try to put an easy filter for date and time range and maybe see if you can put a name filter to search for specific applications.
 
 ## MDE
 
