@@ -290,30 +290,48 @@ Message: Tamper protection blocked a change to Microsoft Defender Antivirus.
 
 Description: If Tamper protection is enabled then any attempt to change any of Defender's settings is blocked. Event ID 5013 is generated and states which setting change was blocked.
 
-## MDAV Detections
+## Microsoft Defender Antivirus (MDAV) Detections
 
-https://learn.microsoft.com/en-us/defender-endpoint/troubleshoot-microsoft-defender-antivirus
+MDAV is the core component of Defender. With it, process creation events and file download events from the internet are monitored. It not only uses its signature-based engine, but also predictive technologies such as machine learning and cloud-delivered protection to find attacks. For more info, click [here](https://learn.microsoft.com/en-us/defender-endpoint/microsoft-defender-antivirus-windows)
 
-1006 MALWAREPROTECTION_MALWARE_DETECTED The antimalware engine found malware or other potentially unwanted software.
-1007 MALWAREPROTECTION_MALWARE_ACTION_TAKEN The antimalware platform performed an action to protect your system from malware or other potentially unwanted software.
-1008 MALWAREPROTECTION_MALWARE_ACTION_FAILED The antimalware platform attempted to perform an action to protect your system from malware or other potentially unwanted software, but the action failed.
-Event ID 1011 The antimalware platform deleted an item from quarantine.
-Symbolic name: MALWAREPROTECTION_QUARANTINE_DELETE
-Event ID 1012 The antimalware platform couldn't delete an item from quarantine.
-Symbolic name: MALWAREPROTECTION_QUARANTINE_DELETE_FAILED
-Event ID 1015 The antimalware platform detected suspicious behavior.
-Symbolic name: MALWAREPROTECTION_BEHAVIOR_DETECTED
-Event ID 1116 The antimalware platform detected malware or other potentially unwanted software.
-Symbolic name: MALWAREPROTECTION_STATE_MALWARE_DETECTED
-Event ID 1117
-Symbolic name: MALWAREPROTECTION_STATE_MALWARE_ACTION_TAKEN
-Event ID 1118
-Symbolic name: MALWAREPROTECTION_STATE_MALWARE_ACTION_FAILED
-Event ID 1119
-Symbolic name: MALWAREPROTECTION_STATE_MALWARE_ACTION_CRITICALLY_FAILED
+Regarding Event IDs, there is a thorough documentation [here](https://learn.microsoft.com/en-us/defender-endpoint/troubleshoot-microsoft-defender-antivirus). The Event IDs which mostly relate to detections and blocks are the following:
 
-Message: The antimalware platform encountered a critical error when trying to take action on malware or other potentially unwanted software. There are more details in the event message.
+|Event ID|Description|
+|:-:|-|
+|1006/1116|The antimalware platform found malware or other potentially unwanted software.|
+|1007/1117|The antimalware platform performed an action to protect your system from malware or other potentially unwanted software.|
+|1008/1118|The antimalware platform attempted to perform an action to protect your system from malware or other potentially unwanted software, but the action failed.|
+|1011|The antimalware platform deleted an item from quarantine.|
+|1012|The antimalware platform couldn't delete an item from quarantine.|
+|1015|The antimalware platform detected suspicious behavior.|
+|1119|The antimalware platform encountered a critical error when trying to take action on malware or other potentially unwanted software.|
 
+These Event IDs are logged under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational.**
+
+The XPath query to filter for those events is the following:
+
+```xml
+<QueryList>
+  <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
+   <Select Path="Microsoft-Windows-Windows Defender/Operational">*[System[(EventID=1006 or EventID=1007 or EventID=1008 or EventID=1011 or EventID=1012 or EventID=1015 or EventID=1116 or EventID=1117 or EventID=1118 or EventID=1119)]]</Select>
+  </Query>
+</QueryList>
+```
+
+As described in the Event IDs table, these events log also events of Potentially Unwanted Software/Applications (PUA). If only events not related to PUA are needed, the following XPath query can be used:
+
+```xml
+<QueryList>
+  <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
+   <Select Path="Microsoft-Windows-Windows Defender/Operational">*[
+    EventData[Data[@Name='Category Name']='Potentially Unwanted Software'] and 
+    System[(EventID=1006 or EventID=1007 or EventID=1008 or EventID=1011 or 
+    EventID=1012 or EventID=1015 or EventID=1116 or EventID=1117 or 
+    EventID=1118 or EventID=1119)]
+    ]</Select>
+  </Query>
+</QueryList>
+```
 
 ## PUA
 
