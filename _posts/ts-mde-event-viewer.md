@@ -404,13 +404,13 @@ For WDAC only, the following Event IDs are of interest:
 
 |Event ID|Description|
 |:-:|-|
-|8028|File was allowed to run but would have been prevented if the Config CI policy were enforced (script or .msi).|
-|8029|File was prevented from running due to Config CI policy (script or .msi).|
-|8036|File was prevented from running due to Config CI policy (COM object).|
-|8037|* passed Config CI policy and was allowed to run.|
-|8038|Publisher info: Subject: * Issuer: * Signature index * (* total)|
-|8039|Package family name * version * was allowed to install or update but would have been prevented if the Config CI policy|
-|8040|Package family name * version * was prevented from installing or updating due to Config CI policy|
+|8028|This event indicates that a script host, such as PowerShell, queried App Control about a file the script host was about to run. Since the policy was in audit mode, the script or MSI file should have run, but wouldn't have passed the App Control policy if it was enforced.|
+|8029|This event is the enforcement mode equivalent of event 8028.|
+|8036|COM object was prevented from running.|
+|8037|This event indicates that a script host checked whether to allow a script to run, and the file passed the App Control policy.|
+|8038|Signing information event correlated with either an 8028 or 8029 event. One 8038 event is generated for each signature of a script file. Contains the total number of signatures on a script file and an index as to which signature it is. Unsigned script files generate a single 8038 event with TotalSignatureCount 0. These events are correlated with 8028 and 8029 events and can be matched using the Correlation ActivityID found in the System portion of the event.|
+|8039|This event indicates that a packaged app (MSIX/AppX) was allowed to install or run because the App Control policy is in audit mode. But, it would have been blocked if the policy was enforced.|
+|8040|This event indicates that a packaged app was prevented from installing or running due to the App Control policy.|
 
 For running files installed via a Managed Installer (Intune, SCCM, etc.), the following events are of interest:
 
