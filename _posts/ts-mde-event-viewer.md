@@ -367,7 +367,54 @@ As mentioned in the previous section, PUA is logged under the same Event IDs as 
 </QueryList>
 ```
 
-## WDAC and AppLocker
+## App Control for Business and AppLocker
+
+[AppLocker](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/applocker/applocker-overview) helps control which apps and files users can run. [App Control for Business](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/appcontrol-and-applocker-overview) also known as **Windows Defender Application Control** (WDAC), formerly known as **Configurable Code Integrity ** (CCI), is a newer solution for the same purpose, and provides more granular controls.
+
+When it comes to Windows Events, both features log their Events under **Application and Services Logs > Microsoft > Windows > AppLocker**. The events are quite granular, where there are categories based on
+
+- the the file type of the event
+- whether the file that is about to be ran is there because of a Managed Installer (Intune, SCCM, etc.)
+- the feature that is controlling the file execution (AppLocker or WDAC)
+
+More info regarding [AppLocker events](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/applocker/using-event-viewer-with-applocker) and [App Control for business events](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/operations/event-id-explanations), follow the corresponding links.
+
+For AppLocker only, the following Event IDs are of interest:
+
+|Event ID|Description|
+|:-:|-|
+|8000|AppID policy conversion failed. This indicates that the policy wasn’t applied correctly to the computer.|
+|8001|The AppLocker policy was applied successfully to this computer.|
+|8002|File was allowed to run. (.exe and .dll files.)|
+|8003|File was allowed to run but would have been prevented from running if the AppLocker policy were enforced. (.exe and .dll files.)|
+|8004|File was prevented from running. (.exe and .dll files.)|
+|8005|File was allowed to run. (script or .msi files)|
+|8006|File was allowed to run but would have been prevented from running if the AppLocker policy were enforced. (script or .msi files)|
+|8007|File was prevented from running. (script or .msi files)|
+|8008|File: AppLocker component not available on this SKU. Indicates that the Windows edition does not support AppLocker.|
+|8020|File was allowed to run. (packaged apps .appx, .msix)|
+|8021|File was allowed to run but would have been prevented from running if the AppLocker policy were enforced. (packaged apps .appx, .msix)|
+|8022|File was prevented from running.  (packaged apps .appx, .msix)|
+|8023|File was allowed to be installed. (packaged apps .appx, .msix)|
+|8024|File was allowed to install but would have been prevented from running if the AppLocker policy were enforced. (packaged apps .appx, .msix)|
+|8025|File was prevented from installing. (packaged apps .appx, .msix)|
+|8027|No packaged apps can be executed while Exe rules are being enforced and no Packaged app rules have been configured.|
+
+For WDAC only, the following Event IDs are of interest:
+
+|Event ID|Description|
+|:-:|-|
+|8028|File was allowed to run but would have been prevented if the Config CI policy were enforced (script or .msi).|
+|8029|File was prevented from running due to Config CI policy (script or .msi).|
+|8036|File was prevented from running due to Config CI policy (COM object).|
+|8037|* passed Config CI policy and was allowed to run.|
+|8038|Publisher info: Subject: * Issuer: * Signature index * (* total)|
+|8039|Package family name * version * was allowed to install or update but would have been prevented if the Config CI policy|
+|8040|Package family name * version * was prevented from installing or updating due to Config CI policy|
+
+For running files installed via a Managed Installer (Intune, SCCM, etc.), the following events are of interest:
+
+
 
 ## General XML for all detections
 
