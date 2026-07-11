@@ -65,43 +65,28 @@ An interesting and useful event related to all Microsoft Defender Antivirus (MDA
 
 Investigating these logs is useful to identify suspicious tampering of the MDAV configuration, like disabling ASR rules or Real-Time protection, as well as to troubleshoot MDAV behavior that started unexpectedly, such as to identify when an ASR rule switched from Audit mode to Block mode.
 
-Event ID 5000
-Symbolic name: MALWAREPROTECTION_RTP_ENABLED
+In addition to Event ID there are the following Event IDs related to changing settings in Defender:
 
-Message: Real-time protection is enabled.
-Event ID 5001
-Symbolic name: MALWAREPROTECTION_RTP_DISABLED
+|Event ID|Description|
+|:-:|-|
+|5000|Real-time protection enabled: Microsoft Defender Antivirus real-time protection scanning for malware and other potentially unwanted software was enabled.|
+|5001|Real-time protection disabled: Microsoft Defender Antivirus real-time protection scanning for malware and other potentially unwanted software was disabled.|
+|5004|Microsoft Defender Antivirus real-time protection feature configuration changed.|
+|5007|The antimalware platform configuration changed.|
+|5009|Antispyware enabled: Microsoft Defender Antivirus enabled scanning for malware and other potentially unwanted software.|
+|5010|Antispyware disabled: Microsoft Defender Antivirus scanning for malware and other potentially unwanted software is disabled.|
+|5011|Malware protection enabled: Microsoft Defender Antivirus enabled scanning for viruses.|
+|5012|Malware protection disabled: Microsoft Defender Antivirus scanning for viruses is disabled.|
 
-Message: Real-time protection is disabled.
-Event ID 5004
-Symbolic name: MALWAREPROTECTION_RTP_FEATURE_CONFIGURED
-
-Message: The real-time protection configuration changed.
-Event ID 5009
-Symbolic name: MALWAREPROTECTION_ANTISPYWARE_ENABLED
-
-Message: Scanning for malware and other potentially unwanted software is enabled.
-Event ID 5010
-Symbolic name: MALWAREPROTECTION_ANTISPYWARE_DISABLED
-
-Message: Scanning for malware and other potentially unwanted software is disabled.
-Event ID 5011
-Symbolic name: MALWAREPROTECTION_ANTIVIRUS_ENABLED
-
-Message: Scanning for viruses is enabled.
-
-Event ID 5012
-Symbolic name: MALWAREPROTECTION_ANTIVIRUS_DISABLED
-
-Message: Scanning for viruses is disabled.
-
-To search for Event ID 5007, which can be found under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational**, the following XPath query can be used:
+To search for these Event IDs, which can be found under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational**, the following XPath query can be used:
 
 ```xml
 <QueryList>
   <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
-   <Select Path="Microsoft-Windows-Windows Defender/Operational">*[System[(EventID=5007)]]</Select>
-   <Select Path="Microsoft-Windows-Windows Defender/WHC">*[System[(EventID=5007)]]</Select>
+   <Select Path="Microsoft-Windows-Windows Defender/Operational">*[
+    System[EventID=5000 or EventID=5001 or EventID=5004 or 
+    EventID=5007 or (EventID &gt;= 5009 and EventID &lt;= 5012)]]
+  </Select>
   </Query>
 </QueryList>
 ```
