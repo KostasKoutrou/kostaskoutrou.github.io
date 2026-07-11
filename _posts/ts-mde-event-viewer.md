@@ -222,6 +222,17 @@ The following XPath query will filter for all detection and block events:
 ```xml
 <QueryList>
   <Query Id="0" Path="Microsoft-Windows-Security-Mitigations/KernelMode">
+   <Select Path="Microsoft-Windows-Security-Mitigations/KernelMode">*[System[(EventID &gt;= 1 and EventID &lt;= 24) or EventID=260]]</Select>
+   <Select Path="Microsoft-Windows-Security-Mitigations/UserMode">*[System[(EventID &gt;= 1 and EventID &lt;= 24) or EventID=260]]</Select>
+   <Select Path="Microsoft-Windows-Win32k/Operational">*[System[(EventID &gt;= 1 and EventID &lt;= 24) or EventID=260]]</Select>
+   <Select Path="Microsoft-Windows-Win32k/Operational">*[System[(EventID &gt;= 1 and EventID &lt;= 24) or EventID=260]]</Select>
+  </Query>
+</QueryList>
+```
+
+```xml
+<QueryList>
+  <Query Id="0" Path="Microsoft-Windows-Security-Mitigations/KernelMode">
    <Select Path="Microsoft-Windows-Security-Mitigations/KernelMode">*[System[Provider[@Name='Microsoft-Windows-Security-Mitigations' or @Name='Microsoft-Windows-WER-Diag' or @Name='Microsoft-Windows-Win32k' or @Name='Win32k'] and ( (EventID &gt;= 1 and EventID &lt;= 24)  or EventID=5 or EventID=260)]]</Select>
    <Select Path="Microsoft-Windows-Win32k/Concurrency">*[System[Provider[@Name='Microsoft-Windows-Security-Mitigations' or @Name='Microsoft-Windows-WER-Diag' or @Name='Microsoft-Windows-Win32k' or @Name='Win32k'] and ( (EventID &gt;= 1 and EventID &lt;= 24)  or EventID=5 or EventID=260)]]</Select>
    <Select Path="Microsoft-Windows-Win32k/Contention">*[System[Provider[@Name='Microsoft-Windows-Security-Mitigations' or @Name='Microsoft-Windows-WER-Diag' or @Name='Microsoft-Windows-Win32k' or @Name='Win32k'] and ( (EventID &gt;= 1 and EventID &lt;= 24)  or EventID=5 or EventID=260)]]</Select>
