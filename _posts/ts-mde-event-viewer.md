@@ -266,8 +266,9 @@ When it comes to Windows Event logs, the Network Protection events are located i
 ```xml
 <QueryList>
  <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
-  <Select Path="Microsoft-Windows-Windows Defender/Operational">*[System[(EventID=1125 or EventID=1126)]]</Select>
-  <Select Path="Microsoft-Windows-Windows Defender/WHC">*[System[(EventID=1125 or EventID=1126)]]</Select>
+  <Select Path="Microsoft-Windows-Windows Defender/Operational">*[
+  System[(EventID=1125 or EventID=1126)]]
+  </Select>
  </Query>
 </QueryList>
 ```
@@ -277,20 +278,28 @@ If only the block events are needed, the audit events can be emitted:
 ```xml
 <QueryList>
  <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
-  <Select Path="Microsoft-Windows-Windows Defender/Operational">*[System[(EventID=1126)]]</Select>
-  <Select Path="Microsoft-Windows-Windows Defender/WHC">*[System[(EventID=1126)]]</Select>
+  <Select Path="Microsoft-Windows-Windows Defender/Operational">*[
+  System[(EventID=1126)]]
+  </Select>
  </Query>
 </QueryList>
 ```
 
 ## Tamper Protection
 
-Event ID 5013
-Symbolic name: MALWAREPROTECTION_SCAN_CANCELLED
+[Tamper Protection](https://learn.microsoft.com/en-us/defender-endpoint/prevent-changes-to-security-settings-with-tamper-protection) blocks any changes attempted to several MDAV settings.
 
-Message: Tamper protection blocked a change to Microsoft Defender Antivirus.
+When it comes to events generated, the only Event ID that matters for Tamper Protection is located under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational**, with Event ID 5013. The message of this Event ID is "Tamper protection blocked a change to Microsoft Defender Antivirus", and states which setting change was blocked.
 
-Description: If Tamper protection is enabled then any attempt to change any of Defender's settings is blocked. Event ID 5013 is generated and states which setting change was blocked.
+The XPath query for this Event ID is the following:
+
+```xml
+<QueryList>
+ <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
+  <Select Path="Microsoft-Windows-Windows Defender/Operational">*[System[(EventID=5013)]]</Select>
+ </Query>
+</QueryList>
+```
 
 ## Microsoft Defender Antivirus (MDAV) Detections
 
