@@ -371,7 +371,7 @@ As mentioned in the previous section, PUA is logged under the same Event IDs as 
 
 [AppLocker](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/applocker/applocker-overview) helps control which apps and files users can run. [App Control for Business](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/appcontrol-and-applocker-overview) also known as **Windows Defender Application Control** (WDAC), formerly known as **Configurable Code Integrity ** (CCI), is a newer solution for the same purpose, and provides more granular controls.
 
-When it comes to Windows Events, both features log their Events under **Application and Services Logs > Microsoft > Windows > AppLocker**. The events are quite granular, where there are categories based on
+When it comes to Windows Events, AppLocker logs events under **Application and Services Logs > Microsoft > Windows > AppLocker**, while App Control logs most events under . The events are quite granular, where there are categories based on
 
 - the the file type of the event
 - whether the file that is about to be ran is there because of a Managed Installer (Intune, SCCM, etc.)
@@ -385,7 +385,7 @@ For AppLocker only, the following Event IDs are of interest:
 |:-:|-|
 |8000|AppID policy conversion failed. This indicates that the policy wasn’t applied correctly to the computer.|
 |8001|The AppLocker policy was applied successfully to this computer.|
-|8002|File was allowed to run. (.exe and .dll files.)|
+|8002|File was allowed to run. (.exe and .dll files.). When a process launches that matches a managed installer rule, this event is raised with PolicyName = MANAGEDINSTALLER found in the event Details.|
 |8003|File was allowed to run but would have been prevented from running if the AppLocker policy were enforced. (.exe and .dll files.)|
 |8004|File was prevented from running. (.exe and .dll files.)|
 |8005|File was allowed to run. (script or .msi files)|
@@ -400,7 +400,7 @@ For AppLocker only, the following Event IDs are of interest:
 |8025|File was prevented from installing. (packaged apps .appx, .msix)|
 |8027|No packaged apps can be executed while Exe rules are being enforced and no Packaged app rules have been configured.|
 
-For WDAC only, the following Event IDs are of interest:
+For WDAC only, the following Event IDs are of interest (the table information was taken from Microsoft's documentation regarding [Understanding App Control events](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/operations/event-id-explanations):
 
 |Event ID|Description|
 |:-:|-|
@@ -412,7 +412,31 @@ For WDAC only, the following Event IDs are of interest:
 |8039|This event indicates that a packaged app (MSIX/AppX) was allowed to install or run because the App Control policy is in audit mode. But, it would have been blocked if the policy was enforced.|
 |8040|This event indicates that a packaged app was prevented from installing or running due to the App Control policy.|
 
-For running files installed via a Managed Installer (Intune, SCCM, etc.), the following events are of interest:
+There are also some logs under **Applications and Services logs > Microsoft > Windows > CodeIntegrity > Operational**, focused on App Control policy activation and the control of executables, dlls, and drivers.
+
+|Event ID|Explanation|
+|:-:|-|
+|3004|This event isn't common and may occur with or without an App Control policy present. It typically indicates a kernel driver tried to load with an invalid signature. For example, the file may not be WHQL-signed ([Windows Hardware Quality Labs](https://learn.microsoft.com/en-us/windows-hardware/drivers/install/whql-test-signature-program)) on a system where WHQL is required.  This event is also seen for kernel- or user-mode code that the developer opted-in to (/INTEGRITYCHECK)[https://learn.microsoft.com/en-us/cpp/build/reference/integritycheck-require-signature-check?view=msvc-170] but isn't signed correctly.|
+|3033|This event may occur with or without an App Control policy present and should occur alongside a 3077 event if caused by App Control policy. It often means the file's signature is revoked or a signature with the Lifetime Signing EKU has expired. Presence of the Lifetime Signing EKU is the only case where App Control blocks files due to an expired signature. Try using option 20 Enabled:Revoked Expired As Unsigned in your policy along with a rule (for example, hash) that doesn't rely on the revoked or expired cert.  This event also occurs if code compiled with Code Integrity Guard (CIG) tries to load other code that doesn't meet the CIG requirements.|
+|3034|This event isn't common. It's the audit mode equivalent of event 3033.|
+|3076|This event is the main App Control block event for audit mode policies. It indicates that the file would have been blocked if the policy was enforced.|
+|3077|This event is the main App Control block event for enforced policies. It indicates that the file didn't pass your policy and was blocked.|
+|3089|This event contains signature information for files that were blocked or audit blocked by App Control. One of these events is created for each signature of a file. Each event shows the total number of signatures found and an index value to identify the current signature. Unsigned files generate a single one of these events with TotalSignatureCount of 0. These events are correlated with 3004, 3033, 3034, 3076 and 3077 events. You can match the events using the Correlation ActivityID found in the System portion of the event.|
+|3090|Optional This event indicates that a file was allowed to run based purely on ISG or managed installer.|
+|3091|This event indicates that a file didn't have ISG or managed installer authorization and the App Control policy is in audit mode.|
+|3092|This event is the enforcement mode equivalent of 3091.|
+
+Lastly, for running files installed via a Managed Installer (Intune, SCCM, etc.), there are some events which are AppLocker events. More specifically, the Managed Installer feature was initially built for AppLocker. The [SmartlockerFilter](https://revertservice.com/10/applockerfltr/) driver that watches the installations and identifies files created by authorized installers, and the [AppID](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/applocker/configure-the-application-identity-service) service that verifies the tags are AppLocker components. This component is used to trust Managed Installers, and tracks applications which exist in the machine because of a Managed Installer. This component can then be used either by AppLocker itself or by App Control to allow or block the execution of Managed Installer managed applications. In this case, the following events are of interest:
+
+|Event ID|Explanation|
+|:-:|-|
+|8030|ManagedInstaller check SUCCEEDED during Appid verification of *. A user tried to run a program. Windows checked for the hidden stamp, found it, and confirmed that the trusted Managed Installed installed it. The program is allowed to run.|
+|8031|SmartlockerFilter detected file * being written by process *. The trusted deployment tool is actively downloading or installing a program. The Smartlocker filter driver is watching the tool write the files to the hard drive and is actively stamping them with the hidden "trusted" tag.|
+|8032|ManagedInstaller check FAILED during Appid verification of *. A user tried to run a program. Windows checked for the hidden stamp, but it wasn't there. This means the user downloaded it themselves from the internet or brought it in on a USB drive. Because the security policy is set to Enforce, the program is blocked.|
+|8033|ManagedInstaller check FAILED during Appid verification of * . Allowed to run due to Audit AppLocker Policy. This is the equivalent of Event ID 8032, but the program is not blocked, but only audited.|
+|8034|ManagedInstaller Script check FAILED during Appid verification of *. A script tried to run, but it lacked the hidden stamp from the trusted Managed Installer. The script is blocked.|
+|8035|ManagedInstaller Script check SUCCEEDED during Appid verification of *. A script tried to run, Windows found the hidden stamp by the trusted Managed Installer, and the script is allowed to run.|
+
 
 
 
