@@ -351,7 +351,7 @@ PUA is a category of software that can:
 
 For more info, click [here](https://learn.microsoft.com/en-us/defender-endpoint/detect-block-potentially-unwanted-apps-microsoft-defender-antivirus)
 
-As mentioned in the previous section, PUA is logged under the same Event IDs as MDAV. Therefore, if events related only PUA are needed, an additional filter is needed to be applied in the "Category Name" field of the EventData 
+As mentioned in the previous section, PUA is logged under the same Event IDs as MDAV. Therefore, if events related only PUA are needed, an additional filter is needed to be applied in the "Category Name" field of the EventData. The XPath query that can be used is the following:
 
 ```xml
 <QueryList>
@@ -437,8 +437,60 @@ Lastly, for running files installed via a Managed Installer (Intune, SCCM, etc.)
 |8034|ManagedInstaller Script check FAILED during Appid verification of *. A script tried to run, but it lacked the hidden stamp from the trusted Managed Installer. The script is blocked.|
 |8035|ManagedInstaller Script check SUCCEEDED during Appid verification of *. A script tried to run, Windows found the hidden stamp by the trusted Managed Installer, and the script is allowed to run.|
 
+For AppLocker, the XPath query that can be used is the following:
+
+```xml
+<QueryList>
+  <Query Id="0" Path="Microsoft-Windows-AppLocker/EXE and DLL">
+    <Select Path="Microsoft-Windows-AppLocker/EXE and DLL">*[
+      System[(EventID &gt;= 8000 and EventID &lt;= 8008) or 
+      (EventID &gt;= 8020 and EventID &lt;= 8027) or 
+      (EventID &gt;= 8030 and EventID &lt;= 8035)]]
+    </Select>
+    <Select Path="Microsoft-Windows-AppLocker/MSI and Script">*[
+      System[(EventID &gt;= 8000 and EventID &lt;= 8008) or 
+      (EventID &gt;= 8020 and EventID &lt;= 8027) or 
+      (EventID &gt;= 8030 and EventID &lt;= 8035)]]
+    </Select>
+    <Select Path="Microsoft-Windows-AppLocker/Packaged app-Deployment">*[
+      System[(EventID &gt;= 8000 and EventID &lt;= 8008) or 
+      (EventID &gt;= 8020 and EventID &lt;= 8027) or 
+      (EventID &gt;= 8030 and EventID &lt;= 8035)]]
+    </Select>
+    <Select Path="Microsoft-Windows-AppLocker/Packaged app-Execution">*[
+      System[(EventID &gt;= 8000 and EventID &lt;= 8008) or 
+      (EventID &gt;= 8020 and EventID &lt;= 8027) or 
+      (EventID &gt;= 8030 and EventID &lt;= 8035)]]
+    </Select>
+  </Query>
+</QueryList>
+```
 
 
+For App Control, the XPath query that can be used is the following:
+
+```xml
+<QueryList>
+  <Query Id="0" Path="Microsoft-Windows-CodeIntegrity/Operational">
+    <Select Path="Microsoft-Windows-CodeIntegrity/Operational">*[
+      System[EventID=3004 or EventID=3033 or EventID=3034 or EventID=3076 or 
+      EventID=3077 or (EventID &gt;= 3089 and EventID &lt;= 3092)]]
+    </Select>
+    <Select Path="Microsoft-Windows-AppLocker/MSI and Script">*[
+      System[EventID=8028 or EventID=8029 or
+      (EventID &gt;= 8036 and EventID &lt;= 8040)]]
+    </Select>
+    <Select Path="Microsoft-Windows-AppLocker/Packaged app-Deployment">*[
+      System[EventID=8028 or EventID=8029 or
+      (EventID &gt;= 8036 and EventID &lt;= 8040)]]
+    </Select>
+    <Select Path="Microsoft-Windows-AppLocker/Packaged app-Execution">*[
+      System[EventID=8028 or EventID=8029 or
+      (EventID &gt;= 8036 and EventID &lt;= 8040)]]
+    </Select>
+  </Query>
+</QueryList>
+```
 
 ## General XML for all detections
 
