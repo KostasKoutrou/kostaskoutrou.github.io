@@ -8,7 +8,7 @@ In this series, each post contains a different component/feature/methodology whe
 
 > In this post, the focus is on **Windows Events: What Event IDs to look for to investigate for blocks/detections done by MDE, and using XPath queries to easily filter for the needed Events.**
 
-In each section, a brief description of a different MDE capability is described, including what Event IDs to look for, and a simple XPath query to use when searching for events of that capability.
+In each section, a brief description of a different MDE capability is described, including what Event IDs to look for, and an XPath query to use when searching for events of that capability.
 
 If you want to get a tl;dr XPath query from this blog post which includes all the detections, check the last section.
 
