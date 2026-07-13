@@ -2,7 +2,19 @@
 
 ## Introduction
 
-Inspired by https://learn.microsoft.com/en-us/defender-endpoint/attack-surface-reduction-windows-events#custom-xml-templates-for-attack-surface-reduction-events
+Welcome to the 4th part of the blog post series "Getting to know MDE"!
+
+In this series, each post contains a different component/feature/methodology when it comes to understanding and managing Microsoft Defender for Endpoint (MDE).
+
+> In this post, the focus is on **Windows Events: What Event IDs to look for to investigate for blocks/detections done by MDE, and using XPath queries to easily filter for the needed Events.**
+
+In each section, a brief description of a different MDE capability is described, including what Event IDs to look for, and a simple XPath query to use when searching for events of that capability.
+
+If you want to get a tl;dr XPath query from this blog post which includes all the detections, check the last section.
+
+This post was inspired by the previous post regarding [Using KQL to identify detections from MDE](https://kostaskoutrou.github.io/2026/01/06/using-kql-for-mde.html#device-control), as well as the [XPath queries provided by Microsoft](https://learn.microsoft.com/en-us/defender-endpoint/attack-surface-reduction-windows-events#custom-xml-templates-for-attack-surface-reduction-events), which were expanded upon to search for all Defender features.
+
+So let's get started.
 
 ---
 
@@ -15,7 +27,7 @@ Inspired by https://learn.microsoft.com/en-us/defender-endpoint/attack-surface-r
 
 ## Event Viewer general info and logs to look for and what they include
 
-To get an idea of how a Windows Event is structured, an example of an Event reporting a detection and quarantine of a file which Defender detected as a threat is provided below:
+Before starting with each MDE capability, to get an idea of how a Windows Event is structured, an example of an Event reporting a detection and quarantine of a file which Defender detected as a threat is provided below:
 
 ```xml
 <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
@@ -76,7 +88,7 @@ To get an idea of how a Windows Event is structured, an example of an Event repo
 </Event>
 ```
 
-It may look like it includes a lot of information at start, but in reality most of it is not really useful for typical troubleshooting. Also, Windows Event viewer parses these logs and show them in a user-friendly format:
+It may look like the event includes a lot of information at start, but in reality most of it is not really useful for typical troubleshooting. Also, Windows Event viewer parses these logs and show them in a user-friendly format:
 
 <img alt="image" src="https://github.com/user-attachments/assets/2546a011-ddba-4d45-8ca0-13ddfa722073" />
 
@@ -87,11 +99,33 @@ Every Windows Event log is divided into two main sections:
 
 ###XPath queries
 
-A great thing about the Windows Event Viewer is that all of its logs are stored as XML data with the strictly enforced XML schema depicted previously, so custom views can be created using XPath queries, where only the needed events can be filtered. XPath (XML Path Language) is a query language used to find and extract specific information from an XML document.
+A great thing about the Windows Event Viewer is that all of its logs are stored as XML data with the strictly enforced XML schema depicted previously, so custom views can be created using XPath queries, where only the needed events are filtered. XPath (XML Path Language) is a query language used to find and extract specific information from an XML document.
 
 Using XPath allows for creating shareable filtered views where only the detections and blocks done by Defender are shown, which results in similar reports to the ones created using the KQL queries shown in the previous post [Using KQL to identify detections from MDE - Getting to know MDE Part 2](https://kostaskoutrou.github.io/2026/01/06/using-kql-for-mde.html).
 
-To import an XPath query in Windows Event Viewer there are 2 ways:
+All the XPath queries used here have the following format:
+
+```xml
+<QueryList>
+  <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
+   <Select Path="Microsoft-Windows-Windows Defender/Operational">*[System[(EventID=... or EventID=... or ...)]]</Select>
+   <Select> more Paths filters... </Select>
+  </Query>
+</QueryList>
+```
+
+The only difference between the queries are **Windows Event channel paths** and the **Event IDs** searched for. To not repeat the explanation of the query under each section, a general explanation is provided here:
+
+1. Default path to look for is `Microsoft-Windows-Windows Defender/Operational`. This is needed to be stated even though other paths are specified below because when Microsoft built the XML structure for Event Viewer, they designed the `<Query>` node to act as the primary "container". The schema rules dictate that this container must declare a starting point.
+2. `Select Path="Microsoft-Windows-Windows Defender/Operational">`: Search in the path `Microsoft-Windows-Windows Defender/Operational`
+3. `*\[System\[\(EventID=... or EventID=... or EventID=...\)\]\]`:
+  1. `*`: Search at any root event, i.e., grab all events in the log as a starting point.
+  2. The brackets contents in XPath are used to apply a filter to the item just before it, i.e., the asterisk, i.e., all the events.
+  3. `System`: Every Windows event is split into two main XML sections: `<System>` (metadata like time, provider and Event ID) and `<EventData>` (the details of what happened). Here we are filtering the `<System>` section.
+  4. The brackets again filter to the item just before, i.e., the `<System>` section.
+  5. `EventID=...`: With this condition the specified Event IDs are filtered.
+
+There are 2 ways to import an XPath query in Windows Event Viewer:
 
 **Create a Custom View**
 
@@ -117,37 +151,13 @@ If you have saved any of the XPath queries as XML files, you can directly import
 
 In the next sections, XPath queries are provided for each MDAV feature. These can be used to facilitate troubleshooting towards identifying false positive detections and blocks. More details on the specific XPath queries are found in the sections below.
 
-### XPath queries
-
-All the XPath queries used here have the following format:
-
-```xml
-<QueryList>
-  <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
-   <Select Path="Microsoft-Windows-Windows Defender/Operational">*[System[(EventID=... or EventID=... or ...)]]</Select>
-   <Select> more Paths filters... </Select>
-  </Query>
-</QueryList>
-```
-
-The only difference between the queries are **Windows Event channel paths** and the **Event IDs** searched for. To not repeat the explanation of the query under each section, a general explanation is provided here:
-
-1. Default path to look for is `Microsoft-Windows-Windows Defender/Operational`. This is needed to be stated even though other paths are specified below because when Microsoft built the XML structure for Event Viewer, they designed the `<Query>` node to act as the primary "container". The schema rules dictate that this container must declare a starting point.
-2. `Select Path="Microsoft-Windows-Windows Defender/Operational">`: Search in the path `Microsoft-Windows-Windows Defender/Operational`
-3. `*\[System\[\(EventID=... or EventID=... or EventID=...\)\]\]`:
-  1. `*`: Search at any root event, i.e., grab all events in the log as a starting point.
-  2. The brackets contents in XPath are used to apply a filter to the item just before it, i.e., the asterisk, i.e., all the events.
-  3. `System`: Every Windows event is split into two main XML sections: `<System>` (metadata like time, provider and Event ID) and `<EventData>` (the details of what happened). Here we are filtering the `<System>` section.
-  4. The brackets again filter to the item just before, i.e., the `<System>` section.
-  5. `EventID=...`: With this condition the specified Event IDs are filtered.
-
 ## Demo Files
 
 If there are no Events for a specific feature and there is a need to produce some for confirmation of the query working as expected, there are [demo files provided by Microsoft](https://learn.microsoft.com/en-us/defender-endpoint/defender-endpoint-demonstrations), which can be used to force MDAV detections and produce Windows Events.
 
 ## MDAV Changes logging
 
-An interesting and useful event related to all Microsoft Defender Antivirus (MDAV) features is Event ID 5007 with description "Event when settings are changed". A lot of events with Event ID 5007 are logged because it includes any change happening to the MDAV configuration, such as:
+Starting with the logging of changes to configurations, An interesting and useful event related to all Microsoft Defender Antivirus (MDAV) features is Event ID 5007 with description "Event when settings are changed". A lot of events with Event ID 5007 are logged because it includes any change happening to the MDAV configuration, such as:
 
 - Signature/Engine updates
 - Policy syncs from Group Policy, Intune, SCCM
@@ -174,8 +184,8 @@ To search for these Event IDs, which can be found under **Applications and Servi
 ```xml
 <QueryList>
   <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
-   <Select Path="Microsoft-Windows-Windows Defender/Operational">*[
-    System[EventID=5000 or EventID=5001 or EventID=5004 or 
+   <Select Path="Microsoft-Windows-Windows Defender/Operational">
+    *[System[EventID=5000 or EventID=5001 or EventID=5004 or 
     EventID=5007 or (EventID &gt;= 5009 and EventID &lt;= 5012)]]
   </Select>
   </Query>
@@ -206,8 +216,8 @@ The following XPath query will filter our ASR rule detections, blocks, and user 
 ```xml
 <QueryList>
   <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
-   <Select Path="Microsoft-Windows-Windows Defender/Operational">*[
-    System[(EventID=1121 or EventID=1122 or EventID=1129)]]
+   <Select Path="Microsoft-Windows-Windows Defender/Operational">
+    *[System[(EventID=1121 or EventID=1122 or EventID=1129)]]
    </Select>
   </Query>
 </QueryList>
@@ -218,7 +228,9 @@ If you just want to **find blocks only**, just keep Event ID 1121:
 ```xml
 <QueryList>
   <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
-   <Select Path="Microsoft-Windows-Windows Defender/Operational">*[System[(EventID=1121)]</Select>
+   <Select Path="Microsoft-Windows-Windows Defender/Operational">
+    *[System[(EventID=1121)]
+   </Select>
   </Query>
 </QueryList>
 ```
@@ -241,8 +253,8 @@ The following XPath query will filter for all detection and block events:
 ```xml
 <QueryList>
   <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
-   <Select Path="Microsoft-Windows-Windows Defender/Operational">*[
-    System[(EventID=1123 or EventID=1124 or EventID=1127 or EventID=1128)]]
+   <Select Path="Microsoft-Windows-Windows Defender/Operational">
+    *[System[(EventID=1123 or EventID=1124 or EventID=1127 or EventID=1128)]]
    </Select>
   </Query>
 </QueryList>
@@ -253,8 +265,8 @@ For blocks only, use the following:
 ```xml
 <QueryList>
   <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
-   <Select Path="Microsoft-Windows-Windows Defender/Operational">*[
-    System[(EventID=1123 or EventID=1127)]]
+   <Select Path="Microsoft-Windows-Windows Defender/Operational">
+    *[System[(EventID=1123 or EventID=1127)]]
    </Select>
   </Query>
 </QueryList>
@@ -262,9 +274,46 @@ For blocks only, use the following:
 
 ## Device Control
 
-basic info
+[Device Control](https://learn.microsoft.com/en-us/defender-endpoint/device-control-overview) enables controls related to usage and installation of peripheral (USB/Bluetooth) or other devices with endpoints.
 
-When it comes to Windows Event logs, the CFA events are located in the Windows Event log under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational**. The following event IDs are related to CFA:
+When it comes to Windows Event logs, for Device Control there is no specific set of events or a specific path where all the events reside. It is more complicated to identify block events. The events are logged under
+
+- **Security**
+- **Microsoft > Windows > Kernel > PnP > Configuration**
+- **Microsoft > Windows > DeviceSetupManager > Admin**
+- **Microsoft > Windows > PrintService > Admin**
+
+|Event ID|Description|
+|:-:|-|
+|100|Device Installation Success: Indicates a device was fully integrated into the system setup.|
+|112|Device Installation Blocked: Device installation was blocked by policy. This is the primary local event for Plug and Play hardware blocks.|
+|400|PnP Configuration Success: Confirms the device was correctly initialized by the OS after connection.|
+|871|Print Job Blocked: A print job was blocked. Used specifically for Printer Protection policies preventing output to unauthorized devices.|
+|4656|Handle Request: A handle to an object was requested. This precedes 4663 and indicates an application or user attempting to obtain access to a device or file.|
+|4663|Object Access Attempt: An attempt was made to access an object. Used for auditing file system operations (read/write/execute) on removable storage. A "Failure" audit here indicates a block.|
+|6416|PnP Recognition: A new external device was recognized by the system. This is highly useful for identifying the hardware instance (Device ID) of a connected USB.|
+
+The XPath query for the Event IDs above is this following:
+
+```xml
+<QueryList>
+  <Query Id="0" Path="Security">
+    <Select Path="Security">
+      *[System[(EventID=6416 or EventID=4663 or EventID=4656)]]
+    </Select>
+    <Select Path="Microsoft-Windows-Kernel-PnP/Configuration">
+      *[System[(EventID=400)]]
+    </Select>
+    <Select Path="Microsoft-Windows-DeviceSetupManager/Admin">
+      *[System[(EventID=100 or EventID=112)]]
+    </Select>
+    <Select Path="Microsoft-Windows-PrintService/Admin">
+      *[System[(EventID=871)]]
+    </Select>
+  </Query>
+</QueryList>
+```
+
 
 ## Exploit Protection
 
@@ -315,11 +364,21 @@ The following XPath query will filter for all detection and block events:
 ```xml
 <QueryList>
   <Query Id="0" Path="Microsoft-Windows-Security-Mitigations/KernelMode">
-   <Select Path="Microsoft-Windows-Security-Mitigations/KernelMode">*[System[(EventID &gt;= 1 and EventID &lt;= 24) or EventID=260]]</Select>
-   <Select Path="Microsoft-Windows-Security-Mitigations/UserMode">*[System[(EventID &gt;= 1 and EventID &lt;= 24) or EventID=260]]</Select>
-   <Select Path="Microsoft-Windows-Win32k/Operational">*[System[(EventID &gt;= 1 and EventID &lt;= 24) or EventID=260]]</Select>
-   <Select Path="Microsoft-Windows-Win32k/Operational">*[System[(EventID &gt;= 1 and EventID &lt;= 24) or EventID=260]]</Select>
-   <Select Path="Microsoft-Windows-WER-Diagnostics/Operational">*[System[(EventID &gt;= 1 and EventID &lt;= 24) or EventID=260]]</Select>
+   <Select Path="Microsoft-Windows-Security-Mitigations/KernelMode">
+    *[System[(EventID &gt;= 1 and EventID &lt;= 24) or EventID=260]]
+   </Select>
+   <Select Path="Microsoft-Windows-Security-Mitigations/UserMode">
+    *[System[(EventID &gt;= 1 and EventID &lt;= 24) or EventID=260]]
+   </Select>
+   <Select Path="Microsoft-Windows-Win32k/Operational">
+    *[System[(EventID &gt;= 1 and EventID &lt;= 24) or EventID=260]]
+   </Select>
+   <Select Path="Microsoft-Windows-Win32k/Operational">
+    *[System[(EventID &gt;= 1 and EventID &lt;= 24) or EventID=260]]
+   </Select>
+   <Select Path="Microsoft-Windows-WER-Diagnostics/Operational">
+    *[System[(EventID &gt;= 1 and EventID &lt;= 24) or EventID=260]]
+   </Select>
   </Query>
 </QueryList>
 ```
@@ -338,8 +397,8 @@ When it comes to Windows Event logs, the Network Protection events are located i
 ```xml
 <QueryList>
  <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
-  <Select Path="Microsoft-Windows-Windows Defender/Operational">*[
-  System[(EventID=1125 or EventID=1126)]]
+  <Select Path="Microsoft-Windows-Windows Defender/Operational">
+  *[System[(EventID=1125 or EventID=1126)]]
   </Select>
  </Query>
 </QueryList>
@@ -350,8 +409,8 @@ If only the block events are needed, the audit events can be emitted:
 ```xml
 <QueryList>
  <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
-  <Select Path="Microsoft-Windows-Windows Defender/Operational">*[
-  System[(EventID=1126)]]
+  <Select Path="Microsoft-Windows-Windows Defender/Operational">
+  *[System[(EventID=1126)]]
   </Select>
  </Query>
 </QueryList>
@@ -368,7 +427,9 @@ The XPath query for this Event ID is the following:
 ```xml
 <QueryList>
  <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
-  <Select Path="Microsoft-Windows-Windows Defender/Operational">*[System[(EventID=5013)]]</Select>
+  <Select Path="Microsoft-Windows-Windows Defender/Operational">
+    *[System[(EventID=5013)]]
+  </Select>
  </Query>
 </QueryList>
 ```
@@ -396,12 +457,11 @@ The XPath query to filter for those events is the following:
 ```xml
 <QueryList>
   <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
-   <Select Path="Microsoft-Windows-Windows Defender/Operational">*[
-    System[(EventID=1006 or EventID=1007 or EventID=1008 or
+   <Select Path="Microsoft-Windows-Windows Defender/Operational">
+    *[System[(EventID=1006 or EventID=1007 or EventID=1008 or
     EventID=1011 or EventID=1012 or EventID=1015 or EventID=1116 or
-    EventID=1117 or EventID=1118 or EventID=1119)]
-    ]
-    </Select>
+    EventID=1117 or EventID=1118 or EventID=1119)]]
+   </Select>
   </Query>
 </QueryList>
 ```
@@ -411,13 +471,12 @@ As described in the Event IDs table, these events log also events of Potentially
 ```xml
 <QueryList>
   <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
-   <Select Path="Microsoft-Windows-Windows Defender/Operational">*[
-    EventData[Data[@Name='Category Name']!='Potentially Unwanted Software'] and 
+   <Select Path="Microsoft-Windows-Windows Defender/Operational">
+    *[EventData[Data[@Name='Category Name']!='Potentially Unwanted Software'] and 
     System[(EventID=1006 or EventID=1007 or EventID=1008 or EventID=1011 or 
     EventID=1012 or EventID=1015 or EventID=1116 or EventID=1117 or 
-    EventID=1118 or EventID=1119)]
-    ]
-    </Select>
+    EventID=1118 or EventID=1119)]]
+   </Select>
   </Query>
 </QueryList>
 ```
@@ -437,13 +496,12 @@ As mentioned in the previous section, PUA is logged under the same Event IDs as 
 ```xml
 <QueryList>
   <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
-   <Select Path="Microsoft-Windows-Windows Defender/Operational">*[
-    EventData[Data[@Name='Category Name']='Potentially Unwanted Software'] and 
+   <Select Path="Microsoft-Windows-Windows Defender/Operational">
+    *[EventData[Data[@Name='Category Name']='Potentially Unwanted Software'] and 
     System[(EventID=1006 or EventID=1007 or EventID=1008 or EventID=1011 or 
     EventID=1012 or EventID=1015 or EventID=1116 or EventID=1117 or 
-    EventID=1118 or EventID=1119)]
-    ]
-    </Select>
+    EventID=1118 or EventID=1119)]]
+   </Select>
   </Query>
 </QueryList>
 ```
@@ -523,23 +581,23 @@ For AppLocker, the XPath query that can be used is the following:
 ```xml
 <QueryList>
   <Query Id="0" Path="Microsoft-Windows-AppLocker/EXE and DLL">
-    <Select Path="Microsoft-Windows-AppLocker/EXE and DLL">*[
-      System[(EventID &gt;= 8000 and EventID &lt;= 8008) or 
+    <Select Path="Microsoft-Windows-AppLocker/EXE and DLL">
+      *[System[(EventID &gt;= 8000 and EventID &lt;= 8008) or 
       (EventID &gt;= 8020 and EventID &lt;= 8027) or 
       (EventID &gt;= 8030 and EventID &lt;= 8035)]]
     </Select>
-    <Select Path="Microsoft-Windows-AppLocker/MSI and Script">*[
-      System[(EventID &gt;= 8000 and EventID &lt;= 8008) or 
+    <Select Path="Microsoft-Windows-AppLocker/MSI and Script">
+      *[System[(EventID &gt;= 8000 and EventID &lt;= 8008) or 
       (EventID &gt;= 8020 and EventID &lt;= 8027) or 
       (EventID &gt;= 8030 and EventID &lt;= 8035)]]
     </Select>
-    <Select Path="Microsoft-Windows-AppLocker/Packaged app-Deployment">*[
-      System[(EventID &gt;= 8000 and EventID &lt;= 8008) or 
+    <Select Path="Microsoft-Windows-AppLocker/Packaged app-Deployment">
+      *[System[(EventID &gt;= 8000 and EventID &lt;= 8008) or 
       (EventID &gt;= 8020 and EventID &lt;= 8027) or 
       (EventID &gt;= 8030 and EventID &lt;= 8035)]]
     </Select>
-    <Select Path="Microsoft-Windows-AppLocker/Packaged app-Execution">*[
-      System[(EventID &gt;= 8000 and EventID &lt;= 8008) or 
+    <Select Path="Microsoft-Windows-AppLocker/Packaged app-Execution">
+      *[System[(EventID &gt;= 8000 and EventID &lt;= 8008) or 
       (EventID &gt;= 8020 and EventID &lt;= 8027) or 
       (EventID &gt;= 8030 and EventID &lt;= 8035)]]
     </Select>
@@ -553,20 +611,20 @@ For App Control, the XPath query that can be used is the following:
 ```xml
 <QueryList>
   <Query Id="0" Path="Microsoft-Windows-CodeIntegrity/Operational">
-    <Select Path="Microsoft-Windows-CodeIntegrity/Operational">*[
-      System[EventID=3004 or EventID=3033 or EventID=3034 or EventID=3076 or 
+    <Select Path="Microsoft-Windows-CodeIntegrity/Operational">
+      *[System[EventID=3004 or EventID=3033 or EventID=3034 or EventID=3076 or 
       EventID=3077 or (EventID &gt;= 3089 and EventID &lt;= 3092)]]
     </Select>
-    <Select Path="Microsoft-Windows-AppLocker/MSI and Script">*[
-      System[EventID=8028 or EventID=8029 or
+    <Select Path="Microsoft-Windows-AppLocker/MSI and Script">
+      *[System[EventID=8028 or EventID=8029 or
       (EventID &gt;= 8036 and EventID &lt;= 8040)]]
     </Select>
-    <Select Path="Microsoft-Windows-AppLocker/Packaged app-Deployment">*[
-      System[EventID=8028 or EventID=8029 or
+    <Select Path="Microsoft-Windows-AppLocker/Packaged app-Deployment">
+      *[System[EventID=8028 or EventID=8029 or
       (EventID &gt;= 8036 and EventID &lt;= 8040)]]
     </Select>
-    <Select Path="Microsoft-Windows-AppLocker/Packaged app-Execution">*[
-      System[EventID=8028 or EventID=8029 or
+    <Select Path="Microsoft-Windows-AppLocker/Packaged app-Execution">
+      *[System[EventID=8028 or EventID=8029 or
       (EventID &gt;= 8036 and EventID &lt;= 8040)]]
     </Select>
   </Query>
