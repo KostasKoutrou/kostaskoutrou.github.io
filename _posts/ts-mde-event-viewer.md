@@ -276,7 +276,7 @@ For blocks only, use the following:
 
 [Device Control](https://learn.microsoft.com/en-us/defender-endpoint/device-control-overview) enables controls related to usage and installation of peripheral (USB/Bluetooth) or other devices with endpoints.
 
-When it comes to Windows Event logs, for Device Control there is no specific set of events or a specific path where all the events reside. It is more complicated to identify block events. The events are logged under
+When it comes to Windows Event logs, for Device Control there is no specific set of events or a specific path where all the events reside. It is more complicated to identify block events. I could not find any specific set of events to look for. The most relevant events are logged under
 
 - **Security**
 - **Microsoft > Windows > Kernel > PnP > Configuration**
@@ -285,13 +285,10 @@ When it comes to Windows Event logs, for Device Control there is no specific set
 
 |Event ID|Description|
 |:-:|-|
-|100|Device Installation Success: Indicates a device was fully integrated into the system setup.|
-|112|Device Installation Blocked: Device installation was blocked by policy. This is the primary local event for Plug and Play hardware blocks.|
-|400|PnP Configuration Success: Confirms the device was correctly initialized by the OS after connection.|
-|871|Print Job Blocked: A print job was blocked. Used specifically for Printer Protection policies preventing output to unauthorized devices.|
-|4656|Handle Request: A handle to an object was requested. This precedes 4663 and indicates an application or user attempting to obtain access to a device or file.|
-|4663|Object Access Attempt: An attempt was made to access an object. Used for auditing file system operations (read/write/execute) on removable storage. A "Failure" audit here indicates a block.|
-|6416|PnP Recognition: A new external device was recognized by the system. This is highly useful for identifying the hardware instance (Device ID) of a connected USB.|
+|6423|The system blocked the installation of a hardware device (USB, Bluetooth radio, etc.) due to device installation restrictions.|
+|871|A print job was explicitly blocked by Defender Device Control or Removable Storage Access Control.|
+|808|The print spooler blocked a plug-in module from loading, often due to untrusted driver execution policies.|
+|215|A printer driver failed to install due to a security policy or restriction.|
 
 The XPath query for the Event IDs above is this following:
 
@@ -299,21 +296,14 @@ The XPath query for the Event IDs above is this following:
 <QueryList>
   <Query Id="0" Path="Security">
     <Select Path="Security">
-      *[System[(EventID=6416 or EventID=4663 or EventID=4656)]]
-    </Select>
-    <Select Path="Microsoft-Windows-Kernel-PnP/Configuration">
-      *[System[(EventID=400)]]
-    </Select>
-    <Select Path="Microsoft-Windows-DeviceSetupManager/Admin">
-      *[System[(EventID=100 or EventID=112)]]
+      *[System[EventID=6423]]
     </Select>
     <Select Path="Microsoft-Windows-PrintService/Admin">
-      *[System[(EventID=871)]]
+      *[System[(EventID=871 or EventID=808 or EventID=215)]]
     </Select>
   </Query>
 </QueryList>
 ```
-
 
 ## Exploit Protection
 
@@ -321,7 +311,7 @@ Exploit Protection helps protect against malware that uses exploits to infect de
 
 When it comes to Windows Event logs, most Exploit Protection events are located in the Windows Event log under **Security-Mitigations > Kernel Mode and Security-Mitigations > User Mode**, while some are located in **WER-Diagnostics > Operational** and **Win32k > Operational**. The following event IDs are related to CFA:
 
-**Security-Mitigations > Kernel Mode and Security-Mitigations > User Mode**
+**Security-Mitigations > Kernel Mode** and **Security-Mitigations > User Mode**
 |Event ID|Description|
 |:-:|-|
 |1|ACG audit|
@@ -373,12 +363,34 @@ The following XPath query will filter for all detection and block events:
    <Select Path="Microsoft-Windows-Win32k/Operational">
     *[System[(EventID &gt;= 1 and EventID &lt;= 24) or EventID=260]]
    </Select>
-   <Select Path="Microsoft-Windows-Win32k/Operational">
-    *[System[(EventID &gt;= 1 and EventID &lt;= 24) or EventID=260]]
-   </Select>
    <Select Path="Microsoft-Windows-WER-Diagnostics/Operational">
     *[System[(EventID &gt;= 1 and EventID &lt;= 24) or EventID=260]]
    </Select>
+  </Query>
+</QueryList>
+```
+
+For blocks only, the following XPath query can be used:
+
+```xml
+<QueryList>
+  <Query Id="0" Path="Microsoft-Windows-Security-Mitigations/KernelMode">
+    <Select Path="Microsoft-Windows-Security-Mitigations/KernelMode">
+      *[System[(EventID=2 or EventID=4 or EventID=6 or EventID=8 or
+      EventID=10 or EventID=12 or EventID=14 or EventID=16 or
+      EventID=18 or EventID=20 or EventID=22 or EventID=24)]]
+    </Select>
+    <Select Path="Microsoft-Windows-Security-Mitigations/UserMode">
+      *[System[(EventID=2 or EventID=4 or EventID=6 or EventID=8 or
+      EventID=10 or EventID=12 or EventID=14 or EventID=16 or
+      EventID=18 or EventID=20 or EventID=22 or EventID=24)]]
+    </Select>
+    <Select Path="Microsoft-Windows-WER-Diagnostics/Operational">
+      *[System[(EventID=5)]]
+    </Select>
+    <Select Path="Microsoft-Windows-Win32k/Operational">
+      *[System[(EventID=260)]]
+    </Select>
   </Query>
 </QueryList>
 ```
