@@ -694,7 +694,6 @@ no defender changes logging, no tamper protection
 
 ```xml
 <QueryList>
-  <!--  -->
   <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
     <!-- ASR blocks -->
     <Select Path="Microsoft-Windows-Windows Defender/Operational">
