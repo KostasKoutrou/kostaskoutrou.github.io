@@ -643,6 +643,44 @@ For App Control, the XPath query that can be used is the following:
 </QueryList>
 ```
 
+For blocks only, for both features, the following XPath query can be used:
+
+```xml
+<QueryList>
+  <Query Id="0" Path="Microsoft-Windows-CodeIntegrity/Operational">
+    <!-- AppLocker and App Control 1 -->
+    <Select Path="Microsoft-Windows-CodeIntegrity/Operational">
+      *[System[(EventID=3004 or EventID=3033 or 
+      EventID=3077 or EventID=3092)]]
+    </Select>
+    <!-- AppLocker and App Control 2 -->
+    <Select Path="Microsoft-Windows-AppLocker/EXE and DLL">
+      *[System[(EventID=8004 or EventID=8007 or EventID=8022 or 
+      EventID=8025 or EventID=8027 or EventID=8029 or 
+      EventID=8032 or EventID=8034 or EventID=8036 or EventID=8040)]]
+    </Select>
+    <!-- AppLocker and App Control 3 -->
+    <Select Path="Microsoft-Windows-AppLocker/MSI and Script">
+      *[System[(EventID=8004 or EventID=8007 or EventID=8022 or 
+      EventID=8025 or EventID=8027 or EventID=8029 or 
+      EventID=8032 or EventID=8034 or EventID=8036 or EventID=8040)]]
+    </Select>
+    <!-- AppLocker and App Control 4 -->
+    <Select Path="Microsoft-Windows-AppLocker/Packaged app-Deployment">
+      *[System[(EventID=8004 or EventID=8007 or EventID=8022 or 
+      EventID=8025 or EventID=8027 or EventID=8029 or 
+      EventID=8032 or EventID=8034 or EventID=8036 or EventID=8040)]]
+    </Select>
+    <!-- AppLocker and App Control 5 -->
+    <Select Path="Microsoft-Windows-AppLocker/Packaged app-Execution">
+      *[System[(EventID=8004 or EventID=8007 or EventID=8022 or 
+      EventID=8025 or EventID=8027 or EventID=8029 or 
+      EventID=8032 or EventID=8034 or EventID=8036 or EventID=8040)]]
+    </Select>
+  </Query>
+</QueryList>
+```
+
 ## MDE
 
 When it comes to Microsoft Defender for Endpoint (MDE) itself, SENSE is the internal name used to refer to the behavioral sensor that powers MDE. The Windows Events created for SENSE can be found under the path **Applications and Services Logs > Microsoft > Windows > SENSE > Operational**. Information about the events created can be found in Microsoft's documentation [Review events and errors using Event Viewer](https://learn.microsoft.com/en-us/defender-endpoint/event-error-codes
@@ -652,3 +690,85 @@ When it comes to Microsoft Defender for Endpoint (MDE) itself, SENSE is the inte
 
 add all block event IDs in one query, and try to put an easy filter for date and time range and maybe see if you can put a name filter to search for specific applications.
 
+no defender changes logging, no tamper protection
+
+```xml
+<QueryList>
+  <!--  -->
+  <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
+    <!-- ASR blocks -->
+    <Select Path="Microsoft-Windows-Windows Defender/Operational">
+        *[System[(EventID=1121)]]
+    </Select>
+    <!-- CFA blocks -->
+    <Select Path="Microsoft-Windows-Windows Defender/Operational">
+        *[System[(EventID=1123 or EventID=1127)]]
+    </Select>
+    <!-- Device Control 1 -->
+    <Select Path="Security">
+        *[System[EventID=6423]]
+    </Select>
+    <!-- Device Control 2 -->
+    <Select Path="Microsoft-Windows-PrintService/Admin">
+       *[System[(EventID=871 or EventID=808 or EventID=215)]]
+    </Select>
+    <!-- Exploit Protection 1 -->
+    <Select Path="Microsoft-Windows-Security-Mitigations/KernelMode">
+      *[System[(EventID=2 or EventID=4 or EventID=6 or EventID=8 or
+      EventID=10 or EventID=12 or EventID=14 or EventID=16 or
+      EventID=18 or EventID=20 or EventID=22 or EventID=24)]]
+    </Select>
+    <!-- Exploit Protection 2 -->
+    <Select Path="Microsoft-Windows-Security-Mitigations/UserMode">
+      *[System[(EventID=2 or EventID=4 or EventID=6 or EventID=8 or
+      EventID=10 or EventID=12 or EventID=14 or EventID=16 or
+      EventID=18 or EventID=20 or EventID=22 or EventID=24)]]
+    </Select>
+    <!-- Exploit Protection 3 -->
+    <Select Path="Microsoft-Windows-WER-Diagnostics/Operational">
+      *[System[(EventID=5)]]
+    </Select>
+    <!-- Exploit Protection 4 -->
+    <Select Path="Microsoft-Windows-Win32k/Operational">
+      *[System[(EventID=260)]]
+    </Select>
+    <!-- Network Protection -->
+    <Select Path="Microsoft-Windows-Windows Defender/Operational">
+      *[System[(EventID=1126)]]
+    </Select>
+    <!-- Microsoft Defender Antivirus Action Taken (both malware and PUA) -->
+    <Select Path="Microsoft-Windows-Windows Defender/Operational">
+      *[System[(EventID=1007 or EventID=1117)]]
+    </Select>
+    <!-- AppLocker and App Control 1 -->
+    <Select Path="Microsoft-Windows-CodeIntegrity/Operational">
+      *[System[(EventID=3004 or EventID=3033 or 
+      EventID=3077 or EventID=3092)]]
+    </Select>
+    <!-- AppLocker and App Control 2 -->
+    <Select Path="Microsoft-Windows-AppLocker/EXE and DLL">
+      *[System[(EventID=8004 or EventID=8007 or EventID=8022 or 
+      EventID=8025 or EventID=8027 or EventID=8029 or 
+      EventID=8032 or EventID=8034 or EventID=8036 or EventID=8040)]]
+    </Select>
+    <!-- AppLocker and App Control 3 -->
+    <Select Path="Microsoft-Windows-AppLocker/MSI and Script">
+      *[System[(EventID=8004 or EventID=8007 or EventID=8022 or 
+      EventID=8025 or EventID=8027 or EventID=8029 or 
+      EventID=8032 or EventID=8034 or EventID=8036 or EventID=8040)]]
+    </Select>
+    <!-- AppLocker and App Control 4 -->
+    <Select Path="Microsoft-Windows-AppLocker/Packaged app-Deployment">
+      *[System[(EventID=8004 or EventID=8007 or EventID=8022 or 
+      EventID=8025 or EventID=8027 or EventID=8029 or 
+      EventID=8032 or EventID=8034 or EventID=8036 or EventID=8040)]]
+    </Select>
+    <!-- AppLocker and App Control 5 -->
+    <Select Path="Microsoft-Windows-AppLocker/Packaged app-Execution">
+      *[System[(EventID=8004 or EventID=8007 or EventID=8022 or 
+      EventID=8025 or EventID=8027 or EventID=8029 or 
+      EventID=8032 or EventID=8034 or EventID=8036 or EventID=8040)]]
+    </Select>
+  </Query>
+</QueryList>
+```
