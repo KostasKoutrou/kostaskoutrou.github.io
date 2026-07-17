@@ -166,7 +166,7 @@ Starting with the logging of changes to configurations, an interesting and usefu
 
 Investigating these logs is useful to identify suspicious tampering of the MDAV configuration, like disabling ASR rules or Real-Time protection, as well as to troubleshoot MDAV behavior that started unexpectedly, such as to identify when an ASR rule switched from Audit mode to Block mode.
 
-In addition to Event ID there are the following Event IDs related to changing settings in Defender:
+In addition to the Event ID above, there are the following Event IDs related to changing settings in Defender:
 
 |Event ID|Description|
 |:-:|-|
@@ -176,7 +176,7 @@ In addition to Event ID there are the following Event IDs related to changing se
 |5007|The antimalware platform configuration changed.|
 |5009|Antispyware enabled: Microsoft Defender Antivirus enabled scanning for malware and other potentially unwanted software.|
 |5010|Antispyware disabled: Microsoft Defender Antivirus scanning for malware and other potentially unwanted software is disabled.|
-|5011|Malware protection enabled: Microsoft Defender Antivirus enabled scanning for viruses.|
+|5011|Malware protection enabled: Microsoft Defender Antivirus scanning for viruses is enabled.|
 |5012|Malware protection disabled: Microsoft Defender Antivirus scanning for viruses is disabled.|
 
 To search for these Event IDs, which can be found under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational**, the following XPath query can be used:
@@ -207,9 +207,9 @@ When it comes to Windows Event logs, the ASR rule events are located in the Wind
 
 |Event ID|Description|
 |:-:|-|
-|1121|Event when rule fires in block mode|
-|1122|Event when rule fires in audit mode|
-|1129|Event when user overrides block in warn mode|
+|1121|Event when ASR rule fires in block mode|
+|1122|Event when ASR rule fires in audit mode|
+|1129|Event when user overrides an ASR rule block in warn mode|
 
 The following XPath query will filter our ASR rule detections, blocks, and user overrides:
 
@@ -223,7 +223,7 @@ The following XPath query will filter our ASR rule detections, blocks, and user 
 </QueryList>
 ```
 
-If you just want to **find blocks only**, just keep Event ID 1121:
+If **blocks only** are needed, just keep Event ID 1121:
 
 ```xml
 <QueryList>
@@ -237,7 +237,7 @@ If you just want to **find blocks only**, just keep Event ID 1121:
 
 ## Controlled Folder Access (CFA)
 
-The basic idea with CFA is that you define a set of directories (folders) and a set of applications. Only that set of apps is allowed to process in any way the set of directories. For more info, click [here](https://learn.microsoft.com/en-us/defender-endpoint/controlled-folder-access-overview)
+The basic idea with CFA is that a set of directories (folders) and a set of applications are defined. Only that set of apps is allowed to process in any way the set of directories. For more info, click [here](https://learn.microsoft.com/en-us/defender-endpoint/controlled-folder-access-overview)
 
 When it comes to Windows Event logs, the CFA events are located in the Windows Event log under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational**. The following event IDs are related to CFA:
 
@@ -245,8 +245,8 @@ When it comes to Windows Event logs, the CFA events are located in the Windows E
 |:-:|-|
 |1124|Audited controlled folder access event|
 |1123|Blocked controlled folder access event|
-|1127|Controlled Folder Access blocked an untrusted process from potentially modifying disk sectors.|
-|1128|Audited controlled folder access sector write block event|
+|1127|Controlled Folder Access blocked an untrusted process from potentially modifying disk sectors. In general, these events are more severe, because they mean that an attempt was done to write directly to the hard drive, bypassing the file system.|
+|1128|Audited controlled folder access sector write block event. In general, these events are more severe, because they mean that an attempt was done to write directly to the hard drive, bypassing the file system.|
 
 The following XPath query will filter for all detection and block events:
 
@@ -307,15 +307,15 @@ The XPath query for the Event IDs above is this following:
 
 ## Exploit Protection
 
-Exploit Protection helps protect against malware that uses exploits to infect devices and spread. It consists of many mitigations that can be applied to either the whole OS or individual apps. Exploit Protection helps protect against malware that uses exploits to infect devices and spread. It consists of many mitigations that can be applied to either the whole OS or individual apps. For more info, click [here](https://learn.microsoft.com/en-us/defender-endpoint/exploit-protection).
+Exploit Protection helps protect against malware that uses exploits to infect devices and spread. It consists of many mitigations that can be applied to either the whole OS or individual apps. For more info, click [here](https://learn.microsoft.com/en-us/defender-endpoint/exploit-protection).
 
 When it comes to Windows Event logs, most Exploit Protection events are located in the Windows Event log under **Security-Mitigations > Kernel Mode and Security-Mitigations > User Mode**, while some are located in **WER-Diagnostics > Operational** and **Win32k > Operational**. The following event IDs are related to CFA:
 
 **Security-Mitigations > Kernel Mode** and **Security-Mitigations > User Mode**
 |Event ID|Description|
 |:-:|-|
-|1|ACG audit|
-|2|ACG enforce|
+|1|Arbitrary Code Guard (ACG) audit|
+|2|rbitrary Code Guard (ACG) enforce|
 |3|Don't allow child processes audit|
 |4|Don't allow child processes block|
 |5|Block low integrity images audit|
@@ -326,23 +326,23 @@ When it comes to Windows Event logs, most Exploit Protection events are located 
 |10|Disable win32k system calls block|
 |11|Code integrity guard audit|
 |12|Code integrity guard block|
-|13|EAF audit|
-|14|EAF enforce|
-|15|EAF+ audit|
-|16|EAF+ enforce|
-|17|IAF audit|
-|18|IAF enforce|
-|19|ROP StackPivot audit|
-|20|ROP StackPivot enforce|
-|21|ROP CallerCheck audit|
-|22|ROP CallerCheck enforce|
-|23|ROP SimExec audit|
-|24|ROP SimExec enforce|
+|13|Export Address Filtering (EAF) audit|
+|14|Export Address Filtering (EAF) enforce|
+|15|Export Address Filtering+ (EAF+) audit|
+|16|Export Address Filtering+ (EAF+) enforce|
+|17|Import Address Filtering (IAF) audit|
+|18|Import Address Filtering (IAF) enforce|
+|19|Return-Oriented Programming (ROP) StackPivot audit|
+|20|Return-Oriented Programming (ROP) StackPivot enforce|
+|21|Return-Oriented Programming (ROP) CallerCheck audit|
+|22|Return-Oriented Programming (ROP) CallerCheck enforce|
+|23|Return-Oriented Programming (ROP) SimExec audit|
+|24|Return-Oriented Programming (ROP) SimExec enforce|
 
 **WER-Diagnostics > Operational**
 |Event ID|Description|
 |:-:|-|
-|5|CFG Block|
+|5|Control Flow Guard (CFG) Block|
 
 **Win32k > Operational**
 |Event ID|Description|
