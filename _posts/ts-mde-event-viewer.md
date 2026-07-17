@@ -397,7 +397,7 @@ For blocks only, the following XPath query can be used:
 
 ## Network Protection, Web Protection, and SmartScreen
 
-The combination of Network Protection, Web Protection, and SmartScreen provide the ability to block access to malicious websites, custom indicators, and web content filtering. For info, click [here](https://learn.microsoft.com/en-us/defender-endpoint/network-protection).
+The combination of Network Protection, Web Protection, and SmartScreen provides the ability to block access to malicious websites, custom indicators, and web content filtering. For more info, click [here](https://learn.microsoft.com/en-us/defender-endpoint/network-protection).
 
 When it comes to Windows Event logs, the Network Protection events are located in the Windows Event log under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational**. The following event IDs are related to Network Protection:
 
@@ -405,6 +405,8 @@ When it comes to Windows Event logs, the Network Protection events are located i
 |:-:|-|
 |1125|Event when network protection fires in audit mode|
 |1126|Event when network protection fires in block mode|
+
+The following XPath query can be used to detect these events:
 
 ```xml
 <QueryList>
@@ -462,7 +464,7 @@ Regarding Event IDs, there is a thorough documentation [here](https://learn.micr
 |1015|The antimalware platform detected suspicious behavior.|
 |1119|The antimalware platform encountered a critical error when trying to take action on malware or other potentially unwanted software.|
 
-These Event IDs are logged under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational.**
+These Event IDs are logged under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational.** Regarding the first Event IDs couples, they log  the same event, but the 100x ones are older Event IDs for Windows 7, Windows 8, while the 111x ones are the new ones introduced in Windows 10.
 
 The XPath query to filter for those events is the following:
 
@@ -478,7 +480,7 @@ The XPath query to filter for those events is the following:
 </QueryList>
 ```
 
-As described in the Event IDs table, these events log also events of Potentially Unwanted Software/Applications (PUA). If only events **not** related to PUA are needed, the following XPath query can be used:
+As described in the Event IDs table, these events log also events of Potentially Unwanted Software/Applications (PUA). If the events **not** related to PUA are needed, an additional filter is needed to be applied in the "Category Name" field of the EventData. The following XPath query can be used:
 
 ```xml
 <QueryList>
@@ -501,7 +503,7 @@ PUA is a category of software that can:
 - Display unexpected apps
 - Install other software that might be unwanted
 
-For more info, click [here](https://learn.microsoft.com/en-us/defender-endpoint/detect-block-potentially-unwanted-apps-microsoft-defender-antivirus)
+For more info, click [here](https://learn.microsoft.com/en-us/defender-endpoint/detect-block-potentially-unwanted-apps-microsoft-defender-antivirus).
 
 As mentioned in the previous section, PUA is logged under the same Event IDs as MDAV. Therefore, if events related only PUA are needed, an additional filter is needed to be applied in the "Category Name" field of the EventData. The XPath query that can be used is the following:
 
