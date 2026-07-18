@@ -751,7 +751,7 @@ If there is no certainty as to which Defender feature may have blocked something
     <Select Path="Microsoft-Windows-Windows Defender/Operational">
     *[System[(EventID=1125 or EventID=1126)]]
     </Select>
-    <!-- Microsoft Defender Antivirus blocks and detections -->
+    <!-- Microsoft Defender Antivirus and PUA blocks and detections -->
     <Select Path="Microsoft-Windows-Windows Defender/Operational">
       *[System[(EventID=1006 or EventID=1007 or EventID=1008 or
       EventID=1011 or EventID=1012 or EventID=1015 or EventID=1116 or
