@@ -284,7 +284,7 @@ For blocks only, use the following:
 
 [Device Control](https://learn.microsoft.com/en-us/defender-endpoint/device-control-overview) enables controls related to usage and installation of peripheral (USB/Bluetooth) or other devices on endpoints.
 
-When it comes to Windows Event logs, for Device Control there is no specific set of events or a specific path where all the events reside. It is more complicated to identify block events. I could not find any specific set of events to look for to ensure all Device Control events are monitored. The most relevant events are logged under
+When it comes to Windows Event logs, for Device Control there is no specific set of events or a specific path where all the events reside. It is more complicated to identify block events. I could not find an exhaustive set of events to look for to ensure all Device Control events are monitored. The most relevant events are logged under
 
 - **Security**
 - **Microsoft > Windows > Kernel > PnP > Configuration**
@@ -541,10 +541,10 @@ As mentioned in the previous section, **PUA is logged under the same Event IDs a
 
 When it comes to Windows Events, **AppLocker** logs events under **Application and Services Logs > Microsoft > Windows > AppLocker**, while **App Control** logs its events under the AppLocker path as well as **Application and Services Logs > Microsoft > Windows > CodeIntegrity > Operational**.
 
-The events are quite granular, where there are categories based on
+The events are quite granular, with categories based on
 
 - the file type of the event
-- whether the file that is about to be ran is there because of a Managed Installer (Intune, SCCM, etc.)
+- whether the file that is about to run is there because of a Managed Installer (Intune, SCCM, etc.)
 - the feature that is controlling the file execution (AppLocker or WDAC)
 
 More info:
@@ -604,7 +604,7 @@ Lastly, for running files installed via a **Managed Installer** (Intune, SCCM, e
 1. The [SmartlockerFilter](https://revertservice.com/10/applockerfltr/) driver that watches the installations and identifies files created by authorized installers
 2. The [AppID](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/applocker/configure-the-application-identity-service) service that verifies the tags.
 
-These components are used to trust Managed Installers, and track applications which exist in the machine because of a Managed Installer. They can then be used either by AppLocker itself or by App Control to allow or block the execution of Managed Installer managed applications. In this case, the following events are of interest:
+These components are used to trust Managed Installers, and track applications which exist on the machine because of a Managed Installer. They can then be used either by AppLocker itself or by App Control to allow or block the execution of Managed Installer managed applications. In this case, the following events are of interest:
 
 |Event ID|Explanation|
 |:-:|-|
@@ -710,7 +710,7 @@ When it comes to Microsoft Defender for Endpoint (MDE) itself, SENSE is the inte
 
 ### General XPath query for all detections
 
-Because sometimes there is no certainty as to which Defender feature may have blocked something, or the need may be to prove that Defender did not actually block anything, the following XPath query filters for any **block or detection event** done by any Defender feature:
+If there is no certainty as to which Defender feature may have blocked something, or the need may be to prove that Defender did not actually block anything, the following XPath query filters for any **block or detection event** done by any Defender feature:
 
 ```xml
 <QueryList>
@@ -891,9 +891,9 @@ For **only block** events, use the following XPath query:
 
 Sometimes, it is complicated to understand what Defender blocked, when, and why the block happened. Having tools like Windows Events or Defender Advanced Hunting logs does help, but there is an overwhelming amount of logs.
 
-By creating a few queries ready to be used and filter for only the needed events, it cuts a few steps in the troubleshooting process and makes it a little bit quicker. This post focused on making such queries for the Windows Events.
+Having a few queries ready to be used and filter for only the needed events cuts a few steps in the troubleshooting process. This post focused on making such queries for the Windows Events.
 
-Hopefully they will be used and help with issues appearing related to Defender, or to prove that Defender was not an issue.
+Hopefully these queries will help towards solving issues related to Defender, or to prove that Defender was not an issue.
 
 Thank you for being here.
 
