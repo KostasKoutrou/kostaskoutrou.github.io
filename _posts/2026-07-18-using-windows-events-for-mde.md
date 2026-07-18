@@ -497,7 +497,7 @@ As described in the Event IDs table, **these events log also events of Potential
 <QueryList>
   <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
    <Select Path="Microsoft-Windows-Windows Defender/Operational">
-    *[EventData[Data[@Name='Category Name']!='Potentially Unwanted Software'] and 
+    *[not(EventData[Data[@Name='Category Name']='Potentially Unwanted Software'])] and 
     System[(EventID=1006 or EventID=1007 or EventID=1008 or EventID=1011 or 
     EventID=1012 or EventID=1015 or EventID=1116 or EventID=1117 or 
     EventID=1118 or EventID=1119)]]
