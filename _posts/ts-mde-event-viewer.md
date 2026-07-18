@@ -149,6 +149,10 @@ If you have saved any of the XPath queries as XML files, you can directly import
 
 <img alt="image" src="https://github.com/user-attachments/assets/a01dc539-1f02-4046-ace8-56a72dd01539" />
 
+After importing the custom view, you can export the results to a CSV, txt, XML, or EVTX (Event Files) format by clicking on `Save All Events in Custom View As...`:
+
+<img alt="image" src="https://github.com/user-attachments/assets/4cc67355-9e5c-45b9-9572-52888c83e356" />
+
 In the next sections, XPath queries are provided for each Defender feature. These can be used to facilitate troubleshooting towards identifying false positive detections and blocks. More details on the specific XPath queries are found in the sections below.
 
 ## Demo Files
@@ -207,11 +211,11 @@ When it comes to Windows Event logs, the ASR rule events are located in the Wind
 
 |Event ID|Description|
 |:-:|-|
-|1121|Event when ASR rule fires in block mode|
-|1122|Event when ASR rule fires in audit mode|
-|1129|Event when user overrides an ASR rule block in warn mode|
+|1121|Event when an ASR rule fires in block mode|
+|1122|Event when an ASR rule fires in audit mode|
+|1129|Event when the user overrides an ASR rule block in warn mode|
 
-The following XPath query will filter our ASR rule detections, blocks, and user overrides:
+The following XPath query will search for ASR rule detections, blocks, and user overrides:
 
 ```xml
 <QueryList>
@@ -239,13 +243,13 @@ If **blocks only** are needed, just keep Event ID 1121:
 
 The basic idea with CFA is that a set of directories (folders) and a set of applications are defined. Only that set of apps is allowed to process in any way the set of directories. For more info, click [here](https://learn.microsoft.com/en-us/defender-endpoint/controlled-folder-access-overview)
 
-When it comes to Windows Event logs, the CFA events are located in the Windows Event log under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational**. The following event IDs are related to CFA:
+When it comes to Windows Event logs, the CFA events are located under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational**. The following event IDs are related to CFA:
 
 |Event ID|Description|
 |:-:|-|
 |1124|Audited controlled folder access event|
 |1123|Blocked controlled folder access event|
-|1127|Controlled Folder Access blocked an untrusted process from potentially modifying disk sectors. In general, these events are more severe, because they mean that an attempt was done to write directly to the hard drive, bypassing the file system.|
+|1127|Controlled Folder Access blocked an untrusted process from potentially modifying disk sectors. In general, these events are more severe, because they mean that an attempt was made to write directly to the hard drive, bypassing the file system.|
 |1128|Audited controlled folder access sector write block event. In general, these events are more severe, because they mean that an attempt was done to write directly to the hard drive, bypassing the file system.|
 
 The following XPath query will filter for all detection and block events:
@@ -349,7 +353,7 @@ When it comes to Windows Event logs, most Exploit Protection events are located 
 |:-:|-|
 |260|Untrusted Font|
 
-The following XPath query will filter for all detection and block events:
+The following XPath query will filter for all detection and block events for Exploit Protection:
 
 ```xml
 <QueryList>
@@ -522,15 +526,18 @@ As mentioned in the previous section, PUA is logged under the same Event IDs as 
 
 ## App Control for Business and AppLocker
 
-[AppLocker](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/applocker/applocker-overview) helps control which apps and files users can run. [App Control for Business](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/appcontrol-and-applocker-overview) also known as **Windows Defender Application Control** (WDAC), formerly known as **Configurable Code Integrity ** (CCI), is a newer solution for the same purpose, and provides more granular controls.
+[AppLocker](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/applocker/applocker-overview) helps control which apps and files users can run. [App Control for Business](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/appcontrol-and-applocker-overview) also known as **Windows Defender Application Control** (WDAC), formerly known as **Configurable Code Integrity** (CCI), is a newer solution for the same purpose, and provides more granular controls.
 
-When it comes to Windows Events, AppLocker logs events under **Application and Services Logs > Microsoft > Windows > AppLocker**, while App Control logs most events under . The events are quite granular, where there are categories based on
+When it comes to Windows Events, AppLocker logs events under **Application and Services Logs > Microsoft > Windows > AppLocker**, while App Control logs its events under the AppLocker path as well as **Application and Services Logs > Microsoft > Windows > CodeIntegrity > Operational**. The events are quite granular, where there are categories based on
 
-- the the file type of the event
+- the file type of the event
 - whether the file that is about to be ran is there because of a Managed Installer (Intune, SCCM, etc.)
 - the feature that is controlling the file execution (AppLocker or WDAC)
 
-More info regarding [AppLocker events](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/applocker/using-event-viewer-with-applocker) and [App Control for business events](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/operations/event-id-explanations), follow the corresponding links.
+More info:
+
+- [AppLocker events](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/applocker/using-event-viewer-with-applocker)
+- [App Control for Business events](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/operations/event-id-explanations)
 
 For AppLocker only, the following Event IDs are of interest:
 
@@ -553,7 +560,7 @@ For AppLocker only, the following Event IDs are of interest:
 |8025|File was prevented from installing. (packaged apps .appx, .msix)|
 |8027|No packaged apps can be executed while Exe rules are being enforced and no Packaged app rules have been configured.|
 
-For WDAC only, the following Event IDs are of interest (the table information was taken from Microsoft's documentation regarding [Understanding App Control events](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/operations/event-id-explanations):
+For App Control only, the following Event IDs are of interest (the table information was taken from the previously providing link regarding [Understanding App Control events](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/operations/event-id-explanations):
 
 |Event ID|Description|
 |:-:|-|
@@ -579,7 +586,12 @@ There are also some logs under **Applications and Services logs > Microsoft > Wi
 |3091|This event indicates that a file didn't have ISG or managed installer authorization and the App Control policy is in audit mode.|
 |3092|This event is the enforcement mode equivalent of 3091.|
 
-Lastly, for running files installed via a Managed Installer (Intune, SCCM, etc.), there are some events which are AppLocker events. More specifically, the Managed Installer feature was initially built for AppLocker. The [SmartlockerFilter](https://revertservice.com/10/applockerfltr/) driver that watches the installations and identifies files created by authorized installers, and the [AppID](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/applocker/configure-the-application-identity-service) service that verifies the tags are AppLocker components. This component is used to trust Managed Installers, and tracks applications which exist in the machine because of a Managed Installer. This component can then be used either by AppLocker itself or by App Control to allow or block the execution of Managed Installer managed applications. In this case, the following events are of interest:
+Lastly, for running files installed via a Managed Installer (Intune, SCCM, etc.), there are some events which are AppLocker events, but may be triggered by either AppLocker or App Control. More specifically, the Managed Installer feature was initially built for AppLocker. The following two are AppLocker components:
+
+1. The [SmartlockerFilter](https://revertservice.com/10/applockerfltr/) driver that watches the installations and identifies files created by authorized installers
+2. The [AppID](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/applocker/configure-the-application-identity-service) service that verifies the tags.
+
+These components are used to trust Managed Installers, and track applications which exist in the machine because of a Managed Installer. They can then be used either by AppLocker itself or by App Control to allow or block the execution of Managed Installer managed applications. In this case, the following events are of interest:
 
 |Event ID|Explanation|
 |:-:|-|
@@ -590,7 +602,7 @@ Lastly, for running files installed via a Managed Installer (Intune, SCCM, etc.)
 |8034|ManagedInstaller Script check FAILED during Appid verification of *. A script tried to run, but it lacked the hidden stamp from the trusted Managed Installer. The script is blocked.|
 |8035|ManagedInstaller Script check SUCCEEDED during Appid verification of *. A script tried to run, Windows found the hidden stamp by the trusted Managed Installer, and the script is allowed to run.|
 
-For AppLocker, the XPath query that can be used is the following:
+For `AppLocker`, the XPath query that can be used is the following:
 
 ```xml
 <QueryList>
@@ -620,7 +632,7 @@ For AppLocker, the XPath query that can be used is the following:
 ```
 
 
-For App Control, the XPath query that can be used is the following:
+For `App Control`, the XPath query that can be used is the following:
 
 ```xml
 <QueryList>
@@ -685,14 +697,12 @@ For blocks only, for both features, the following XPath query can be used:
 
 ## MDE
 
-When it comes to Microsoft Defender for Endpoint (MDE) itself, SENSE is the internal name used to refer to the behavioral sensor that powers MDE. The Windows Events created for SENSE can be found under the path **Applications and Services Logs > Microsoft > Windows > SENSE > Operational**. Information about the events created can be found in Microsoft's documentation [Review events and errors using Event Viewer](https://learn.microsoft.com/en-us/defender-endpoint/event-error-codes
+When it comes to Microsoft Defender for Endpoint (MDE) itself, SENSE is the internal name used to refer to the behavioral sensor that powers MDE. The Windows Events created for SENSE can be found under the path **Applications and Services Logs > Microsoft > Windows > SENSE > Operational**. Information about the events created can be found in Microsoft's documentation: [Review events and errors using Event Viewer](https://learn.microsoft.com/en-us/defender-endpoint/event-error-codes
 ). The events created are only useful for troubleshooting purposes related to the SENSE service not operating as expected, but they are not related to any blocking activities. Therefore, they will not be documented in this post.
 
 ## General XML for all detections
 
-add all block event IDs in one query, and try to put an easy filter for date and time range and maybe see if you can put a name filter to search for specific applications.
-
-no defender changes logging, no tamper protection
+Because sometimes there is no certainty as to which Defender feature may have blocked something, or the need may be to prove that Defender did not actually block anything, the following XPath query filters for any block event done by any Defender feature:
 
 ```xml
 <QueryList>
@@ -775,3 +785,13 @@ no defender changes logging, no tamper protection
 ```
 
 ##Conclusion
+
+Sometimes, it is complicated to understand what Defender blocked, when, and why the block happened. Having tools like Windows Events or Defender Advanced Hunting logs does help, but there is an overwhelming amount of logs.
+
+By creating a few queries ready to be used and filter for only the needed events, it cuts a few steps in the troubleshooting process and makes it a little bit quicker. This post focused on making such queries for the Windows Events.
+
+Hopefully they will be used and help with issues appearing related to Defender, or to prove that Defender was not an issue.
+
+Thank you for being here.
+
+On to the next one!
