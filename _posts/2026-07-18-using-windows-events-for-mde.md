@@ -322,7 +322,7 @@ When it comes to Windows Event logs, most Exploit Protection events are located 
 |Event ID|Description|
 |:-:|-|
 |**1**|Arbitrary Code Guard (ACG) audit|
-|**2**|rbitrary Code Guard (ACG) enforce|
+|**2**|Arbitrary Code Guard (ACG) enforce|
 |**3**|Don't allow child processes audit|
 |**4**|Don't allow child processes block|
 |**5**|Block low integrity images audit|
