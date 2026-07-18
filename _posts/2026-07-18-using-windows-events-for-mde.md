@@ -237,7 +237,7 @@ If **blocks only** are needed, just keep Event ID 1121:
 <QueryList>
   <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
    <Select Path="Microsoft-Windows-Windows Defender/Operational">
-    *[System[(EventID=1121)]
+    *[System[(EventID=1121)]]
    </Select>
   </Query>
 </QueryList>
@@ -497,14 +497,18 @@ As described in the Event IDs table, **these events log also events of Potential
 <QueryList>
   <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
    <Select Path="Microsoft-Windows-Windows Defender/Operational">
-    *[not(EventData[Data[@Name='Category Name']='Potentially Unwanted Software'])] and 
-    System[(EventID=1006 or EventID=1007 or EventID=1008 or EventID=1011 or 
+    *[System[(EventID=1006 or EventID=1007 or EventID=1008 or EventID=1011 or 
     EventID=1012 or EventID=1015 or EventID=1116 or EventID=1117 or 
     EventID=1118 or EventID=1119)]]
    </Select>
+   <Suppress Path="Microsoft-Windows-Windows Defender/Operational">
+    *[EventData[Data[@Name='Category Name']='Potentially Unwanted Software']]
+   </Suppress>
   </Query>
 </QueryList>
 ```
+
+The reason that the `<Suppress>` tag is used instead of filter with a `EventData[Data[@Name='Category Name']!='Potentially Unwanted Software']` condition with a `!=` is that if there is an event that does not have a "Category Name", then the condition would output `false`, removing that log from the query results.
 
 ### Potentially Unwanted Apps (PUA)
 
