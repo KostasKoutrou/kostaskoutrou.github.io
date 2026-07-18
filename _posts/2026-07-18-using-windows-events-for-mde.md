@@ -99,7 +99,7 @@ Every Windows Event log is divided into two main sections:
 
 ### XPath queries
 
-A great thing about the Windows Event Viewer is that **all of its logs are stored as XML data with the strictly enforced XML schema** depicted previously. This allows to creat custom views using XPath queries, where only the needed events are filtered. XPath (XML Path Language) is a query language used to find and extract specific information from an XML document.
+A great thing about the Windows Event Viewer is that **all of its logs are stored as XML data with the strictly enforced XML schema** depicted previously. This allows to create custom views using XPath queries, where only the needed events are filtered. XPath (XML Path Language) is a query language used to find and extract specific information from an XML document.
 
 Using XPath allows for creating shareable filtered **views where only the detections and blocks done by Defender are shown**, which results in similar reports to the ones created using the KQL queries shown in the previous post [Using KQL to identify detections from MDE - Getting to know MDE Part 2](https://kostaskoutrou.github.io/2026/01/06/using-kql-for-mde.html).
 
@@ -116,7 +116,7 @@ All the XPath queries used here have the following format:
 
 The only difference between the queries are **Windows Event channel paths** and the **Event IDs** searched for. To not repeat the explanation of the query under each section, a general explanation is provided here:
 
-1. `Query Id="0" Path="..."`:Default path to look for is "Microsoft-Windows-Windows Defender/Operational". This is needed to be stated even though other paths are specified below because the schema rules dictate that this container must declare a starting point. Even if you try to skip it, when you save the Custom View in Windows Event Viewer, a path will be added automatically.
+1. `Query Id="0" Path="..."`: Default path to look for is "Microsoft-Windows-Windows Defender/Operational". This is needed to be stated even though other paths are specified below because the schema rules dictate that this container must declare a starting point. Even if you try to skip it, when you save the Custom View in Windows Event Viewer, a path will be added automatically.
 2. `Select Path="Microsoft-Windows-Windows Defender/Operational">`: Search in the path "Microsoft-Windows-Windows Defender/Operational"
 3. `*[System[(EventID=... or EventID=... or EventID=...)]]`:
   1. `*`: Search at any root event, i.e., grab all events in the log as a starting point.
@@ -429,7 +429,7 @@ The following XPath query can be used to detect these events:
 </QueryList>
 ```
 
-If only the **block events** are needed, the audit events can be emitted:
+If only the **block events** are needed, the audit events can be omitted:
 
 ```xml
 <QueryList>
@@ -475,7 +475,7 @@ Regarding Event IDs, there is a thorough documentation [here](https://learn.micr
 |**1015**|The antimalware platform **detected suspicious behavior**.|
 |**1119**|The antimalware platform encountered a **critical error when trying to take action** on malware or other potentially unwanted software.|
 
-Regarding the first Event IDs couples, they log  the same event, but the 100x ones are older Event IDs for Windows 7, Windows 8, while the 111x ones are the new ones introduced in Windows 10. All these Event IDs are logged under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational.** 
+Regarding the first pair of Event IDs, they log  the same event, but the 100x ones are older Event IDs for Windows 7, Windows 8, while the 111x ones are the new ones introduced in Windows 10. All these Event IDs are logged under **Applications and Services Logs > Microsoft > Windows > Windows Defender > Operational.** 
 
 The XPath query to filter for those events is the following:
 
@@ -508,7 +508,7 @@ As described in the Event IDs table, **these events log also events of Potential
 </QueryList>
 ```
 
-The reason that the `<Suppress>` tag is used instead of filter with a `EventData[Data[@Name='Category Name']!='Potentially Unwanted Software']` condition with a `!=` is that if there is an event that does not have a "Category Name", then the condition would output `false`, removing that log from the query results.
+The reason that the `<Suppress>` tag is used instead of filtering with a `EventData[Data[@Name='Category Name']!='Potentially Unwanted Software']` condition with a `!=` is that if there is an event that does not have a "Category Name", then the condition would output `false`, removing that log from the query results.
 
 ### Potentially Unwanted Apps (PUA)
 
@@ -541,7 +541,7 @@ As mentioned in the previous section, **PUA is logged under the same Event IDs a
 
 When it comes to Windows Events, **AppLocker** logs events under **Application and Services Logs > Microsoft > Windows > AppLocker**, while **App Control** logs its events under the AppLocker path as well as **Application and Services Logs > Microsoft > Windows > CodeIntegrity > Operational**.
 
-The events are quite granular, with categories based on
+The events are quite granular, with categories based on:
 
 - the file type of the event
 - whether the file that is about to run is there because of a Managed Installer (Intune, SCCM, etc.)
@@ -589,7 +589,7 @@ There are also some logs under **Applications and Services logs > Microsoft > Wi
 
 |Event ID|Explanation|
 |:-:|-|
-|**3004**|This event isn't common and may occur with or without an App Control policy present. It typically indicates a **kernel driver tried to load with an invalid signature**. For example, the file may not be WHQL-signed ([Windows Hardware Quality Labs](https://learn.microsoft.com/en-us/windows-hardware/drivers/install/whql-test-signature-program)) on a system where WHQL is required.  This event is also seen for kernel- or user-mode code that the developer opted-in to (/INTEGRITYCHECK)[https://learn.microsoft.com/en-us/cpp/build/reference/integritycheck-require-signature-check?view=msvc-170] but isn't signed correctly.|
+|**3004**|This event isn't common and may occur with or without an App Control policy present. It typically indicates a **kernel driver tried to load with an invalid signature**. For example, the file may not be WHQL-signed ([Windows Hardware Quality Labs](https://learn.microsoft.com/en-us/windows-hardware/drivers/install/whql-test-signature-program)) on a system where WHQL is required.  This event is also seen for kernel- or user-mode code that the developer opted-in to [/INTEGRITYCHECK](https://learn.microsoft.com/en-us/cpp/build/reference/integritycheck-require-signature-check?view=msvc-170) but isn't signed correctly.|
 |**3033**|This event may occur with or without an App Control policy present and **should occur alongside a 3077 event** if caused by App Control policy. It often means the file's signature is revoked or a signature with the Lifetime Signing EKU has expired. Presence of the Lifetime Signing EKU is the only case where App Control blocks files due to an expired signature. Try using option 20 Enabled:Revoked Expired As Unsigned in your policy along with a rule (for example, hash) that doesn't rely on the revoked or expired cert.  This event also occurs if code compiled with Code Integrity Guard (CIG) tries to load other code that doesn't meet the CIG requirements.|
 |**3034**|This event isn't common. It's the audit mode equivalent of event 3033.|
 |**3076**|This event is the main App Control block event for **audit** mode policies. It indicates that the file would have been blocked if the policy was enforced.|
@@ -891,7 +891,7 @@ For **only block** events, use the following XPath query:
 
 Sometimes, it is complicated to understand what Defender blocked, when, and why the block happened. Having tools like Windows Events or Defender Advanced Hunting logs does help, but there is an overwhelming amount of logs.
 
-Having a few queries ready to be used and filter for only the needed events cuts a few steps in the troubleshooting process. This post focused on making such queries for the Windows Events.
+Having a few queries ready to be used that filter for only the needed events cuts a few steps in the troubleshooting process. This post focused on making such queries for the Windows Events.
 
 Hopefully these queries will help towards solving issues related to Defender, or to prove that Defender was not an issue.
 
