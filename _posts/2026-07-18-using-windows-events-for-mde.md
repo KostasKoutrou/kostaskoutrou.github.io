@@ -161,7 +161,9 @@ In the next sections, XPath queries are provided for each Defender feature. Thes
 
 If there are no Events for a specific feature and there is a need to produce some for confirmation of the query working as expected, there are [demo files provided by Microsoft](https://learn.microsoft.com/en-us/defender-endpoint/defender-endpoint-demonstrations), which can be used to force Defender detections and produce Windows Events.
 
-## MDAV Changes logging
+## XPath Queries for Defender components
+
+### MDAV Changes logging
 
 Starting with the **logging of changes to configurations**, an interesting and useful event related to all Microsoft Defender Antivirus (MDAV) features is Event ID **5007** with description **"Event when settings are changed"**. A lot of events with Event ID 5007 are logged because it includes any change happening to the MDAV configuration, such as:
 
@@ -198,7 +200,7 @@ To search for these Event IDs, which can be found under **Applications and Servi
 </QueryList>
 ```
 
-## Attack Surface Reduction (ASR) rules
+### Attack Surface Reduction (ASR) rules
 
 Attack Surface Reduction (ASR) rules in MDAV protect against **risky software behavior** commonly exploited, such as:
 
@@ -241,7 +243,7 @@ If **blocks only** are needed, just keep Event ID 1121:
 </QueryList>
 ```
 
-## Controlled Folder Access (CFA)
+### Controlled Folder Access (CFA)
 
 The basic idea with CFA is that a set of directories (folders) and a set of applications are defined. Only that set of apps is allowed to process in any way the set of directories. For more info, click [here](https://learn.microsoft.com/en-us/defender-endpoint/controlled-folder-access-overview)
 
@@ -278,7 +280,7 @@ For blocks only, use the following:
 </QueryList>
 ```
 
-## Device Control
+### Device Control
 
 [Device Control](https://learn.microsoft.com/en-us/defender-endpoint/device-control-overview) enables controls related to usage and installation of peripheral (USB/Bluetooth) or other devices with endpoints.
 
@@ -311,7 +313,7 @@ The XPath query for the Event IDs above is this following:
 </QueryList>
 ```
 
-## Exploit Protection
+### Exploit Protection
 
 Exploit Protection helps protect against malware that uses exploits to infect devices and spread. It consists of many mitigations that can be applied to either the whole OS or individual apps. For more info, click [here](https://learn.microsoft.com/en-us/defender-endpoint/exploit-protection).
 
@@ -404,7 +406,7 @@ For **blocks only**, the following XPath query can be used:
 </QueryList>
 ```
 
-## Network Protection, Web Protection, and SmartScreen
+### Network Protection, Web Protection, and SmartScreen
 
 The combination of Network Protection, Web Protection, and SmartScreen provides the ability to **block access to malicious websites, custom indicators, and web content filtering**. For more info, click [here](https://learn.microsoft.com/en-us/defender-endpoint/network-protection).
 
@@ -439,7 +441,7 @@ If only the **block events** are needed, the audit events can be emitted:
 </QueryList>
 ```
 
-## Tamper Protection
+### Tamper Protection
 
 [Tamper Protection](https://learn.microsoft.com/en-us/defender-endpoint/prevent-changes-to-security-settings-with-tamper-protection) blocks any changes attempted to several MDAV settings.
 
@@ -457,7 +459,7 @@ The XPath query for this Event ID is the following:
 </QueryList>
 ```
 
-## Microsoft Defender Antivirus (MDAV) Detections
+### Microsoft Defender Antivirus (MDAV) Detections
 
 MDAV is the **core component of Defender**. With it, process creation events and file download events from the internet are monitored. It not only uses its signature-based engine, but also predictive technologies such as machine learning and cloud-delivered protection to find attacks. For more info, click [here](https://learn.microsoft.com/en-us/defender-endpoint/microsoft-defender-antivirus-windows)
 
@@ -504,7 +506,7 @@ As described in the Event IDs table, **these events log also events of Potential
 </QueryList>
 ```
 
-## Potentially Unwanted Apps (PUA)
+### Potentially Unwanted Apps (PUA)
 
 PUA is a category of software that can:
 
@@ -529,7 +531,7 @@ As mentioned in the previous section, **PUA is logged under the same Event IDs a
 </QueryList>
 ```
 
-## App Control for Business and AppLocker
+### App Control for Business and AppLocker
 
 **[AppLocker](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/applocker/applocker-overview)** helps control which apps and files users can run. **[App Control for Business](https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/appcontrol-and-applocker-overview)** also known as **Windows Defender Application Control** (WDAC), formerly known as **Configurable Code Integrity** (CCI), is a newer solution for the same purpose, and provides more granular controls.
 
@@ -697,12 +699,12 @@ For **blocks only**, for both features, the following XPath query can be used:
 </QueryList>
 ```
 
-## MDE
+### MDE
 
 When it comes to Microsoft Defender for Endpoint (MDE) itself, SENSE is the internal name used to refer to the behavioral sensor that powers MDE. The Windows Events created for SENSE can be found under the path **Applications and Services Logs > Microsoft > Windows > SENSE > Operational**. Information about the events created can be found in Microsoft's documentation: [Review events and errors using Event Viewer](https://learn.microsoft.com/en-us/defender-endpoint/event-error-codes
 ). The events created are only useful for troubleshooting purposes related to the SENSE service not operating as expected, but they are not related to any blocking activities. Therefore, they will not be documented in this post.
 
-## General XML for all detections
+### General XPath query for all detections
 
 Because sometimes there is no certainty as to which Defender feature may have blocked something, or the need may be to prove that Defender did not actually block anything, the following XPath query filters for any **block or detection event** done by any Defender feature:
 
