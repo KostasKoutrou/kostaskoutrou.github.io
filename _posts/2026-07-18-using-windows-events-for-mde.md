@@ -704,7 +704,102 @@ When it comes to Microsoft Defender for Endpoint (MDE) itself, SENSE is the inte
 
 ## General XML for all detections
 
-Because sometimes there is no certainty as to which Defender feature may have blocked something, or the need may be to prove that Defender did not actually block anything, the following XPath query filters for any block event done by any Defender feature:
+Because sometimes there is no certainty as to which Defender feature may have blocked something, or the need may be to prove that Defender did not actually block anything, the following XPath query filters for any **block or detection event** done by any Defender feature:
+
+```xml
+<QueryList>
+  <Query Id="0" Path="Microsoft-Windows-Windows Defender/Operational">
+    <!-- ASR blocks and detections -->
+    <Select Path="Microsoft-Windows-Windows Defender/Operational">
+      *[System[(EventID=1121 or EventID=1122 or EventID=1129)]]
+    </Select>
+    <!-- CFA blocks and detections -->
+    <Select Path="Microsoft-Windows-Windows Defender/Operational">
+      *[System[(EventID=1123 or EventID=1124 or EventID=1127 or EventID=1128)]]
+    </Select>
+    <!-- Device Control 1 -->
+    <Select Path="Security">
+        *[System[EventID=6423]]
+    </Select>
+    <!-- Device Control 2 -->
+    <Select Path="Microsoft-Windows-PrintService/Admin">
+       *[System[(EventID=871 or EventID=808 or EventID=215)]]
+    </Select>
+    <!-- Exploit Protection blocks and detections 1 -->
+    <Select Path="Microsoft-Windows-Security-Mitigations/KernelMode">
+      *[System[(EventID &gt;= 1 and EventID &lt;= 24) or EventID=260]]
+    </Select>
+    <!-- Exploit Protection blocks and detections 2 -->
+    <Select Path="Microsoft-Windows-Security-Mitigations/UserMode">
+      *[System[(EventID &gt;= 1 and EventID &lt;= 24) or EventID=260]]
+    </Select>
+    <!-- Exploit Protection blocks and detections 3 -->
+    <Select Path="Microsoft-Windows-Win32k/Operational">
+      *[System[(EventID &gt;= 1 and EventID &lt;= 24) or EventID=260]]
+    </Select>
+    <!-- Exploit Protection blocks and detections 4 -->
+    <Select Path="Microsoft-Windows-WER-Diagnostics/Operational">
+      *[System[(EventID &gt;= 1 and EventID &lt;= 24) or EventID=260]]
+    </Select>
+    <!-- Network Protection blocks and detections -->
+    <Select Path="Microsoft-Windows-Windows Defender/Operational">
+    *[System[(EventID=1125 or EventID=1126)]]
+    </Select>
+    <!-- Microsoft Defender Antivirus blocks and detections -->
+    <Select Path="Microsoft-Windows-Windows Defender/Operational">
+      *[System[(EventID=1006 or EventID=1007 or EventID=1008 or
+      EventID=1011 or EventID=1012 or EventID=1015 or EventID=1116 or
+      EventID=1117 or EventID=1118 or EventID=1119)]]
+    </Select>
+    <!-- AppLocker blocks and detections 1 -->
+    <Select Path="Microsoft-Windows-AppLocker/EXE and DLL">
+      *[System[(EventID &gt;= 8000 and EventID &lt;= 8008) or 
+      (EventID &gt;= 8020 and EventID &lt;= 8027) or 
+      (EventID &gt;= 8030 and EventID &lt;= 8035)]]
+    </Select>
+    <!-- AppLocker blocks and detections 2 -->
+    <Select Path="Microsoft-Windows-AppLocker/MSI and Script">
+      *[System[(EventID &gt;= 8000 and EventID &lt;= 8008) or 
+      (EventID &gt;= 8020 and EventID &lt;= 8027) or 
+      (EventID &gt;= 8030 and EventID &lt;= 8035)]]
+    </Select>
+    <!-- AppLocker blocks and detections 3 -->
+    <Select Path="Microsoft-Windows-AppLocker/Packaged app-Deployment">
+      *[System[(EventID &gt;= 8000 and EventID &lt;= 8008) or 
+      (EventID &gt;= 8020 and EventID &lt;= 8027) or 
+      (EventID &gt;= 8030 and EventID &lt;= 8035)]]
+    </Select>
+    <!-- AppLocker blocks and detections 4 -->
+    <Select Path="Microsoft-Windows-AppLocker/Packaged app-Execution">
+      *[System[(EventID &gt;= 8000 and EventID &lt;= 8008) or 
+      (EventID &gt;= 8020 and EventID &lt;= 8027) or 
+      (EventID &gt;= 8030 and EventID &lt;= 8035)]]
+    </Select>
+    <!-- App Control blocks and detections 1 -->
+    <Select Path="Microsoft-Windows-CodeIntegrity/Operational">
+      *[System[EventID=3004 or EventID=3033 or EventID=3034 or EventID=3076 or 
+      EventID=3077 or (EventID &gt;= 3089 and EventID &lt;= 3092)]]
+    </Select>
+    <!-- App Control blocks and detections 2 -->
+    <Select Path="Microsoft-Windows-AppLocker/MSI and Script">
+      *[System[EventID=8028 or EventID=8029 or
+      (EventID &gt;= 8036 and EventID &lt;= 8040)]]
+    </Select>
+    <!-- App Control blocks and detections 3 -->
+    <Select Path="Microsoft-Windows-AppLocker/Packaged app-Deployment">
+      *[System[EventID=8028 or EventID=8029 or
+      (EventID &gt;= 8036 and EventID &lt;= 8040)]]
+    </Select>
+    <!-- App Control blocks and detections 4 -->
+    <Select Path="Microsoft-Windows-AppLocker/Packaged app-Execution">
+      *[System[EventID=8028 or EventID=8029 or
+      (EventID &gt;= 8036 and EventID &lt;= 8040)]]
+    </Select>
+  </Query>
+</QueryList>
+```
+
+For **only block** events, use the following XPath query:
 
 ```xml
 <QueryList>
